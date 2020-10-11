@@ -166,7 +166,7 @@ class Laikago(object):
             self._leg_masses_urdf.append(
                 self._pybullet_client.getDynamicsInfo(self.quadruped, leg_id)[0])
 
-    def GetBaseMassesFromURDF(self):
+    def GetBaseMassFromURDF(self):
         return self._base_mass_urdf
 
     def SetBaseMass(self, base_mass):
@@ -199,17 +199,17 @@ class Laikago(object):
     def SetBaseInertia(self, base_inertia):
         for chassis_id, chassis_inertia in zip(self._chassis_link_ids, base_inertia):
             self._pybullet_client.changeDynamics(
-                self.quadruped, chassis_id, localInertiaDiagnoal=chassis_inertia)
+                self.quadruped, chassis_id, localInertiaDiagonal=chassis_inertia)
 
-    def GetLegInertiaFromURDF(self):
+    def GetLegInertiasFromURDF(self):
         return self._leg_inertia_urdf
 
-    def SetLegInertia(self, leg_inertias):
+    def SetLegInertias(self, leg_inertias):
         for leg_id, leg_inertia in zip(self._chassis_link_ids, leg_inertias):
             self._pybullet_client.changeDynamics(
-                self.quadruped, leg_id, localInertiaDiagnoal=leg_inertia)
+                self.quadruped, leg_id, localInertiaDiagonal=leg_inertia)
 
-    def GetToeFriction(self):
+    def GetToeFrictionFromURDF(self):
         toe_frictions = []
         for toe_id in self._toe_link_ids:
             toe_frictions.append(
@@ -221,18 +221,12 @@ class Laikago(object):
             self._pybullet_client.changeDynamics(
                 self.quadruped, link_id, lateralFriction=toe_friction)
 
-    def GetJointFriction(self):
-        joint_frictions = []
-        for joint_id in self._movable_joint_ids:
-            joint_frictions.append(self._pybullet_client.getJointStates(self.quadruped, self._movable_joint_ids)[7])
-        return joint_frictions
-
     def SetJointFriction(self, joint_frictions):
         for joint_id, friction in zip(self._movable_joint_ids, joint_frictions):
             self._pybullet_client.setJointMotorControl2(
                 bodyIndex=self.quadruped,
                 jointIndex=joint_id,
-                controlMode=self._pybullet_client.TORQUE_CONTROL,
+                controlMode=self._pybullet_client.VELOCITY_CONTROL,
                 targetVelocity=0,
                 force=friction)
 
@@ -408,7 +402,7 @@ class Laikago(object):
         print(self._leg_inertia_urdf)
 
 if __name__ == '__main__':
-    pyb = bullet_client.BulletClient(connection_mode=pybullet.GUI)
+    pyb = bullet_client.BulletClient(connection_mode=pybullet.DIRECT)
     pyb.setGravity(0, 0, -10)
     pyb.setAdditionalSearchPath(pd.getDataPath())
     ground = pyb.loadURDF("plane_implicit.urdf")
@@ -417,5 +411,4 @@ if __name__ == '__main__':
     laikago.PrintLaikagoInfo()
 
     while True:
-        laikago.Step([100,100,100,0,0,0,0,0,0,0,0,0])
-        laikago.GetToeContacts()
+        laikago.Reset()

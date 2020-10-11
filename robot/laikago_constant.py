@@ -42,4 +42,14 @@ STAND_MOTOR_ANGLES = np.array([0, 40, -75,
                    0, 40, -75,
                    0, 40, -75]) * np.pi / 180
 
+"""
+Randomization:随机化分为两部分，一部分是观测的随机，另一部分是动力学参数的随机。
+"""
+
 SENSOR_NOISE_STDDEV = {'IMU_angle': 0.1, 'IMU_rate': 0.1, 'motor_angle': 0.1, 'motor_velocity': 0.1}
+# related bound
+MASS_BOUND = [0.8, 1.2]
+INERTIA_BOUND = [0.5, 1.5]
+# abstract bound
+JOINT_F_BOUND = [0, 0.1]
+TOE_F_BOUND = [0.5, 1.25]
