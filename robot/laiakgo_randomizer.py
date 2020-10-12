@@ -16,37 +16,37 @@ class LaikagoRobotRandomizer(object):
 
 
     def randomize(self):
-        base_mass = self.laikago.GetBaseMassFromURDF()
+        base_mass = self.laikago.get_base_mass_from_urdf()
         randomized_base_mass = random.uniform(
             np.array(base_mass) * (1.0 + self.mass_bound[0]),
             np.array(base_mass) * (1.0 + self.mass_bound[1]))
-        self.laikago.SetBaseMass(randomized_base_mass)
+        self.laikago.set_base_mass(randomized_base_mass)
 
-        leg_masses = self.laikago.GetLegMassesFromURDF()
+        leg_masses = self.laikago.get_leg_masses_from_urdf()
         randomized_leg_masses = random.uniform(
             np.array(leg_masses) * (1.0 + self.mass_bound[0]),
             np.array(leg_masses) * (1.0 + self.mass_bound[1]))
-        self.laikago.SetLegMasses(randomized_leg_masses)
+        self.laikago.set_leg_masses(randomized_leg_masses)
 
-        base_inertial = self.laikago.GetBaseInertiaFromURDF()
+        base_inertial = self.laikago.get_base_inertia_from_urdf()
         randomized_base_inertial = random.uniform(
             np.array(base_inertial) * (1.0 + self.mass_bound[0]),
             np.array(base_inertial) * (1.0 + self.mass_bound[1]))
-        self.laikago.SetBaseInertia(randomized_base_inertial)
+        self.laikago.set_base_inertia(randomized_base_inertial)
 
-        leg_inertias = self.laikago.GetLegInertiasFromURDF()
+        leg_inertias = self.laikago.get_leg_inertias_from_urdf()
         randomized_leg_inertias = random.uniform(
             np.array(leg_inertias) * (1.0 + self.mass_bound[0]),
             np.array(leg_inertias) * (1.0 + self.mass_bound[1]))
-        self.laikago.SetLegInertias(randomized_leg_inertias)
+        self.laikago.set_leg_inertias(randomized_leg_inertias)
 
         randomized_toe_friction = random.uniform(
             np.full(4, self.toe_f_bound[0]),
             np.full(4, self.toe_f_bound[1]))
-        self.laikago.SetToeFriction(randomized_toe_friction)
+        self.laikago.set_toe_friction(randomized_toe_friction)
 
         randomized_joint_fraction = random.uniform(
             np.full(12, self.joint_f_bound[0]),
             np.full(12, self.joint_f_bound[1]))
-        self.laikago.SetJointFriction(randomized_joint_fraction)
+        self.laikago.set_joint_friction(randomized_joint_fraction)
 

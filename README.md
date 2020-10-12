@@ -20,3 +20,17 @@
 
 同时，我们在这一层使用torque控制，而不使用position控制，因为我们需要自己改进PD算法，unitree公司对底层做了封装，使我们无法修改。
 通过position计算torque是transfer的任务之一。
+
+robot提供两种观测，分别是：
+- get_true_observation：真实的观测，用来计算reward
+- get_observation：添加了随机噪声的观测，用来作为神经网络的输入
+
+### transfer
+
+从这个模块之后，仿真环境和真实环境的代码都完全一样了。
+
+这个模块的指责主要有：
+- 通过更上层模块（Builder）返回的position计算torque控制电机
+- 积累robot的历史数据帮助agent处理POMDP的问题
+- 通过底层的observation计算更多的obs，给reward的计算提供接口
+

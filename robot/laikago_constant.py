@@ -1,7 +1,9 @@
 import re
 import numpy as np
-
-URDF_FILE = './laikago_urdf/laikago.urdf'
+import os
+ROBOT_DIR_NAME = os.path.dirname(__file__)
+URDF_DIR_NAME = os.path.join(ROBOT_DIR_NAME, 'laikago_urdf')
+URDF_FILE = os.path.join(URDF_DIR_NAME, 'laikago.urdf')
 
 NUM_MOTORS = 12
 DOFS_PER_LEG = 3
