@@ -1,4 +1,5 @@
 from robot.laikago import Laikago
+from transfer import transfer_constant
 import collections
 import numpy as np
 
@@ -7,9 +8,9 @@ class Transfer(object):
 
     def __init__(self,
                  pybullet_client,
-                 kp,
-                 kd,
-                 torque_limits,
+                 kp=transfer_constant.KP,
+                 kd=transfer_constant.KD,
+                 torque_limits=transfer_constant.TORQUE_LIMITS,
                  robot_class=Laikago,
                  history_len=1e6):
         self._pybullet_client = pybullet_client

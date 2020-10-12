@@ -49,3 +49,6 @@ class LaikagoEnv(gym.Env):
 if __name__ == '__main__':
     task = LaikagoTask()
     laikago_env = LaikagoEnv(task=task)
+
+    while True:
+        laikago_env.transfer.step()
