@@ -63,7 +63,7 @@ class Transfer(object):
     def _cal_toe_position(self):
         """Get the robot's foot position in the base frame."""
         foot_positions = []
-        foot_ids = []  # TODO: 手动添加脚的id或对urdf中的关节利用正则表达式解析
+        foot_ids = [3, 7, 11, 15]  # TODO: 最好还是检查这个id对不对
         for foot_id in foot_ids:
             foot_positions.append(self._link_pos_in_base_frame(foot_id))
 
