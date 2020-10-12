@@ -386,6 +386,7 @@ class Laikago(object):
         observation.extend(self.get_base_roll_pitch_yaw())          # [24, 27]
         observation.extend(self.get_base_roll_pitch_yaw_rate())      # [27, 30]
         observation.extend(self.get_toe_contacts())               # [30, 33]
+        return observation
 
     def print_laikago_info(self):
         print('-'*50)
