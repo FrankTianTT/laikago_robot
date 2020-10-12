@@ -7,19 +7,21 @@ import numpy as np
 class Transfer(object):
 
     def __init__(self,
-                 pybullet_client,
                  kp=transfer_constant.KP,
                  kd=transfer_constant.KD,
                  torque_limits=transfer_constant.TORQUE_LIMITS,
                  robot_class=Laikago,
+                 visual=False,
                  history_len=transfer_constant.HISTORY_LEN):
-        self._pybullet_client = pybullet_client
         self._kp = kp
         self._kd = kd
         self._torque_limits = torque_limits
-        self.laikago = robot_class(pybullet_client)
+        self.laikago = None
+        self.robot_class = robot_class
+        self.visual = visual
         self.history_len = history_len
         self.history_observation = collections.deque(maxlen=history_len)
+        self.laikago = self.robot_class(visual=self.visual)
 
     def step(self, pos_action):
         """
@@ -27,7 +29,8 @@ class Transfer(object):
         :param action: 这个action是上层传过来的，应该是position
         :return:
         """
-        torque_action = self.position2torque(pos_action)
+        # torque_action = self.position2torque(pos_action)
+        torque_action = np.zeros(12)
         obs = self.laikago.step(torque_action)
         self.history_observation.appendleft(obs)
         return self.history_observation

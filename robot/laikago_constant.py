@@ -5,6 +5,10 @@ ROBOT_DIR_NAME = os.path.dirname(__file__)
 URDF_DIR_NAME = os.path.join(ROBOT_DIR_NAME, 'laikago_urdf')
 URDF_FILE = os.path.join(URDF_DIR_NAME, 'laikago.urdf')
 
+CAMERA_SETTING = {'camera_distance': 2.0,
+                  'camera_yaw': 0,
+                  'camera_pitch': -30}
+TIME_STEP = 0.025
 NUM_MOTORS = 12
 DOFS_PER_LEG = 3
 

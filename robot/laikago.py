@@ -11,8 +11,9 @@ import collections
 
 class Laikago(object):
     def __init__(self,
-                 pybullet_client,
-                 time_step=0.01,
+                 visual=False,
+                 camera_setting=laikago_constant.CAMERA_SETTING,
+                 time_step=laikago_constant.TIME_STEP,
                  num_motors=laikago_constant.NUM_MOTORS,
                  dofs_per_leg=laikago_constant.DOFS_PER_LEG,
                  urdf_filename=laikago_constant.URDF_FILE,
@@ -22,7 +23,13 @@ class Laikago(object):
                  randomized=True,
                  observation_noise_stdev=laikago_constant.SENSOR_NOISE_STDDEV,
                  control_latency=0.0):
-        self._pybullet_client = pybullet_client
+        self.visual = visual
+        if self.visual:
+            self._pybullet_client = bullet_client.BulletClient(connection_mode=pybullet.GUI)
+        else:
+            self._pybullet_client = bullet_client.BulletClient(connection_mode=pybullet.DIRECT)
+        self._pybullet_client.setAdditionalSearchPath(pd.getDataPath())
+        self.camera_setting = camera_setting
         self.time_step = time_step
         self.num_motors = num_motors
         self.num_legs = num_motors / dofs_per_leg
@@ -41,20 +48,36 @@ class Laikago(object):
         self._observation_history = collections.deque(maxlen=100)
         self._control_observation = []
 
-        self.reset()
+        self.reset(init_reset=True)
         self.receive_observation()
 
-    def reset(self):
+    def reset(self, init_reset=False):
+        if self.visual:
+            self._pybullet_client.configureDebugVisualizer(self._pybullet_client.COV_ENABLE_RENDERING, 0)
+        if init_reset:
+            self._pybullet_client.resetSimulation()
+            self._pybullet_client.setTimeStep(self.time_step)
+            self._pybullet_client.setGravity(0, 0, -10)
+            self.ground = self._pybullet_client.loadURDF("plane_implicit.urdf")
+
+        self._pybullet_client.resetDebugVisualizerCamera(self.camera_setting['camera_distance'],
+                                                         self.camera_setting['camera_yaw'],
+                                                         self.camera_setting['camera_pitch'],
+                                                         [0, 0, 0])
+        if self.visual:
+            self._pybullet_client.configureDebugVisualizer(self._pybullet_client.COV_ENABLE_RENDERING, 1)
+
         self._load_robot_urdf()
         if self._init_pose == InitPose.ON_POCK:
             self.rack_constraint = (self._create_rack_constraint(self._get_default_init_position(),
                                                                  self._get_default_init_orientation()))
-        self._build_joint_name2Id_dict()
-        self._build_urdf_Ids()
-        self._remove_default_joint_damping()
-        self._build_motor_Id_list()
-        self._record_mass_info_from_urdf()
-        self._record_inertia_info_from_urdf()
+        if init_reset:
+            self._build_joint_name2Id_dict()
+            self._build_urdf_Ids()
+            self._remove_default_joint_damping()
+            self._build_motor_Id_list()
+            self._record_mass_info_from_urdf()
+            self._record_inertia_info_from_urdf()
         self._pybullet_client.resetBasePositionAndOrientation(self.quadruped,
                                                               self._get_default_init_position(),
                                                               self._get_default_init_orientation())
