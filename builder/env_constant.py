@@ -1,5 +1,5 @@
 
-camera_setting = {'camera_distance': 1.0,
+CAMERA_SETTING = {'camera_distance': 1.0,
                   'camera_yaw': 0,
                   'camera_pitch': 30}
 

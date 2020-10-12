@@ -12,7 +12,7 @@ class Transfer(object):
                  kd=transfer_constant.KD,
                  torque_limits=transfer_constant.TORQUE_LIMITS,
                  robot_class=Laikago,
-                 history_len=1e6):
+                 history_len=transfer_constant.HISTORY_LEN):
         self._pybullet_client = pybullet_client
         self._kp = kp
         self._kd = kd
@@ -64,9 +64,9 @@ class Transfer(object):
     def _cal_toe_position(self):
         """Get the robot's foot position in the base frame."""
         foot_positions = []
-        foot_ids = [3, 7, 11, 15]  # TODO: 最好还是检查这个id对不对
-        for foot_id in foot_ids:
-            foot_positions.append(self._link_pos_in_base_frame(foot_id))
+        toe_link_ids = self.laikago.get_toe_link_ids()
+        for toe_link_id in toe_link_ids:
+            foot_positions.append(self._link_pos_in_base_frame(toe_link_id))
 
         return np.array(foot_positions)
 

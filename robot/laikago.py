@@ -142,6 +142,9 @@ class Laikago(object):
         self._movable_joint_ids = self._hip_link_ids + self._upper_link_ids + self._lower_link_ids
         return
 
+    def get_toe_link_ids(self):
+        return self._toe_link_ids
+
     def _remove_default_joint_damping(self):
         num_joints = self._pybullet_client.getNumJoints(self.quadruped)
         for i in range(num_joints):

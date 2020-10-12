@@ -20,3 +20,12 @@ class LaikagoTask(object):
 
         self.max_r = 0
         return
+
+    def reset(self):
+        pass
+
+    def update(self):
+        pass
+
+    def done(self):
+        return False

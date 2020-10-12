@@ -4,14 +4,15 @@ from builder.laikago_task import LaikagoTask
 import pybullet
 import pybullet_utils.bullet_client as bullet_client
 import pybullet_data as pd
-from builder import gym_config
+import numpy as np
+from builder import env_constant
 
 class LaikagoEnv(gym.Env):
     def __init__(self,
                  task,
                  visual=True,
                  transfer_class=Transfer,
-                 camera_setting=gym_config.camera_setting):
+                 camera_setting=env_constant.CAMERA_SETTING):
         self.task = task
         self.visual = visual
         if self.visual:
@@ -34,7 +35,7 @@ class LaikagoEnv(gym.Env):
 
     def reset(self):
         self.transfer.reset()
-        self._pybullet_client.resetDebugVisualizerCamera(self.camera_setting['camera_dist'],
+        self._pybullet_client.resetDebugVisualizerCamera(self.camera_setting['camera_distance'],
                                                          self.camera_setting['camera_yaw'],
                                                          self.camera_setting['camera_pitch'],
                                                          [0, 0, 0])
@@ -50,5 +51,6 @@ if __name__ == '__main__':
     task = LaikagoTask()
     laikago_env = LaikagoEnv(task=task)
 
+    a = np.zeros(12)
     while True:
-        laikago_env.transfer.step()
+        laikago_env.transfer.step(a)
