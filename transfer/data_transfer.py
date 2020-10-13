@@ -1,5 +1,6 @@
 from robot.laikago import Laikago
 from transfer import transfer_constant
+from transfer.transfer_constant import FL, FR, RL, RR, L1, L2, L3, ROBOT_LENGTH, ROBOT_WIDTH
 import collections
 import numpy as np
 
@@ -7,12 +8,12 @@ import numpy as np
 class Transfer(object):
 
     def __init__(self,
-                 kp=transfer_constant.KP,
-                 kd=transfer_constant.KD,
-                 torque_limits=transfer_constant.TORQUE_LIMITS,
+                 kp=KP,
+                 kd=KD,
+                 torque_limits=TORQUE_LIMITS,
                  robot_class=Laikago,
                  visual=False,
-                 history_len=transfer_constant.HISTORY_LEN):
+                 history_len=HISTORY_LEN):
         self._kp = kp
         self._kd = kd
         self._torque_limits = torque_limits
@@ -156,19 +157,17 @@ class Transfer(object):
 
     def cal_jacobian_matrix(self, leg_idx, motor_angle):
         motor_angle = motor_angle[leg_idx*3: leg_idx*3+3] # current angle
-        width, length = 0, 0  # 机器人长宽
-        L1, L2, L3 = 0.037, 0.25, 0.25  # consistent with the manual
         matrices = []
-        FR, FL, RR, RL = (0, 1, 2, 3)
         flag = 1  # 1 if left, -1 if right
+
         if leg_idx == FR:
-            matrices.append(self.translation_matrix(length/2, -width/2, 0))
+            matrices.append(self.translation_matrix(ROBOT_LENGTH/2, -ROBOT_WIDTH/2, 0))
         elif leg_idx == FL:
-            matrices.append(self.translation_matrix(length/2, width/2, 0))
+            matrices.append(self.translation_matrix(ROBOT_LENGTH/2, ROBOT_WIDTH/2, 0))
         elif leg_idx == RR:
-            matrices.append(self.translation_matrix(-length/2, -width/2, 0))
+            matrices.append(self.translation_matrix(-ROBOT_LENGTH/2, -ROBOT_WIDTH/2, 0))
         elif leg_idx == RL:
-            matrices.append(self.translation_matrix(-length/2, width/2, 0))
+            matrices.append(self.translation_matrix(-ROBOT_LENGTH/2, ROBOT_WIDTH/2, 0))
         else:
             assert 0
 
