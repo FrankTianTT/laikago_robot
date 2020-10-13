@@ -59,6 +59,8 @@ class Transfer(object):
         assert len(self.get_observation()) == 34
         pos = np.array(self.get_observation()[0: 12])
         vel = np.array(self.get_observation()[12: 24])
+        print('pos:', pos)
+        print('vel:', vel)
         additional_torques = 0
         motor_torques = -1 * (self._kp * (pos - target_pos)) - self._kd * (vel - target_vel) + additional_torques
         motor_torques = np.clip(motor_torques, -1*self._torque_limits, self._torque_limits)
@@ -77,12 +79,8 @@ class Transfer(object):
     def _link_pos_in_base_frame(self, link_id):
         """
         Computes the link's local position in the robot frame.
-        Args:
-            robot: A robot instance.
-            link_id: The link to calculate its relative position.
-
-        Returns:
-            The relative position of the link.
+        :param link_id: The link to calculate its relative position.
+        :return: The relative position of the link.
         """
         base_position, base_orientation = self._pybullet_client.getBasePositionAndOrientation(self.laikago.quadruped)
         inverse_translation, inverse_rotation = self._pybullet_client.invertTransform(
@@ -94,9 +92,6 @@ class Transfer(object):
             inverse_translation, inverse_rotation, link_position, (0, 0, 0, 1))
 
         return np.array(link_local_position)
-
-    def cal_matrices(self):
-        pass
 
     @staticmethod
     def get_transform_matrix(alpha, a, d, theta):
@@ -155,13 +150,19 @@ class Transfer(object):
         ]
         return np.array(matrix)
 
-    def cal_jacobian_matrix(self, leg_idx, motor_angle):
+    def compute_foot_position(self, leg_idx, motor_angle):
+        """
+        Compute the position of foot
+        :param leg_idx: the index of legs
+        :param motor_angle: current motor angle
+        :return: The position in base frame
+        """
         motor_angle = motor_angle[leg_idx*3: leg_idx*3+3] # current angle
         matrices = []
         flag = 1  # 1 if left, -1 if right
 
         if leg_idx == FR:
-            matrices.append(self.translation_matrix(ROBOT_LENGTH/2, -ROBOT_WIDTH/2, 0))
+            matrices.append(self.translation_matrix(ROBOT_LENGTH/2, -ROBOT_WIDTH/2, 0))  # 从躯干中心坐标系平移到髋
         elif leg_idx == FL:
             matrices.append(self.translation_matrix(ROBOT_LENGTH/2, ROBOT_WIDTH/2, 0))
         elif leg_idx == RR:
@@ -172,33 +173,48 @@ class Transfer(object):
             assert 0
 
         matrices.extend([
-            self.rotate_matrix('x', motor_angle[0]),
-            self.translation_matrix(0, flag*L1, 0),
-            self.rotate_matrix('y', np.pi/2+motor_angle[1]),
-            self.translation_matrix(L2, 0, 0),
-            self.rotate_matrix('y', -np.pi/6+motor_angle[2]),
-            self.translation_matrix(L3, 0, 0)
+            self.rotate_matrix('x', motor_angle[0]),           # 旋转使y轴与大腿电机垂直
+            self.translation_matrix(0, flag*L1, 0),            # 从髋电机转移到大腿电机
+            self.rotate_matrix('y', np.pi/2+motor_angle[1]),   # 旋转到x轴与大腿同向
+            self.translation_matrix(L2, 0, 0),                 # 沿大腿平移
+            self.rotate_matrix('y', -np.pi/6+motor_angle[2]),  # 在腿关节旋转，直到x轴与小腿同向
+            self.translation_matrix(L3, 0, 0)                  # 沿小腿平移
         ])
         matrix = matrices[0]
         for tmp_m in matrices[1: ]:
-            matrix = np.matmul(matrix, tmp_m)
+            matrix = np.matmul(matrix, tmp_m)  # 动坐标系，矩阵顺序应该是从左往右
         pos = np.array([[0], [0], [0], [1]])
         ret = np.matmul(matrix, pos)
         assert ret[-1] == 1
 
         return ret[: -1]
 
-    def get_history_velocity(self):
-        return
-
     def get_history_angle(self):
-        return
+        history_angle = []
+        for obs in self.history_observation:
+            history_angle.append(obs[0: 12])
+        return np.array(history_angle)
+
+    def get_history_velocity(self):
+        history_vel = []
+        for obs in self.history_observation:
+            history_vel.append(obs[12: 24])
+        return np.array(history_vel)
 
     def get_history_rpy(self):
-        return
+        history_rpy = []
+        for obs in self.history_observation:
+            history_rpy.append(obs[24: 27])
+        return np.array(history_rpy)
 
-    def get_history_rate_rpy(self):
-        return
+    def get_history_rpy_rate(self):
+        history_rpy_rate = []
+        for obs in self.history_observation:
+            history_rpy_rate.append(obs[27: 30])
+        return np.array(history_rpy_rate)
 
     def get_history_toe_position(self):
-        return
+        history_toe_position = []
+        for obs in self.history_observation:
+            history_toe_position.append(obs[30: 34])
+        return np.array(history_toe_position)

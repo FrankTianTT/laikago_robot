@@ -17,7 +17,8 @@ class Laikago(object):
                  num_motors=laikago_constant.NUM_MOTORS,
                  dofs_per_leg=laikago_constant.DOFS_PER_LEG,
                  urdf_filename=laikago_constant.URDF_FILE,
-                 init_pose=InitPose.STAND,
+                 init_pose=InitPose.ON_ROCK,
+                 # init_pose=InitPose.STAND,
                  self_collision_enabled=False,
                  action_repeat=1,
                  randomized=True,
@@ -68,7 +69,7 @@ class Laikago(object):
             self._pybullet_client.configureDebugVisualizer(self._pybullet_client.COV_ENABLE_RENDERING, 1)
 
         self._load_robot_urdf()
-        if self._init_pose == InitPose.ON_POCK:
+        if self._init_pose == InitPose.ON_ROCK:
             self.rack_constraint = (self._create_rack_constraint(self._get_default_init_position(),
                                                                  self._get_default_init_orientation()))
         if init_reset:
@@ -295,7 +296,7 @@ class Laikago(object):
         return self._urdf_filename
 
     def _get_default_init_position(self):
-        if self._init_pose == InitPose.ON_POCK:
+        if self._init_pose == InitPose.ON_ROCK:
             return laikago_constant.ON_RACK_INIT_POSITION
         elif self._init_pose == InitPose.STAND:
             return laikago_constant.STAND_INIT_POSITION

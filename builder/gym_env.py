@@ -50,9 +50,10 @@ if __name__ == '__main__':
     task = LaikagoTask()
     laikago_env = LaikagoEnv(task=task)
 
-    a = np.array([0, 40, -75,
-                   0, 40, -75,
-                   0, 40, -75,
-                   0, 40, -75]) * np.pi / 180
+    a = np.array([-15, 15, -35,
+                   15, 15, -35,
+                   -15, 15, -35,
+                   15, 15, -35]) * np.pi / 180
     while True:
         laikago_env.step(a)
+        print('target:', a)
