@@ -183,6 +183,9 @@ class Transfer(object):
             history_angle.append(obs[0: 12])
         return np.array(history_angle)
 
+    def get_history_chassis_velocity(self):
+        return np.zeros((3, 3))
+
     def get_history_velocity(self):
         history_vel = []
         for obs in self.history_observation:

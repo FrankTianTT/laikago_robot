@@ -3,6 +3,7 @@ from transfer.data_transfer import Transfer
 from builder.laikago_task import LaikagoTask
 import numpy as np
 from builder import env_constant
+from tasks.task_standup import LaikagoStandUp
 
 class LaikagoEnv(gym.Env):
     def __init__(self,
@@ -34,20 +35,24 @@ class LaikagoEnv(gym.Env):
     def get_history_velocity(self):
         return self.transfer.get_history_velocity()
 
+    def get_history_chassis_velocity(self):
+        return self.transfer.get_history_chassis_velocity()
+
     def get_history_angle(self):
-        return
+        return self.transfer.get_history_angle()
 
     def get_history_rpy(self):
-        return
+        return self.transfer.get_history_rpy()
 
     def get_history_rate_rpy(self):
-        return
+        return self.transfer.get_history_rate_rpy()
 
-    def get_history_toe_position(self):
-        return
+    def get_toe_position(self):
+        return self.transfer.get_history_toe_position()
 
 if __name__ == '__main__':
-    task = LaikagoTask()
+    # task = LaikagoTask()
+    task = LaikagoStandUp()
     laikago_env = LaikagoEnv(task=task)
 
     a = np.array([-15, 15, -35,
@@ -55,5 +60,7 @@ if __name__ == '__main__':
                    -15, 15, -35,
                    15, 15, -35]) * np.pi / 180
     while True:
-        laikago_env.step(a)
+        o, r, d, _ = laikago_env.step(a)
+        print(r)
+
         # print('target:', a)

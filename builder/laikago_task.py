@@ -34,5 +34,22 @@ class LaikagoTask(object):
         return False
 
     def reward(self):
-        self._env
         return 0
+
+    def precision_cost(self, v, t, m):
+        w = math.atanh(math.sqrt(0.95)) / m
+        return math.tanh(((v - t) * w) ** 2)
+
+    def reward_up(self):
+        roll = self._env.get_history_rpy()[0][0]
+        pitch = self._env.get_history_rpy()[0][1]
+        return 1 - self.precision_cost(math.sqrt(roll * roll + pitch * pitch), 0.0, 0.4)
+
+    def reward_still(self):
+        chassis_vel = self._env.get_history_chassis_velocity()[0]
+        return -math.sqrt(chassis_vel[0] ** 2 + chassis_vel[1] ** 2)
+
+    def reward_rotation(self, r):
+        yaw = self._env.get_history_rpy()[0][2]
+        k = 1 - self.precision_cost(yaw, 0.0, 0.5)
+        return min(k * r, r)
