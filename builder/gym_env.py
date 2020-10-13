@@ -56,4 +56,4 @@ if __name__ == '__main__':
                    15, 15, -35]) * np.pi / 180
     while True:
         laikago_env.step(a)
-        print('target:', a)
+        # print('target:', a)

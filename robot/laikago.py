@@ -68,20 +68,21 @@ class Laikago(object):
         if self.visual:
             self._pybullet_client.configureDebugVisualizer(self._pybullet_client.COV_ENABLE_RENDERING, 1)
 
-        self._load_robot_urdf()
-        if self._init_pose == InitPose.ON_ROCK:
-            self.rack_constraint = (self._create_rack_constraint(self._get_default_init_position(),
-                                                                 self._get_default_init_orientation()))
         if init_reset:
+            self._load_robot_urdf()
+            if self._init_pose == InitPose.ON_ROCK:
+                self.rack_constraint = (self._create_rack_constraint(self._get_default_init_position(),
+                                                                     self._get_default_init_orientation()))
             self._build_joint_name2Id_dict()
             self._build_urdf_Ids()
             self._remove_default_joint_damping()
             self._build_motor_Id_list()
             self._record_mass_info_from_urdf()
             self._record_inertia_info_from_urdf()
-        self._pybullet_client.resetBasePositionAndOrientation(self.quadruped,
-                                                              self._get_default_init_position(),
-                                                              self._get_default_init_orientation())
+        else:
+            self._pybullet_client.resetBasePositionAndOrientation(self.quadruped,
+                                                                  self._get_default_init_position(),
+                                                                  self._get_default_init_orientation())
         self._pybullet_client.resetBaseVelocity(self.quadruped, [0, 0, 0], [0, 0, 0])
         self.reset_pose()
         if self.randomized:
@@ -430,12 +431,7 @@ class Laikago(object):
         print(self._leg_inertia_urdf)
 
 if __name__ == '__main__':
-    pyb = bullet_client.BulletClient(connection_mode=pybullet.DIRECT)
-    pyb.setGravity(0, 0, -10)
-    pyb.setAdditionalSearchPath(pd.getDataPath())
-    ground = pyb.loadURDF("plane_implicit.urdf")
-    laikago = Laikago(pyb,
-                      init_pose=InitPose.LIE)
+    laikago = Laikago(visual=True, init_pose=InitPose.LIE)
     laikago.print_laikago_info()
 
     while True:

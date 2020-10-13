@@ -32,11 +32,17 @@ class Transfer(object):
         """
         torque_action = self.position2torque(pos_action)
         obs = self.laikago.step(torque_action)
-        self.history_observation.appendleft(obs)
+        self.collocation_observation(obs)
+        print(self.get_toe_position())
         return self.history_observation
 
+    def collocation_observation(self, obs):
+        toe_position = self.get_toe_position()
+        obs = obs.extend(toe_position)
+        self.history_observation.appendleft(obs)
+
     def reset(self):
-        self.laikago.reset()
+        self.laikago.reset(init_reset=False)
 
     def get_observation(self):
         return self.laikago.get_observation()
@@ -59,39 +65,13 @@ class Transfer(object):
         assert len(self.get_observation()) == 34
         pos = np.array(self.get_observation()[0: 12])
         vel = np.array(self.get_observation()[12: 24])
-        print('pos:', pos)
-        print('vel:', vel)
+        # print('pos:', pos)
+        # print('vel:', vel)
         additional_torques = 0
         motor_torques = -1 * (self._kp * (pos - target_pos)) - self._kd * (vel - target_vel) + additional_torques
         motor_torques = np.clip(motor_torques, -1*self._torque_limits, self._torque_limits)
 
         return motor_torques
-
-    def _cal_toe_position(self):
-        """Get the robot's foot position in the base frame."""
-        foot_positions = []
-        toe_link_ids = self.laikago.get_toe_link_ids()
-        for toe_link_id in toe_link_ids:
-            foot_positions.append(self._link_pos_in_base_frame(toe_link_id))
-
-        return np.array(foot_positions)
-
-    def _link_pos_in_base_frame(self, link_id):
-        """
-        Computes the link's local position in the robot frame.
-        :param link_id: The link to calculate its relative position.
-        :return: The relative position of the link.
-        """
-        base_position, base_orientation = self._pybullet_client.getBasePositionAndOrientation(self.laikago.quadruped)
-        inverse_translation, inverse_rotation = self._pybullet_client.invertTransform(
-            base_position, base_orientation)
-
-        link_state = self._pybullet_client.getLinkState(self.laikago.quadruped, link_id)
-        link_position = link_state[0]
-        link_local_position, _ = self._pybullet_client.multiplyTransforms(
-            inverse_translation, inverse_rotation, link_position, (0, 0, 0, 1))
-
-        return np.array(link_local_position)
 
     @staticmethod
     def get_transform_matrix(alpha, a, d, theta):
@@ -149,25 +129,33 @@ class Transfer(object):
             [0, 0, 0, 1]
         ]
         return np.array(matrix)
+    def get_toe_position(self):
+        pos = []
+        toe_links = self.laikago.get_toe_link_ids()
+        motor_angle = self.get_observation()[0:12]
+        id2id = {3: 0, 7: 1, 11: 2, 15: 3}
+        for toe_id in toe_links:
+            pos.append(self.compute_toe_position(toe_id=id2id[toe_id], motor_angle=motor_angle))
+        return pos
 
-    def compute_foot_position(self, leg_idx, motor_angle):
+    def compute_toe_position(self, toe_id, motor_angle):
         """
         Compute the position of foot
-        :param leg_idx: the index of legs
+        :param toe_id: the index of legs
         :param motor_angle: current motor angle
         :return: The position in base frame
         """
-        motor_angle = motor_angle[leg_idx*3: leg_idx*3+3] # current angle
+        motor_angle = motor_angle[toe_id * 3: toe_id * 3 + 3] # current angle
         matrices = []
         flag = 1  # 1 if left, -1 if right
 
-        if leg_idx == FR:
+        if toe_id == FR:
             matrices.append(self.translation_matrix(ROBOT_LENGTH/2, -ROBOT_WIDTH/2, 0))  # 从躯干中心坐标系平移到髋
-        elif leg_idx == FL:
+        elif toe_id == FL:
             matrices.append(self.translation_matrix(ROBOT_LENGTH/2, ROBOT_WIDTH/2, 0))
-        elif leg_idx == RR:
+        elif toe_id == RR:
             matrices.append(self.translation_matrix(-ROBOT_LENGTH/2, -ROBOT_WIDTH/2, 0))
-        elif leg_idx == RL:
+        elif toe_id == RL:
             matrices.append(self.translation_matrix(-ROBOT_LENGTH/2, ROBOT_WIDTH/2, 0))
         else:
             assert 0
@@ -181,7 +169,7 @@ class Transfer(object):
             self.translation_matrix(L3, 0, 0)                  # 沿小腿平移
         ])
         matrix = matrices[0]
-        for tmp_m in matrices[1: ]:
+        for tmp_m in matrices[1:]:
             matrix = np.matmul(matrix, tmp_m)  # 动坐标系，矩阵顺序应该是从左往右
         pos = np.array([[0], [0], [0], [1]])
         ret = np.matmul(matrix, pos)
@@ -212,6 +200,12 @@ class Transfer(object):
         for obs in self.history_observation:
             history_rpy_rate.append(obs[27: 30])
         return np.array(history_rpy_rate)
+
+    def get_history_toe_collision(self):
+        history_toe_collision = []
+        for obs in self.history_observation:
+            history_toe_collision.append(obs[30: 34])
+        return np.array(history_toe_collision)
 
     def get_history_toe_position(self):
         history_toe_position = []
