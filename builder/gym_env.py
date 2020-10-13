@@ -44,16 +44,16 @@ class LaikagoEnv(gym.Env):
     def get_history_rpy(self):
         return self.transfer.get_history_rpy()
 
-    def get_history_rate_rpy(self):
-        return self.transfer.get_history_rate_rpy()
+    def get_history_rpy_rate(self):
+        return self.transfer.get_history_rpy_rate()
 
-    def get_toe_position(self):
+    def get_history_toe_position(self):
         return self.transfer.get_history_toe_position()
 
 if __name__ == '__main__':
     # task = LaikagoTask()
     task = LaikagoStandUp()
-    laikago_env = LaikagoEnv(task=task)
+    laikago_env = LaikagoEnv(task=task, visual=False)
 
     a = np.array([-15, 15, -35,
                    15, 15, -35,
@@ -61,6 +61,6 @@ if __name__ == '__main__':
                    15, 15, -35]) * np.pi / 180
     while True:
         o, r, d, _ = laikago_env.step(a)
-        print(r)
+        print(laikago_env.get_history_toe_position()[0])
 
         # print('target:', a)

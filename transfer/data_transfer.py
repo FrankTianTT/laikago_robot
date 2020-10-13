@@ -22,6 +22,7 @@ class Transfer(object):
         self.visual = visual
         self.history_len = history_len
         self.history_observation = collections.deque(maxlen=history_len)
+        self._init_history_observation()
         self.laikago = self.robot_class(visual=self.visual)
 
     def step(self, pos_action):
@@ -33,12 +34,11 @@ class Transfer(object):
         torque_action = self.position2torque(pos_action)
         obs = self.laikago.step(torque_action)
         self.collocation_observation(obs)
-        print(self.get_toe_position())
         return self.history_observation
 
     def collocation_observation(self, obs):
         toe_position = self.get_toe_position()
-        obs = obs.extend(toe_position)
+        obs.extend(toe_position)
         self.history_observation.appendleft(obs)
 
     def reset(self):
@@ -49,7 +49,7 @@ class Transfer(object):
 
     def _init_history_observation(self):
         for i in range(self.history_len):
-            self.history_observation.appendleft(np.zeros(34))
+            self.history_observation.appendleft(np.zeros(34+12))
 
     def position2torque(self, target_pos, target_vel=np.zeros(12)):
         """
@@ -135,8 +135,8 @@ class Transfer(object):
         motor_angle = self.get_observation()[0:12]
         id2id = {3: 0, 7: 1, 11: 2, 15: 3}
         for toe_id in toe_links:
-            pos.append(self.compute_toe_position(toe_id=id2id[toe_id], motor_angle=motor_angle))
-        return pos
+            pos.extend(self.compute_toe_position(toe_id=id2id[toe_id], motor_angle=motor_angle).tolist())
+        return list(pos)
 
     def compute_toe_position(self, toe_id, motor_angle):
         """
@@ -174,8 +174,7 @@ class Transfer(object):
         pos = np.array([[0], [0], [0], [1]])
         ret = np.matmul(matrix, pos)
         assert ret[-1] == 1
-
-        return ret[: -1]
+        return ret[: -1].reshape(-1)
 
     def get_history_angle(self):
         history_angle = []
@@ -213,5 +212,5 @@ class Transfer(object):
     def get_history_toe_position(self):
         history_toe_position = []
         for obs in self.history_observation:
-            history_toe_position.append(obs[30: 34])
+            history_toe_position.append(obs[34: 34+12])
         return np.array(history_toe_position)

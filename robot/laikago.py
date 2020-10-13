@@ -23,7 +23,8 @@ class Laikago(object):
                  action_repeat=1,
                  randomized=True,
                  observation_noise_stdev=laikago_constant.SENSOR_NOISE_STDDEV,
-                 control_latency=0.0):
+                 control_latency=0.0,
+                 observation_history_len=laikago_constant.OBSERVATION_HISTORY_LEN):
         self.visual = visual
         if self.visual:
             self._pybullet_client = bullet_client.BulletClient(connection_mode=pybullet.GUI)
@@ -43,12 +44,12 @@ class Laikago(object):
         self._control_latency = control_latency
         if self.randomized:
             self.randomizer = LaikagoRobotRandomizer(self)
+        self.observation_history_len = observation_history_len
 
         _, self._init_orientation_inv = self._pybullet_client.invertTransform(
             position=[0, 0, 0], orientation=self._get_default_init_orientation())
-        self._observation_history = collections.deque(maxlen=100)
+        self._observation_history = collections.deque(maxlen=self.observation_history_len)
         self._control_observation = []
-
         self.reset(init_reset=True)
         self.receive_observation()
 
@@ -101,6 +102,11 @@ class Laikago(object):
         self.receive_observation()
         return
 
+    def _init_observation_history(self):
+        obs = self.get_true_observation()
+        for i in range(self.observation_history_len):
+            self._observation_history.appendleft(obs)
+
     def _set_motor_torque_by_Ids(self, motor_ids, torques):
         self._pybullet_client.setJointMotorControlArray(
             bodyIndex=self.quadruped,
@@ -121,6 +127,8 @@ class Laikago(object):
             positionB=[0, 0, 0],
             orientationB=self._init_orientation_inv)
         self._observation_history.appendleft(self.get_true_observation())
+        if len(self._observation_history) < self.observation_history_len:
+            self._init_observation_history()
         self._control_observation = self._get_control_observation()
 
     def _get_control_observation(self):

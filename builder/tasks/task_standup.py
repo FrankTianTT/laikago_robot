@@ -3,7 +3,7 @@ from laikago_task import LaikagoTask
 class LaikagoStandUp(LaikagoTask):
 
     def __init__(self, mode='train'):
-        #super(LaikagoTask, self).__init__(mode)
+        super(LaikagoStandUp, self).__init__(mode)
         pass
 
     def reward(self):
