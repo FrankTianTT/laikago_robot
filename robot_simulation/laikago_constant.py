@@ -8,7 +8,7 @@ URDF_FILE = os.path.join(URDF_DIR_NAME, 'laikago.urdf')
 CAMERA_SETTING = {'camera_distance': 2.0,
                   'camera_yaw': 0,
                   'camera_pitch': -30}
-TIME_STEP = 0.025
+TIME_STEP = 0.02
 NUM_MOTORS = 12
 DOFS_PER_LEG = 3
 
@@ -61,3 +61,11 @@ JOINT_F_BOUND = [0, 0.1]
 TOE_F_BOUND = [0.5, 1.25]
 
 OBSERVATION_HISTORY_LEN = 100
+
+from enum import Enum
+
+
+class InitPose(Enum):
+    STAND = 1
+    LIE = 2
+    ON_ROCK = 3

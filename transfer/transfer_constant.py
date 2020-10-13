@@ -1,10 +1,32 @@
 import numpy as np
 
 
-KP = 25
-KD = 0.1
-TORQUE_LIMITS = np.ones(12) * 20
+ABDUCTION_P_GAIN = 220.0
+ABDUCTION_D_GAIN = 0.3
+HIP_P_GAIN = 220.0
+HIP_D_GAIN = 2.0
+KNEE_P_GAIN = 220.0
+KNEE_D_GAIN = 2.0
+KP = [ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
+            ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
+            ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
+            ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN]
+KD = [ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN,
+            ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN,
+            ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN,
+            ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN]
+
+TORQUE_LIMITS = np.ones(12) * 40
 HISTORY_LEN = 3
 ROBOT_WIDTH, ROBOT_LENGTH = 0.175, 0.4387  # 机器人长宽
 L1, L2, L3 = 0.037, 0.25, 0.25  # consistent with the manual
 FR, FL, RR, RL = (0, 1, 2, 3)
+
+
+from enum import Enum
+
+
+class InitPose(Enum):
+    STAND = 1
+    LIE = 2
+    ON_ROCK = 3

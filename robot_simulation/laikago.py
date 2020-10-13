@@ -1,10 +1,10 @@
 # 这个文件是对laikago的机械特性和电气特性的仿真。
 
 import laikago_constant
+from laikago_constant import InitPose
 import pybullet
 import pybullet_utils.bullet_client as bullet_client
 import pybullet_data as pd
-from laikago_config import InitPose
 from laiakgo_randomizer import LaikagoRobotRandomizer
 import numpy as np
 import collections
@@ -18,7 +18,6 @@ class Laikago(object):
                  dofs_per_leg=laikago_constant.DOFS_PER_LEG,
                  urdf_filename=laikago_constant.URDF_FILE,
                  init_pose=InitPose.ON_ROCK,
-                 # init_pose=InitPose.STAND,
                  self_collision_enabled=False,
                  action_repeat=1,
                  randomized=True,
@@ -71,7 +70,7 @@ class Laikago(object):
 
         if init_reset:
             self._load_robot_urdf()
-            if self._init_pose == InitPose.ON_ROCK:
+            if self._init_pose.value == InitPose.ON_ROCK.value:
                 self.rack_constraint = (self._create_rack_constraint(self._get_default_init_position(),
                                                                      self._get_default_init_orientation()))
             self._build_joint_name2Id_dict()
@@ -80,10 +79,9 @@ class Laikago(object):
             self._build_motor_Id_list()
             self._record_mass_info_from_urdf()
             self._record_inertia_info_from_urdf()
-        else:
-            self._pybullet_client.resetBasePositionAndOrientation(self.quadruped,
-                                                                  self._get_default_init_position(),
-                                                                  self._get_default_init_orientation())
+        self._pybullet_client.resetBasePositionAndOrientation(self.quadruped,
+                                                              self._get_default_init_position(),
+                                                              self._get_default_init_orientation())
         self._pybullet_client.resetBaseVelocity(self.quadruped, [0, 0, 0], [0, 0, 0])
         self.reset_pose()
         if self.randomized:
@@ -119,7 +117,7 @@ class Laikago(object):
             self.quadruped, self._motor_id_list)
         self._base_position, orientation = (
             self._pybullet_client.getBasePositionAndOrientation(self.quadruped))
-        # Computes the relative orientation relative to the robot's
+        # Computes the relative orientation relative to the robot_simulation's
         # initial_orientation.
         _, self._base_orientation = self._pybullet_client.multiplyTransforms(
             positionA=[0, 0, 0],
@@ -267,7 +265,7 @@ class Laikago(object):
                 force=friction)
 
     def reset_pose(self):
-        if self._init_pose == InitPose.LIE:
+        if self._init_pose.value == InitPose.LIE.value:
             init_angles = laikago_constant.LIE_MOTOR_ANGLES
         else:
             init_angles = laikago_constant.STAND_MOTOR_ANGLES
@@ -305,9 +303,9 @@ class Laikago(object):
         return self._urdf_filename
 
     def _get_default_init_position(self):
-        if self._init_pose == InitPose.ON_ROCK:
+        if self._init_pose.value == InitPose.ON_ROCK.value:
             return laikago_constant.ON_RACK_INIT_POSITION
-        elif self._init_pose == InitPose.STAND:
+        elif self._init_pose.value == InitPose.STAND.value:
             return laikago_constant.STAND_INIT_POSITION
         else:
             return laikago_constant.LIE_INIT_POSITION

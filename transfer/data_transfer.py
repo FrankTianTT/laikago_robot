@@ -1,5 +1,6 @@
-from robot.laikago import Laikago
+from robot_simulation.laikago import Laikago
 from transfer import transfer_constant
+from transfer.transfer_constant import InitPose
 from transfer.transfer_constant import FL, FR, RL, RR, L1, L2, L3, ROBOT_LENGTH, ROBOT_WIDTH
 import collections
 import numpy as np
@@ -8,6 +9,7 @@ import numpy as np
 class Transfer(object):
 
     def __init__(self,
+                 init_pose=InitPose.STAND,
                  kp=transfer_constant.KP,
                  kd=transfer_constant.KD,
                  torque_limits=transfer_constant.TORQUE_LIMITS,
@@ -23,7 +25,7 @@ class Transfer(object):
         self.history_len = history_len
         self.history_observation = collections.deque(maxlen=history_len)
         self._init_history_observation()
-        self.laikago = self.robot_class(visual=self.visual)
+        self.laikago = self.robot_class(visual=self.visual, init_pose=init_pose)
 
     def step(self, pos_action):
         """
@@ -34,6 +36,7 @@ class Transfer(object):
         torque_action = self.position2torque(pos_action)
         obs = self.laikago.step(torque_action)
         self.collocation_observation(obs)
+        print('torque_action',torque_action)
         return self.history_observation
 
     def collocation_observation(self, obs):
@@ -43,6 +46,7 @@ class Transfer(object):
 
     def reset(self):
         self.laikago.reset(init_reset=False)
+        return self.history_observation
 
     def get_observation(self):
         return self.laikago.get_observation()
