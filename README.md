@@ -34,3 +34,6 @@ robot提供两种观测，分别是：
 - 积累robot的历史数据帮助agent处理POMDP的问题
 - 通过底层的observation计算更多的obs，给reward的计算提供接口
 
+### builder
+
+将transfer层传过来的底层数据和task相结合，并满足gym中env类的接口规范，形成一个可以直接用于强化学习算法学习的环境。

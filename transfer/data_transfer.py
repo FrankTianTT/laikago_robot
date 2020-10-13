@@ -8,12 +8,12 @@ import numpy as np
 class Transfer(object):
 
     def __init__(self,
-                 kp=KP,
-                 kd=KD,
-                 torque_limits=TORQUE_LIMITS,
+                 kp=transfer_constant.KP,
+                 kd=transfer_constant.KD,
+                 torque_limits=transfer_constant.TORQUE_LIMITS,
                  robot_class=Laikago,
                  visual=False,
-                 history_len=HISTORY_LEN):
+                 history_len=transfer_constant.HISTORY_LEN):
         self._kp = kp
         self._kd = kd
         self._torque_limits = torque_limits
@@ -30,8 +30,9 @@ class Transfer(object):
         :param action: 这个action是上层传过来的，应该是position
         :return:
         """
-        # torque_action = self.position2torque(pos_action)
-        torque_action = np.zeros(12)
+        torque_action = self.position2torque(pos_action)
+        print(pos_action)
+        print(torque_action)
         obs = self.laikago.step(torque_action)
         self.history_observation.appendleft(obs)
         return self.history_observation
@@ -44,9 +45,9 @@ class Transfer(object):
 
     def _init_history_observation(self):
         for i in range(self.history_len):
-            self.history_observation.appendleft(np.zeros(33))
+            self.history_observation.appendleft(np.zeros(34))
 
-    def position2torque(self, target_pos, target_vel, pos, vel):
+    def position2torque(self, target_pos, target_vel=np.zeros(12)):
         """
         通过PD控制将位置信号转化为电机的扭矩信号
         :param target_pos: 目标位置
@@ -57,8 +58,9 @@ class Transfer(object):
         """
         target_pos = np.array(target_pos)
         target_vel = np.array(target_vel)
-        pos = np.array(pos)
-        vel = np.array(vel)
+        assert len(self.get_observation()) == 34
+        pos = np.array(self.get_observation()[0: 12])
+        vel = np.array(self.get_observation()[12: 24])
         additional_torques = 0
         motor_torques = -1 * (self._kp * (pos - target_pos)) - self._kd * (vel - target_vel) + additional_torques
         motor_torques = np.clip(motor_torques, -1*self._torque_limits, self._torque_limits)

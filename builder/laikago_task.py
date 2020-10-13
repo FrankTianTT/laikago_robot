@@ -29,3 +29,6 @@ class LaikagoTask(object):
 
     def done(self):
         return False
+
+    def reward(self):
+        return 0

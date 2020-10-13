@@ -402,7 +402,7 @@ class Laikago(object):
         observation.extend(self.get_true_motor_velocities())       # [12, 24]
         observation.extend(self.get_true_base_roll_pitch_yaw())      # [24, 27]
         observation.extend(self.get_true_base_roll_pitch_yaw_rate())  # [27, 30]
-        observation.extend(self.get_toe_contacts())               # [30, 33]
+        observation.extend(self.get_toe_contacts())               # [30, 34]
         return observation
 
     def get_observation(self):
@@ -411,7 +411,7 @@ class Laikago(object):
         observation.extend(self.get_motor_velocities())           # [12, 24]
         observation.extend(self.get_base_roll_pitch_yaw())          # [24, 27]
         observation.extend(self.get_base_roll_pitch_yaw_rate())      # [27, 30]
-        observation.extend(self.get_toe_contacts())               # [30, 33]
+        observation.extend(self.get_toe_contacts())               # [30, 34]
         return observation
 
     def print_laikago_info(self):
