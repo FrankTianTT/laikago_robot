@@ -31,8 +31,6 @@ class Transfer(object):
         :return:
         """
         torque_action = self.position2torque(pos_action)
-        print(pos_action)
-        print(torque_action)
         obs = self.laikago.step(torque_action)
         self.history_observation.appendleft(obs)
         return self.history_observation
@@ -189,3 +187,18 @@ class Transfer(object):
         assert ret[-1] == 1
 
         return ret[: -1]
+
+    def get_history_velocity(self):
+        return
+
+    def get_history_angle(self):
+        return
+
+    def get_history_rpy(self):
+        return
+
+    def get_history_rate_rpy(self):
+        return
+
+    def get_history_toe_position(self):
+        return

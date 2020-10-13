@@ -10,6 +10,7 @@ class LaikagoEnv(gym.Env):
                  visual=True,
                  transfer_class=Transfer):
         self.task = task
+        self.task.set_env(self)
         self.visual = visual
         self.transfer_class = transfer_class
         self.transfer = None
@@ -30,6 +31,20 @@ class LaikagoEnv(gym.Env):
     def get_observation(self):
         return self.transfer.get_observation()
 
+    def get_history_velocity(self):
+        return self.transfer.get_history_velocity()
+
+    def get_history_angle(self):
+        return
+
+    def get_history_rpy(self):
+        return
+
+    def get_history_rate_rpy(self):
+        return
+
+    def get_history_toe_position(self):
+        return
 
 if __name__ == '__main__':
     task = LaikagoTask()

@@ -21,6 +21,9 @@ class LaikagoTask(object):
         self.max_r = 0
         return
 
+    def set_env(self, env):
+        self._env = env
+
     def reset(self):
         pass
 
@@ -31,4 +34,5 @@ class LaikagoTask(object):
         return False
 
     def reward(self):
+        self._env
         return 0
