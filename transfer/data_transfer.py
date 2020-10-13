@@ -93,3 +93,98 @@ class Transfer(object):
             inverse_translation, inverse_rotation, link_position, (0, 0, 0, 1))
 
         return np.array(link_local_position)
+
+    def cal_matrices(self):
+        pass
+
+    @staticmethod
+    def get_transform_matrix(alpha, a, d, theta):
+        """
+        Get transform matrix by DH parameters
+        Args:
+            alpha: alpha_{i-1}
+            a: a_{i-1}
+            d: d_i
+            theta: theta_i
+        Return:
+            Transform matrix
+        """
+        matrix = [
+            [np.cos(theta), -np.sin(theta), 0, a],
+            [np.sin(theta)*np.cos(alpha), np.cos(theta)*np.cos(alpha), -np.sin(alpha), -np.sin(alpha)*d],
+            [np.sin(theta)*np.sin(alpha), np.cos(theta)*np.sin(alpha), np.cos(alpha), np.cos(alpha)*d],
+            [0, 0, 0, 1]
+        ]
+        return np.array(matrix)
+
+    @staticmethod
+    def rotate_matrix(axis, theta):
+        if axis == 'x':
+            matrix = [
+                [1, 0, 0, 0],
+                [0, np.cos(theta), -np.sin(theta), 0],
+                [0, np.sin(theta), np.cos(theta), 0],
+                [0, 0, 0, 1]
+            ]
+        elif axis == 'y':
+            matrix = [
+                [np.cos(theta), 0, np.sin(theta), 0],
+                [0, 1, 0, 0],
+                [-np.sin(theta), 0, np.cos(theta), 0],
+                [0, 0, 0, 1]
+            ]
+        elif axis == 'z':
+            matrix = [
+                [np.cos(theta), -np.sin(theta), 0, 0],
+                [np.sin(theta), np.cos(theta), 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1]
+            ]
+        else:
+            assert 0
+        return np.array(matrix)
+
+    @staticmethod
+    def translation_matrix(dx, dy, dz):
+        matrix = [
+            [1, 0, 0, dx],
+            [0, 1, 0, dy],
+            [0, 0, 1, dz],
+            [0, 0, 0, 1]
+        ]
+        return np.array(matrix)
+
+    def cal_jacobian_matrix(self, leg_idx, motor_angle):
+        motor_angle = motor_angle[leg_idx*3: leg_idx*3+3] # current angle
+        width, length = 0, 0  # 机器人长宽
+        L1, L2, L3 = 0.037, 0.25, 0.25  # consistent with the manual
+        matrices = []
+        FR, FL, RR, RL = (0, 1, 2, 3)
+        flag = 1  # 1 if left, -1 if right
+        if leg_idx == FR:
+            matrices.append(self.translation_matrix(length/2, -width/2, 0))
+        elif leg_idx == FL:
+            matrices.append(self.translation_matrix(length/2, width/2, 0))
+        elif leg_idx == RR:
+            matrices.append(self.translation_matrix(-length/2, -width/2, 0))
+        elif leg_idx == RL:
+            matrices.append(self.translation_matrix(-length/2, width/2, 0))
+        else:
+            assert 0
+
+        matrices.extend([
+            self.rotate_matrix('x', motor_angle[0]),
+            self.translation_matrix(0, flag*L1, 0),
+            self.rotate_matrix('y', np.pi/2+motor_angle[1]),
+            self.translation_matrix(L2, 0, 0),
+            self.rotate_matrix('y', -np.pi/6+motor_angle[2]),
+            self.translation_matrix(L3, 0, 0)
+        ])
+        matrix = matrices[0]
+        for tmp_m in matrices[1: ]:
+            matrix = np.matmul(matrix, tmp_m)
+        pos = np.array([[0], [0], [0], [1]])
+        ret = np.matmul(matrix, pos)
+        assert ret[-1] == 1
+
+        return ret[: -1]
