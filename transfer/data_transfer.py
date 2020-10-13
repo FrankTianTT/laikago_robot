@@ -151,6 +151,13 @@ class Transfer(object):
         assert ret[-1] == 1
         return ret[: -1].reshape(-1)
 
+    def get_chassis_vel_by_toe(self):
+        history_toe_position = self.get_history_toe_position()
+        now_toe_height = [history_toe_position[0][index] for index in [0, 3, 6, 9]]
+        lowest_toe_id = np.argmin(now_toe_height)
+        return history_toe_position[0][lowest_toe_id * 3: lowest_toe_id * 3 + 3] - \
+               history_toe_position[1][lowest_toe_id * 3: lowest_toe_id * 3 + 3]
+
     def get_history_angle(self):
         history_angle = []
         for obs in self.history_observation:

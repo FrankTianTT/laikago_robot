@@ -79,4 +79,4 @@ if __name__ == '__main__':
                    50, 15, -35]) * np.pi / 180
     while True:
         o, r, d, _ = laikago_env.step(a)
-        print(len(o))
+        print(laikago_env.transfer.get_chassis_vel_by_toe())

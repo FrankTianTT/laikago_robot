@@ -7,7 +7,9 @@ URDF_FILE = os.path.join(URDF_DIR_NAME, 'laikago.urdf')
 
 CAMERA_SETTING = {'camera_distance': 2.0,
                   'camera_yaw': 0,
-                  'camera_pitch': -30}
+                  'camera_pitch': -30,
+                  'render_width': 480,
+                  'render_height': 360}
 TIME_STEP = 0.002
 ACTION_REPEAT = 10
 NUM_MOTORS = 12

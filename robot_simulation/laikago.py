@@ -383,6 +383,10 @@ class Laikago(object):
         roll_pitch_yaw = self._pybullet_client.getEulerFromQuaternion(orientation)
         return np.asarray(roll_pitch_yaw)
 
+    def get_base_position(self):
+        # Attention! This function should be only used in SIMULATION!
+        return self._base_position
+
     def get_base_roll_pitch_yaw(self):
         return self._add_sensor_noise(np.array(
             self._control_observation[2 * self.num_motors: 2 * self.num_motors + 3]),

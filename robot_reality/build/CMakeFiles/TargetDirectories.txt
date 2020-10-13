@@ -1,0 +1,3 @@
+/home/songlei/Code/cpp/laikago/laikago_socket/build/CMakeFiles/rebuild_cache.dir
+/home/songlei/Code/cpp/laikago/laikago_socket/build/CMakeFiles/client.dir
+/home/songlei/Code/cpp/laikago/laikago_socket/build/CMakeFiles/edit_cache.dir
