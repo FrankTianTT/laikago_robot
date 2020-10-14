@@ -52,3 +52,14 @@ class LaikagoTask(object):
         k = 1 - self.precision_cost(yaw, 0.0, 0.5)
         return min(k * r, r)
 
+    def reward_turn(self, dir):
+        yaw = self._env.get_history_rpy()[0][2]
+        return dir * yaw + 0.1 * self.reward_up()
+
+    def reward_lift(self, foot):
+        toe_height = []
+        for i in range(0, 4):
+            toe_height.append(self._env.get_history_toe_position()[0][3*i+2])
+        # print(toe_height)
+        h = toe_height[foot] - min(toe_height)
+        return min(1, h)

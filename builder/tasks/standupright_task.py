@@ -1,9 +1,9 @@
 from laikago_task import LaikagoTask
 
-class LaikagoStandUp(LaikagoTask):
+class LaikagoStandUpright(LaikagoTask):
 
     def __init__(self, mode='train'):
-        super(LaikagoStandUp, self).__init__(mode)
+        super(LaikagoStandUpright, self).__init__(mode)
         pass
 
     def reward(self):

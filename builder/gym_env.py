@@ -5,7 +5,9 @@ from builder.laikago_task import LaikagoTask
 import time
 import numpy as np
 from builder import env_constant
-from tasks.standupright_task import LaikagoStandUp
+from tasks.standupright_task import LaikagoStandUpright
+from tasks.turn_task import LaikagoTurn
+from tasks.liftfoot_task import LaikagoLiftFoot
 
 class LaikagoEnv(gym.Env):
     def __init__(self,
@@ -67,7 +69,7 @@ class LaikagoEnv(gym.Env):
         return self.transfer.get_history_toe_position()
 
 if __name__ == '__main__':
-    task = LaikagoStandUp()
+    task = LaikagoLiftFoot()
     laikago_env = LaikagoEnv(task=task, visual=True)
 
     a = np.array([-50, 15, -35,
@@ -76,4 +78,5 @@ if __name__ == '__main__':
                    50, 15, -35]) * np.pi / 180
     while True:
         o, r, d, _ = laikago_env.step(a)
-        print(laikago_env.transfer.get_chassis_vel_by_toe())
+        # print(laikago_env.transfer.get_chassis_vel_by_toe())
+        print(r)
