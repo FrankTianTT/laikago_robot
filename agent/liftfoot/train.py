@@ -1,16 +1,16 @@
-from builder.tasks.standupright_task import LaikagoStandUpright
+from builder.tasks.liftfoot_task import LaikagoLiftFoot
 from builder.gym_env import LaikagoEnv
 from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import EvalCallback
 import torch
 
-task = LaikagoStandUpright()
+task = LaikagoLiftFoot()
 env = LaikagoEnv(task=task, visual=False)
 eval_env = LaikagoEnv(task=task, visual=False)
 
 eval_callback = EvalCallback(eval_env,
-                             best_model_save_path='./logs/',
-                             log_path='./logs/',
+                             best_model_save_path='logs/',
+                             log_path='logs/',
                              eval_freq=1000,
                              deterministic=True,
                              render=False)
