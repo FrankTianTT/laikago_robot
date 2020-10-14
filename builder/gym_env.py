@@ -70,16 +70,13 @@ class LaikagoEnv(gym.Env):
         return self.transfer.get_history_toe_position()
 
 if __name__ == '__main__':
-    # task = LaikagoTask()
     task = LaikagoStandUp()
-    laikago_env = LaikagoEnv(task=task, visual=False)
+    laikago_env = LaikagoEnv(task=task, visual=True)
 
-    a = np.array([-15, 15, -35,
-                   15, 15, -35,
-                   -15, 15, -35,
-                   15, 15, -35]) * np.pi / 180
+    a = np.array([-50, 15, -35,
+                   50, 15, -35,
+                   -50, 15, -35,
+                   50, 15, -35]) * np.pi / 180
     while True:
         o, r, d, _ = laikago_env.step(a)
         print(len(o))
-
-        # print('target:', a)

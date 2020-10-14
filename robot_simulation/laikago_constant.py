@@ -8,7 +8,8 @@ URDF_FILE = os.path.join(URDF_DIR_NAME, 'laikago.urdf')
 CAMERA_SETTING = {'camera_distance': 2.0,
                   'camera_yaw': 0,
                   'camera_pitch': -30}
-TIME_STEP = 0.02
+TIME_STEP = 0.002
+ACTION_REPEAT = 10
 NUM_MOTORS = 12
 DOFS_PER_LEG = 3
 
@@ -69,3 +70,19 @@ class InitPose(Enum):
     STAND = 1
     LIE = 2
     ON_ROCK = 3
+
+ABDUCTION_P_GAIN = 220.0
+ABDUCTION_D_GAIN = 0.3
+HIP_P_GAIN = 220.0
+HIP_D_GAIN = 2.0
+KNEE_P_GAIN = 220.0
+KNEE_D_GAIN = 2.0
+KP = [ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
+            ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
+            ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
+            ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN]
+KD = [ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN,
+            ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN,
+            ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN,
+            ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN]
+TORQUE_LIMITS = np.ones(12) * 40

@@ -19,11 +19,14 @@ class Laikago(object):
                  urdf_filename=laikago_constant.URDF_FILE,
                  init_pose=InitPose.ON_ROCK,
                  self_collision_enabled=False,
-                 action_repeat=1,
+                 action_repeat=laikago_constant.ACTION_REPEAT,
                  randomized=True,
                  observation_noise_stdev=laikago_constant.SENSOR_NOISE_STDDEV,
                  control_latency=0.0,
-                 observation_history_len=laikago_constant.OBSERVATION_HISTORY_LEN):
+                 observation_history_len=laikago_constant.OBSERVATION_HISTORY_LEN,
+                 kp=laikago_constant.KP,
+                 kd=laikago_constant.KD,
+                 torque_limits=laikago_constant.TORQUE_LIMITS):
         self.visual = visual
         if self.visual:
             self._pybullet_client = bullet_client.BulletClient(connection_mode=pybullet.GUI)
@@ -44,6 +47,9 @@ class Laikago(object):
         if self.randomized:
             self.randomizer = LaikagoRobotRandomizer(self)
         self.observation_history_len = observation_history_len
+        self._kp = kp
+        self._kd = kd
+        self._torque_limits = torque_limits
 
         _, self._init_orientation_inv = self._pybullet_client.invertTransform(
             position=[0, 0, 0], orientation=self._get_default_init_orientation())
@@ -94,11 +100,33 @@ class Laikago(object):
             self._step_internal(action)
         return self.get_observation()
 
-    def _step_internal(self, action):
-        self._set_motor_torque_by_Ids(self._motor_id_list, action)
+    def _step_internal(self, pos_action):
+        torque_action = self.position2torque(pos_action)
+        self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
         self.receive_observation()
         return
+
+    def position2torque(self, target_pos, target_vel=np.zeros(12)):
+        """
+        通过PD控制将位置信号转化为电机的扭矩信号
+        :param target_pos: 目标位置
+        :param target_vel: 目标速度
+        :param pos: 观测位置
+        :param vel: 观测速度
+        :return: 对应的电机扭矩
+        """
+        target_pos = np.array(target_pos)
+        target_vel = np.array(target_vel)
+        pos = np.array(self.get_true_motor_angles())
+        vel = np.array(self.get_true_motor_velocities())
+        # print('pos:', pos)
+        # print('vel:', vel)
+        additional_torques = 0
+        motor_torques = -1 * (self._kp * (pos - target_pos)) - self._kd * (vel - target_vel) + additional_torques
+        motor_torques = np.clip(motor_torques, -1*self._torque_limits, self._torque_limits)
+
+        return motor_torques
 
     def _init_observation_history(self):
         obs = self.get_true_observation()
