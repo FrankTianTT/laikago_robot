@@ -227,3 +227,4 @@ class Transfer(object):
         for obs in self.history_observation:
             history_toe_position.append(obs[34: 34+12])
         return np.array(history_toe_position)
+

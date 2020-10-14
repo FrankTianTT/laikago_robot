@@ -104,3 +104,12 @@ class LaikagoTask(object):
 
     def reward_walk(self, walk_dir):
         return self.reward_chassis(walk_dir) + 0.5 * self.reward_feet(walk_dir) + 0.1 * self.reward_up()
+
+    def reward_stand_high(self):
+        toe_position = self._env.get_history_toe_position()
+        height = 0
+        for pos in toe_position:
+            height += pos[2]
+        height = - height/4
+        roll = self._env.get_history_rpy()[0][0]
+        return height * math.cos(roll)

@@ -5,9 +5,9 @@ from laikago_constant import InitPose
 import pybullet
 import pybullet_utils.bullet_client as bullet_client
 import pybullet_data as pd
-from laiakgo_randomizer import LaikagoRobotRandomizer
 import numpy as np
 import collections
+import random
 
 class Laikago(object):
     def __init__(self,
@@ -26,7 +26,12 @@ class Laikago(object):
                  observation_history_len=laikago_constant.OBSERVATION_HISTORY_LEN,
                  kp=laikago_constant.KP,
                  kd=laikago_constant.KD,
-                 torque_limits=laikago_constant.TORQUE_LIMITS):
+                 torque_limits=laikago_constant.TORQUE_LIMITS,
+                 mass_bound=laikago_constant.MASS_BOUND,
+                 inertia_bound=laikago_constant.INERTIA_BOUND,
+                 joint_f_bound=laikago_constant.JOINT_F_BOUND,
+                 toe_f_bound=laikago_constant.TOE_F_BOUND
+                 ):
         self.visual = visual
         if self.visual:
             self._pybullet_client = bullet_client.BulletClient(connection_mode=pybullet.GUI)
@@ -44,12 +49,14 @@ class Laikago(object):
         self.randomized = randomized
         self._observation_noise_stdev = observation_noise_stdev
         self._control_latency = control_latency
-        if self.randomized:
-            self.randomizer = LaikagoRobotRandomizer(self)
         self.observation_history_len = observation_history_len
         self._kp = kp
         self._kd = kd
         self._torque_limits = torque_limits
+        self.mass_bound = mass_bound
+        self.inertia_bound = inertia_bound
+        self.joint_f_bound = joint_f_bound
+        self.toe_f_bound = toe_f_bound
 
         _, self._init_orientation_inv = self._pybullet_client.invertTransform(
             position=[0, 0, 0], orientation=self._get_default_init_orientation())
@@ -91,7 +98,7 @@ class Laikago(object):
         self._pybullet_client.resetBaseVelocity(self.quadruped, [0, 0, 0], [0, 0, 0])
         self.reset_pose()
         if self.randomized:
-            self.randomizer.randomize()
+            self.randomize()
         return
 
     def step(self, action):
@@ -436,6 +443,42 @@ class Laikago(object):
                 toe_contacts[i] = 1
         return toe_contacts
 
+
+    def randomize(self):
+        base_mass = self.get_base_mass_from_urdf()
+        randomized_base_mass = random.uniform(
+            np.array(base_mass) * (1.0 + self.mass_bound[0]),
+            np.array(base_mass) * (1.0 + self.mass_bound[1]))
+        self.set_base_mass(randomized_base_mass)
+
+        leg_masses = self.get_leg_masses_from_urdf()
+        randomized_leg_masses = random.uniform(
+            np.array(leg_masses) * (1.0 + self.mass_bound[0]),
+            np.array(leg_masses) * (1.0 + self.mass_bound[1]))
+        self.set_leg_masses(randomized_leg_masses)
+
+        base_inertial = self.get_base_inertia_from_urdf()
+        randomized_base_inertial = random.uniform(
+            np.array(base_inertial) * (1.0 + self.mass_bound[0]),
+            np.array(base_inertial) * (1.0 + self.mass_bound[1]))
+        self.set_base_inertia(randomized_base_inertial)
+
+        leg_inertias = self.get_leg_inertias_from_urdf()
+        randomized_leg_inertias = random.uniform(
+            np.array(leg_inertias) * (1.0 + self.mass_bound[0]),
+            np.array(leg_inertias) * (1.0 + self.mass_bound[1]))
+        self.set_leg_inertias(randomized_leg_inertias)
+
+        randomized_toe_friction = random.uniform(
+            np.full(4, self.toe_f_bound[0]),
+            np.full(4, self.toe_f_bound[1]))
+        self.set_toe_friction(randomized_toe_friction)
+
+        randomized_joint_fraction = random.uniform(
+            np.full(12, self.joint_f_bound[0]),
+            np.full(12, self.joint_f_bound[1]))
+        self.set_joint_friction(randomized_joint_fraction)
+
     def get_true_observation(self):
         observation = []
         observation.extend(self.get_true_motor_angles())           # [0, 12]
@@ -469,5 +512,5 @@ class Laikago(object):
         print(self._leg_inertia_urdf)
 
 if __name__ == '__main__':
-    laikago = Laikago(visual=True, init_pose=InitPose.LIE)
-    ind = laikago.get_toe_link_ids()
+    laikago = Laikago(visual=False, init_pose=InitPose.LIE)
+    laikago.reset()
