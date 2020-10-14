@@ -70,7 +70,7 @@ class LaikagoEnv(gym.Env):
         return self.transfer.get_history_toe_position()
 
 if __name__ == '__main__':
-    task = LaikagoWalk(dir=env_constant.WALK_RIGHT)
+    task = LaikagoWalk()
     laikago_env = LaikagoEnv(task=task, visual=True)
 
     a = np.array([-50, 15, -35,
@@ -80,4 +80,4 @@ if __name__ == '__main__':
     while True:
         o, r, d, _ = laikago_env.step(a)
         # print(laikago_env.transfer.get_chassis_vel_by_toe())
-        print('reward = ', r)
+        print('reward =', r)
