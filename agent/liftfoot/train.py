@@ -11,7 +11,7 @@ eval_env = LaikagoEnv(task=task, visual=False)
 eval_callback = EvalCallback(eval_env,
                              best_model_save_path='logs/',
                              log_path='logs/',
-                             eval_freq=1000,
+                             eval_freq=10000,
                              deterministic=True,
                              render=False)
 policy_kwargs = dict(activation_fn=torch.nn.ReLU, net_arch=[256, 256])

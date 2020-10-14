@@ -67,7 +67,7 @@ class LaikagoEnv(gym.Env):
         return self.transfer.get_history_toe_position()
 
 if __name__ == '__main__':
-    task = LaikagoWalk(dir=env_constant.WALK_RIGHT)
+    task = LaikagoWalk(direction=env_constant.WALK_RIGHT)
     laikago_env = LaikagoEnv(task=task, visual=False)
 
     a = np.array([-50, 15, -35,
