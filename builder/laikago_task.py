@@ -3,6 +3,7 @@ import random
 import numpy as np
 from enum import Enum
 from builder import env_constant
+import collections
 
 class InitPose(Enum):
     STAND = 1
@@ -17,19 +18,38 @@ class LaikagoTask(object):
         self.mode = mode
         self.init_pose = init_pose
         self.steps = 0
+        self.history_rpy_diff = collections.deque(maxlen=100)
         return
 
     def reset(self, env):
         self._env = env
         self.steps = 0
+        self.fall_timer = 0
+        self.history_rpy_diff.clear()
         pass
 
     def update(self):
         self.steps += 1
+        history_rpy = self._env.get_history_rpy()
+        rpy_diff = ((np.array(history_rpy[0]) - np.array(history_rpy[-1]))**2).sum()
+        self.history_rpy_diff.appendleft(rpy_diff)
         pass
 
     def done(self):
-        return False
+        if self.steps > 1000:
+            return True
+
+        roll = self._env.get_history_rpy()[0][0]
+        if roll > 3 or roll < -3:
+            self.fall_timer += 1
+        else:
+            self.fall_timer = 0
+
+        if self.fall_timer > 20:
+            return True
+
+        if len(self.history_rpy_diff) == 100 and max(self.history_rpy_diff) < 0.01:
+            return True
 
     def reward(self):
         return 0

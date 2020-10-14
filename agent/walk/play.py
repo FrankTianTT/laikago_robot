@@ -14,11 +14,11 @@ if __name__ == '__main__':
     total_reward = 0
     obs = env.reset()
     for i in range(100000):
-        # action, _states = model.predict(obs, deterministic=True)
-        action = np.array([0, 40, -75,
-                   0, 40, -75,
-                   0, 40, -75,
-                   0, 40, -75]) * np.pi / 180
+        action, _states = model.predict(obs, deterministic=True)
+        # action = np.array([0, 40, -75,
+        #            0, 40, -75,
+        #            0, 40, -75,
+        #            0, 40, -75]) * np.pi / 180
         obs, reward, done, info = env.step(action)
         total_reward += reward
         if done:

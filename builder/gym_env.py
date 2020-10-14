@@ -18,6 +18,7 @@ class LaikagoEnv(gym.Env):
                  position_upper_bound=env_constant.POSITION_UPPER_BOUND,
                  position_lower_bound=env_constant.POSITION_LOWER_BOUND):
         self.task = task
+        self.task.reset(self)
         self.visual = visual
         self.transfer_class = transfer_class
         self.transfer = None
