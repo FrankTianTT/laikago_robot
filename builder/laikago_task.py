@@ -2,7 +2,7 @@ import math
 import random
 import numpy as np
 from enum import Enum
-
+from builder import env_constant
 
 class InitPose(Enum):
     STAND = 1
@@ -63,3 +63,26 @@ class LaikagoTask(object):
         # print(toe_height)
         h = toe_height[foot] - min(toe_height)
         return min(1, h)
+
+    def reward_chassis(self, walk_dir):
+        chassis_vel = self._env.get_history_chassis_velocity()[0]
+        return self.reward_rotation(np.dot(walk_dir, chassis_vel))
+
+    def toe_swing_velocity(self, foot):
+        toe_pos = self._env.get_history_toe_position()[0][3*foot: 3*foot+3]
+        last_toe_pos = self._env.get_history_toe_position()[1][3*foot: 3*foot+3]
+        v = (toe_pos - last_toe_pos) / env_constant.TIME_STEP
+        print('foot = ', foot, 'swing = ', v + self._env.get_history_chassis_velocity()[0])
+        return np.array(v + self._env.get_history_chassis_velocity()[0])
+
+    def reward_feet(self, walk_dir):
+        reward = 0.0
+        for i in range(0, 4):
+            swing_v = self.toe_swing_velocity(i)
+            reward += np.dot(walk_dir, swing_v)
+        reward /= 4
+        return self.reward_rotation(reward)
+
+    def reward_walk(self, walk_dir):
+        return self.reward_chassis(walk_dir) + 0.5 * self.reward_feet(walk_dir) + 0.1 * self.reward_up()
+
