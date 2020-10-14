@@ -471,4 +471,3 @@ class Laikago(object):
 if __name__ == '__main__':
     laikago = Laikago(visual=True, init_pose=InitPose.LIE)
     ind = laikago.get_toe_link_ids()
-    print(ind)

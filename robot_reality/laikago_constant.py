@@ -1,7 +1,6 @@
 import re
 import numpy as np
 
-
 NUM_MOTORS = 12
 DOFS_PER_LEG = 3
 

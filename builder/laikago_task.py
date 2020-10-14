@@ -15,17 +15,17 @@ class LaikagoTask(object):
                  init_pose=InitPose.STAND):
         self._env = None
         self.mode = mode
-
         self.init_pose = init_pose
+        self.steps = 0
         return
 
-    def set_env(self, env):
+    def reset(self, env):
         self._env = env
-
-    def reset(self):
+        self.steps = 0
         pass
 
     def update(self):
+        self.steps += 1
         pass
 
     def done(self):
@@ -72,7 +72,6 @@ class LaikagoTask(object):
         toe_pos = self._env.get_history_toe_position()[0][3*foot: 3*foot+3]
         last_toe_pos = self._env.get_history_toe_position()[1][3*foot: 3*foot+3]
         v = (toe_pos - last_toe_pos) / env_constant.TIME_STEP
-        print('foot = ', foot, 'swing = ', v + self._env.get_history_chassis_velocity()[0])
         return np.array(v + self._env.get_history_chassis_velocity()[0])
 
     def reward_feet(self, walk_dir):

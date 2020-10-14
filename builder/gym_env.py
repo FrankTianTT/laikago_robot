@@ -18,7 +18,6 @@ class LaikagoEnv(gym.Env):
                  position_upper_bound=env_constant.POSITION_UPPER_BOUND,
                  position_lower_bound=env_constant.POSITION_LOWER_BOUND):
         self.task = task
-        self.task.set_env(self)
         self.visual = visual
         self.transfer_class = transfer_class
         self.transfer = None
@@ -28,24 +27,22 @@ class LaikagoEnv(gym.Env):
             np.array(position_lower_bound),
             dtype=np.float32)
         self.observation_space = spaces.Box(
-            np.ones(46*3),
-            - np.ones(46*3),
+            np.ones(90),
+            - np.ones(90),
             dtype=np.float32)
 
 
     def step(self, action):
         obs = self.transfer.step(action)
-        reward = self.task.reward()
-        done = self.task.done()
         self.task.update()
-        return obs, reward, done, None
+
+        done = self.task.done()
+        reward = self.task.reward()
+        return obs, reward, done, {}
 
     def reset(self):
-        transfer_obs = self.transfer.reset()
-        obs = []
-        for o in transfer_obs:
-            obs.extend(o)
-        self.task.reset()
+        obs = self.transfer.reset()
+        self.task.reset(self)
         return obs
 
     def get_observation(self):
@@ -71,7 +68,7 @@ class LaikagoEnv(gym.Env):
 
 if __name__ == '__main__':
     task = LaikagoWalk(dir=env_constant.WALK_RIGHT)
-    laikago_env = LaikagoEnv(task=task, visual=True)
+    laikago_env = LaikagoEnv(task=task, visual=False)
 
     a = np.array([-50, 15, -35,
                    50, 15, -35,
@@ -80,4 +77,3 @@ if __name__ == '__main__':
     while True:
         o, r, d, _ = laikago_env.step(a)
         # print(laikago_env.transfer.get_chassis_vel_by_toe())
-        print('reward = ', r)

@@ -34,9 +34,13 @@ class Transfer(object):
 
     def get_env_observation(self):
         obs = []
-        obs.extend(self.history_observation[0][0:24])
+        obs.extend(np.array(self.history_observation[0][0:12])/(2 * np.pi))
+        obs.extend(np.array(self.history_observation[0][12:24]) / (20 * np.pi))
         for i in range(self.history_len):
-            obs.extend(self.history_observation[i][24:46])
+            obs.extend(np.array(self.history_observation[i][24:27])/(2 * np.pi))
+            obs.extend(np.array(self.history_observation[i][27:30])/(20 * np.pi))
+            obs.extend(np.array(self.history_observation[i][30:34]))
+            obs.extend(np.array(self.history_observation[i][34:46]))
         return obs
 
     def collocation_observation(self, obs):
@@ -60,14 +64,15 @@ class Transfer(object):
 
     def reset(self):
         self.laikago.reset(init_reset=False)
-        return self.history_observation
+        self._init_history_observation()
+        return self.get_env_observation()
 
     def get_observation(self):
         return self.laikago.get_observation()
 
     def _init_history_observation(self):
         for i in range(self.history_len):
-            self.history_observation.appendleft(np.zeros(34+12))
+            self.history_observation.appendleft(np.zeros(50))
 
     @staticmethod
     def get_transform_matrix(alpha, a, d, theta):
@@ -190,7 +195,7 @@ class Transfer(object):
     def get_history_chassis_velocity(self):
         chassis_vel = []
         for obs in self.history_observation:
-            chassis_vel.append(obs[46:50])
+            chassis_vel.append(obs[46: 50])
         return np.array(chassis_vel)
 
     def get_history_velocity(self):
