@@ -41,7 +41,7 @@ class LaikagoTask(object):
     def reward_up(self):
         roll = self._env.get_history_rpy()[0][0]
         pitch = self._env.get_history_rpy()[0][1]
-        return 1 - self.precision_cost(math.sqrt(roll * roll + pitch * pitch), 0.0, 0.4)
+        return 1 - self.precision_cost(math.sqrt(roll ** 2 + pitch ** 2), 0.0, 0.4)
 
     def reward_still(self):
         chassis_vel = self._env.get_history_chassis_velocity()[0]
@@ -51,3 +51,4 @@ class LaikagoTask(object):
         yaw = self._env.get_history_rpy()[0][2]
         k = 1 - self.precision_cost(yaw, 0.0, 0.5)
         return min(k * r, r)
+

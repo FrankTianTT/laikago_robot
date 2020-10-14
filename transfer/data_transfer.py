@@ -30,11 +30,32 @@ class Transfer(object):
         """
         obs = self.laikago.step(pos_action)
         self.collocation_observation(obs)
-        return self.history_observation
+        return self.get_env_observation()
+
+    def get_env_observation(self):
+        obs = []
+        obs.extend(self.history_observation[0][0:24])
+        for i in range(self.history_len):
+            obs.extend(self.history_observation[i][24:46])
+        return obs
 
     def collocation_observation(self, obs):
+        """
+        收集历史数据，历史数据分别为
+        [0:12] motor angle
+        [12:24] motor velocity
+        [24:27] rpy
+        [27:30] dRPY
+        [30:34] toe collision
+        [34:46] toe position (3*4)
+        [46:50] chassis velocity
+        :param obs:
+        :return:
+        """
         toe_position = self.get_toe_position()
+        chassis_vel = self.get_chassis_vel_by_toe()
         obs.extend(toe_position)
+        obs.extend(chassis_vel)
         self.history_observation.appendleft(obs)
 
     def reset(self):
@@ -104,6 +125,7 @@ class Transfer(object):
             [0, 0, 0, 1]
         ]
         return np.array(matrix)
+
     def get_toe_position(self):
         pos = []
         toe_links = self.laikago.get_toe_link_ids()
@@ -152,11 +174,12 @@ class Transfer(object):
         return ret[: -1].reshape(-1)
 
     def get_chassis_vel_by_toe(self):
-        history_toe_position = self.get_history_toe_position()
-        now_toe_height = [history_toe_position[0][index] for index in [0, 3, 6, 9]]
+        now_toe_position = self.get_toe_position()
+        last_toe_position = self.get_history_toe_position()[0]
+        now_toe_height = [now_toe_position[index] for index in [0, 3, 6, 9]]
         lowest_toe_id = np.argmin(now_toe_height)
-        return history_toe_position[0][lowest_toe_id * 3: lowest_toe_id * 3 + 3] - \
-               history_toe_position[1][lowest_toe_id * 3: lowest_toe_id * 3 + 3]
+        return last_toe_position[lowest_toe_id * 3: lowest_toe_id * 3 + 3] - \
+               now_toe_position[lowest_toe_id * 3: lowest_toe_id * 3 + 3]
 
     def get_history_angle(self):
         history_angle = []
@@ -165,7 +188,10 @@ class Transfer(object):
         return np.array(history_angle)
 
     def get_history_chassis_velocity(self):
-        return np.zeros((3, 3))
+        chassis_vel = []
+        for obs in self.history_observation:
+            chassis_vel.append(obs[46:50])
+        return np.array(chassis_vel)
 
     def get_history_velocity(self):
         history_vel = []

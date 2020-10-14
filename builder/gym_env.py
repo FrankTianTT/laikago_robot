@@ -5,7 +5,7 @@ from builder.laikago_task import LaikagoTask
 import time
 import numpy as np
 from builder import env_constant
-from tasks.task_standup import LaikagoStandUp
+from tasks.standupright_task import LaikagoStandUp
 
 class LaikagoEnv(gym.Env):
     def __init__(self,
@@ -31,10 +31,7 @@ class LaikagoEnv(gym.Env):
 
 
     def step(self, action):
-        transfer_obs = self.transfer.step(action)
-        obs = []
-        for o in transfer_obs:
-            obs.extend(o)
+        obs = self.transfer.step(action)
         reward = self.task.reward()
         done = self.task.done()
         self.task.update()
