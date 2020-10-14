@@ -104,4 +104,3 @@ class LaikagoTask(object):
 
     def reward_walk(self, walk_dir):
         return self.reward_chassis(walk_dir) + 0.5 * self.reward_feet(walk_dir) + 0.1 * self.reward_up()
-

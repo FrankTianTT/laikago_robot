@@ -52,7 +52,7 @@ class Transfer(object):
         [27:30] dRPY
         [30:34] toe collision
         [34:46] toe position (3*4)
-        [46:50] chassis velocity
+        [46:49] chassis velocity
         :param obs:
         :return:
         """
@@ -72,7 +72,7 @@ class Transfer(object):
 
     def _init_history_observation(self):
         for i in range(self.history_len):
-            self.history_observation.appendleft(np.zeros(50))
+            self.history_observation.appendleft(np.zeros(49))
 
     @staticmethod
     def get_transform_matrix(alpha, a, d, theta):
@@ -183,8 +183,8 @@ class Transfer(object):
         last_toe_position = self.get_history_toe_position()[0]
         now_toe_height = [now_toe_position[index] for index in [0, 3, 6, 9]]
         lowest_toe_id = np.argmin(now_toe_height)
-        return last_toe_position[lowest_toe_id * 3: lowest_toe_id * 3 + 3] - \
-               now_toe_position[lowest_toe_id * 3: lowest_toe_id * 3 + 3]
+        return (last_toe_position[lowest_toe_id * 3: lowest_toe_id * 3 + 3] -
+               now_toe_position[lowest_toe_id * 3: lowest_toe_id * 3 + 3])/0.02
 
     def get_history_angle(self):
         history_angle = []
@@ -195,7 +195,7 @@ class Transfer(object):
     def get_history_chassis_velocity(self):
         chassis_vel = []
         for obs in self.history_observation:
-            chassis_vel.append(obs[46: 50])
+            chassis_vel.append(obs[46: 49])
         return np.array(chassis_vel)
 
     def get_history_velocity(self):
