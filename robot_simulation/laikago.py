@@ -6,7 +6,6 @@ import pybullet
 import pybullet_utils.bullet_client as bullet_client
 import pybullet_data as pd
 import numpy as np
-import collections
 import random
 
 class Laikago(object):
@@ -22,7 +21,6 @@ class Laikago(object):
                  action_repeat=laikago_constant.ACTION_REPEAT,
                  randomized=True,
                  observation_noise_stdev=laikago_constant.SENSOR_NOISE_STDDEV,
-                 control_latency=0.0,
                  observation_history_len=laikago_constant.OBSERVATION_HISTORY_LEN,
                  kp=laikago_constant.KP,
                  kd=laikago_constant.KD,
@@ -48,7 +46,6 @@ class Laikago(object):
         self._action_repeat = action_repeat
         self.randomized = randomized
         self._observation_noise_stdev = observation_noise_stdev
-        self._control_latency = control_latency
         self.observation_history_len = observation_history_len
         self._kp = kp
         self._kd = kd
@@ -63,8 +60,6 @@ class Laikago(object):
         self.last_observation = np.zeros(34).tolist()
         _, self._init_orientation_inv = self._pybullet_client.invertTransform(
             position=[0, 0, 0], orientation=self._get_default_init_orientation())
-        self._observation_history = collections.deque(maxlen=self.observation_history_len)
-        self._control_observation = []
         self.reset(init_reset=True)
         self.receive_observation()
 
@@ -103,7 +98,6 @@ class Laikago(object):
             self.randomize()
         else:
             self._pybullet_client.setGravity(0, 0, - self.now_g)
-        # self.print_laikago_info()
         return
 
     def step(self, action):
@@ -111,6 +105,7 @@ class Laikago(object):
         for i in range(self._action_repeat):
             self._step_internal(action)
         obs = self.last_observation
+        self.receive_observation()
         self.last_observation = self.get_observation()
         return obs
 
@@ -118,7 +113,6 @@ class Laikago(object):
         torque_action = self.position2torque(pos_action)
         self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
-        self.receive_observation()
         return
 
     def position2torque(self, target_pos, target_vel=np.zeros(12)):
@@ -132,20 +126,13 @@ class Laikago(object):
         """
         target_pos = np.array(target_pos)
         target_vel = np.array(target_vel)
-        pos = np.array(self.get_true_motor_angles())
-        vel = np.array(self.get_true_motor_velocities())
-        # print('pos:', pos)
-        # print('vel:', vel)
+        pos = np.array(self.get_motor_angles())
+        vel = np.array(self.get_motor_velocities())
         additional_torques = 0
         motor_torques = -1 * (self._kp * (pos - target_pos)) - self._kd * (vel - target_vel) + additional_torques
         motor_torques = np.clip(motor_torques, -1*self._torque_limits, self._torque_limits)
 
         return motor_torques
-
-    def _init_observation_history(self):
-        obs = self.get_true_observation()
-        for i in range(self.observation_history_len):
-            self._observation_history.appendleft(obs)
 
     def _set_motor_torque_by_Ids(self, motor_ids, torques):
         self._pybullet_client.setJointMotorControlArray(
@@ -153,28 +140,6 @@ class Laikago(object):
             jointIndices=motor_ids,
             controlMode=self._pybullet_client.TORQUE_CONTROL,
             forces=torques)
-
-    def receive_observation(self):
-        self._joint_states = self._pybullet_client.getJointStates(
-            self.quadruped, self._motor_id_list)
-        self._base_position, orientation = (
-            self._pybullet_client.getBasePositionAndOrientation(self.quadruped))
-        # Computes the relative orientation relative to the robot_simulation's
-        # initial_orientation.
-        _, self._base_orientation = self._pybullet_client.multiplyTransforms(
-            positionA=[0, 0, 0],
-            orientationA=orientation,
-            positionB=[0, 0, 0],
-            orientationB=self._init_orientation_inv)
-        self._observation_history.appendleft(self.get_true_observation())
-        if len(self._observation_history) < self.observation_history_len:
-            self._init_observation_history()
-        self._control_observation = self._get_control_observation()
-
-    def _get_control_observation(self):
-        control_delayed_observation = self._get_delayed_observation(
-            self._control_latency)
-        return control_delayed_observation
 
     def _build_joint_name2Id_dict(self):
         num_joints = self._pybullet_client.getNumJoints(self.quadruped)
@@ -285,7 +250,7 @@ class Laikago(object):
             self._pybullet_client.changeDynamics(
                 self.quadruped, leg_id, localInertiaDiagonal=leg_inertia)
 
-    def GetToeFrictionFromURDF(self):
+    def get_toe_friction_from_urdf(self):
         toe_frictions = []
         for toe_id in self._toe_link_ids:
             toe_frictions.append(
@@ -368,43 +333,43 @@ class Laikago(object):
                 urdf_file, self._get_default_init_position(),
                 self._get_default_init_orientation())
 
+    def receive_observation(self):
+        self._joint_states = self._pybullet_client.getJointStates(
+            self.quadruped, self._motor_id_list)
+        self._base_position, orientation = (
+            self._pybullet_client.getBasePositionAndOrientation(self.quadruped))
+        # Computes the relative orientation relative to the robot_simulation's
+        # initial_orientation.
+        _, self._base_orientation = self._pybullet_client.multiplyTransforms(
+            positionA=[0, 0, 0],
+            orientationA=orientation,
+            positionB=[0, 0, 0],
+            orientationB=self._init_orientation_inv)
+        angular_velocity = self._pybullet_client.getBaseVelocity(self.quadruped)[1]
+        self.roll_pitch_yaw_rate = self.transform_angular_velocity2local_frame(angular_velocity, self._base_orientation)
+
+    def get_true_base_roll_pitch_yaw(self):
+        orientation = self._base_orientation
+        roll_pitch_yaw = self._pybullet_client.getEulerFromQuaternion(orientation)
+        return np.asarray(roll_pitch_yaw)
+
+    def get_true_base_roll_pitch_yaw_rate(self):
+        return self.roll_pitch_yaw_rate
+
+    def get_true_motor_angles(self):
+        motor_angles = [state[0] for state in self._joint_states]
+        return motor_angles
+
+    def get_true_motor_velocities(self):
+        motor_velocities = [state[1] for state in self._joint_states]
+        return motor_velocities
+
     def _add_sensor_noise(self, sensor_values, noise_stdev):
         if noise_stdev <= 0:
             return sensor_values
         observation = sensor_values + np.random.normal(
             scale=noise_stdev, size=sensor_values.shape)
         return observation
-
-    def _get_delayed_observation(self, latency):
-        if latency <= 0 or len(self._observation_history) == 1:
-            observation = self._observation_history[0]
-        else:
-            n_steps_ago = int(latency / self.time_step)
-            if n_steps_ago + 1 >= len(self._observation_history):
-                return self._observation_history[-1]
-            remaining_latency = latency - n_steps_ago * self.time_step
-            blend_alpha = remaining_latency / self.time_step
-            observation = (
-                    (1.0 - blend_alpha) * np.array(self._observation_history[n_steps_ago])
-                    + blend_alpha * np.array(self._observation_history[n_steps_ago + 1]))
-        return observation
-
-    def get_true_base_orientation(self):
-        return self._base_orientation
-
-    def get_true_base_roll_pitch_yaw(self):
-        orientation = self.get_true_base_orientation()
-        roll_pitch_yaw = self._pybullet_client.getEulerFromQuaternion(orientation)
-        return np.asarray(roll_pitch_yaw)
-
-    def get_base_position(self):
-        # Attention! This function should be only used in SIMULATION!
-        return self._base_position
-
-    def get_base_roll_pitch_yaw(self):
-        return self._add_sensor_noise(np.array(
-            self._control_observation[2 * self.num_motors: 2 * self.num_motors + 3]),
-            self._observation_noise_stdev['IMU_angle'])
 
     def transform_angular_velocity2local_frame(self, angular_velocity, orientation):
         _, orientation_inversed = self._pybullet_client.invertTransform([0, 0, 0],
@@ -414,32 +379,26 @@ class Laikago(object):
             self._pybullet_client.getQuaternionFromEuler([0, 0, 0]))
         return np.asarray(relative_velocity)
 
-    def get_true_base_roll_pitch_yaw_rate(self):
-        angular_velocity = self._pybullet_client.getBaseVelocity(self.quadruped)[1]
-        orientation = self.get_true_base_orientation()
-        return self.transform_angular_velocity2local_frame(angular_velocity, orientation)
+    def get_base_position(self):
+        # Attention! This function should be only used in SIMULATION!
+        return self._base_position
+
+    def get_base_roll_pitch_yaw(self):
+        return self._add_sensor_noise(self.get_true_base_roll_pitch_yaw(),
+            self._observation_noise_stdev['IMU_angle'])
+
 
     def get_base_roll_pitch_yaw_rate(self):
-        return self._add_sensor_noise(
-            np.array(self._control_observation[2 * self.num_motors + 3: 2 * self.num_motors + 6]),
+        return self._add_sensor_noise(self.get_true_base_roll_pitch_yaw_rate(),
             self._observation_noise_stdev['IMU_rate'])
 
-    def get_true_motor_angles(self):
-        motor_angles = [state[0] for state in self._joint_states]
-        return motor_angles
-
     def get_motor_angles(self):
-        return self._add_sensor_noise(
-            np.array(self._control_observation[0:self.num_motors]),
+        return self._add_sensor_noise(np.array(self.get_true_motor_angles()),
             self._observation_noise_stdev['motor_angle'])
-
-    def get_true_motor_velocities(self):
-        motor_velocities = [state[1] for state in self._joint_states]
-        return motor_velocities
 
     def get_motor_velocities(self):
         return self._add_sensor_noise(
-            np.array(self._control_observation[self.num_motors:2 * self.num_motors]),
+            np.array(self.get_true_motor_velocities()),
             self._observation_noise_stdev['motor_velocity'])
 
     def get_toe_contacts(self):
@@ -451,7 +410,6 @@ class Laikago(object):
             else:
                 contacts[i] = sum([contact_point[9] for contact_point in contact_points])/len(contact_points)
         return contacts
-
 
     def randomize(self):
         base_mass = self.get_base_mass_from_urdf()
@@ -492,22 +450,13 @@ class Laikago(object):
         self._pybullet_client.setGravity(0, 0, - randomized_g)
         self.now_g = randomized_g
 
-    def get_true_observation(self):
-        observation = []
-        observation.extend(self.get_true_motor_angles())           # [0, 12]
-        observation.extend(self.get_true_motor_velocities())       # [12, 24]
-        observation.extend(self.get_true_base_roll_pitch_yaw())      # [24, 27]
-        observation.extend(self.get_true_base_roll_pitch_yaw_rate())  # [27, 30]
-        observation.extend(self.get_toe_contacts())               # [30, 34]
-        return observation
-
     def get_observation(self):
         observation = []
-        observation.extend(self.get_motor_angles())               # [0, 12]
-        observation.extend(self.get_motor_velocities())           # [12, 24]
+        observation.extend(self.get_motor_angles())                 # [0, 12]
+        observation.extend(self.get_motor_velocities())             # [12, 24]
         observation.extend(self.get_base_roll_pitch_yaw())          # [24, 27]
-        observation.extend(self.get_base_roll_pitch_yaw_rate())      # [27, 30]
-        observation.extend(self.get_toe_contacts())               # [30, 34]
+        observation.extend(self.get_base_roll_pitch_yaw_rate())     # [27, 30]
+        observation.extend(self.get_toe_contacts())                 # [30, 34]
         return observation
 
     def print_laikago_info(self):
