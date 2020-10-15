@@ -465,7 +465,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <sphere radius="0.03"/>
+                <sphere radius="0.0"/>
             </geometry>
             <material name="white"/>
         </visual>
@@ -476,8 +476,8 @@
             </geometry>
         </collision>
         <inertial>
-            <mass value="0.1"/>
-            <inertia ixx="0.000025" ixy="0" ixz="0" iyy="0.000025" iyz="0" izz="0.000025"/>
+            <mass value="0.001"/>
+            <inertia ixx="0.000005" ixy="0" ixz="0" iyy="0.000005" iyz="0" izz="0.000005"/>
         </inertial>
     </link>
     <joint name="jtoeRL" type="fixed">
@@ -498,7 +498,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <sphere radius="0.03"/>
+                <sphere radius="0.0"/>
             </geometry>
             <material name="white"/>
         </visual>
@@ -509,8 +509,8 @@
             </geometry>
         </collision>
         <inertial>
-            <mass value="0.1"/>
-            <inertia ixx="0.000025" ixy="0" ixz="0" iyy="0.000025" iyz="0" izz="0.000025"/>
+            <mass value="0.001"/>
+            <inertia ixx="0.000005" ixy="0" ixz="0" iyy="0.000005" iyz="0" izz="0.000005"/>
         </inertial>
     </link>
     <joint name="jtoeRR" type="fixed">
@@ -531,7 +531,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <sphere radius="0.03"/>
+                <sphere radius="0.0"/>
             </geometry>
             <material name="white"/>
         </visual>
@@ -542,8 +542,8 @@
             </geometry>
         </collision>
         <inertial>
-            <mass value="0.1"/>
-            <inertia ixx="0.000025" ixy="0" ixz="0" iyy="0.000025" iyz="0" izz="0.000025"/>
+            <mass value="0.001"/>
+            <inertia ixx="0.000005" ixy="0" ixz="0" iyy="0.000005" iyz="0" izz="0.000005"/>
         </inertial>
     </link>
     <joint name="jtoeFL" type="fixed">
@@ -564,7 +564,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <sphere radius="0.03"/>
+                <sphere radius="0.0"/>
             </geometry>
             <material name="white"/>
         </visual>
@@ -575,8 +575,8 @@
             </geometry>
         </collision>
         <inertial>
-            <mass value="0.1"/>
-            <inertia ixx="0.000025" ixy="0" ixz="0" iyy="0.000025" iyz="0" izz="0.000025"/>
+            <mass value="0.001"/>
+            <inertia ixx="0.000005" ixy="0" ixz="0" iyy="0.000005" iyz="0" izz="0.000005"/>
         </inertial>
     </link>
     <joint name="jtoeFR" type="fixed">
