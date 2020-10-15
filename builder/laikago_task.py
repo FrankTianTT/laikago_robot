@@ -34,7 +34,6 @@ class LaikagoTask(object):
         rpy_diff = ((np.array(history_rpy[0]) - np.array(history_rpy[-1]))**2).sum()
         self.history_rpy_diff.appendleft(rpy_diff)
 
-
         roll = self._env.get_history_rpy()[0][0]
         if roll > 3 or roll < -3:
             self.fall_timer += 1

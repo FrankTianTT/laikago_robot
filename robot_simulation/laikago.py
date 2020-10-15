@@ -60,6 +60,7 @@ class Laikago(object):
         self.g_bound = g_bound
 
         self.now_g = sum(g_bound)/2
+        self.last_observation = np.zeros(34).tolist()
         _, self._init_orientation_inv = self._pybullet_client.invertTransform(
             position=[0, 0, 0], orientation=self._get_default_init_orientation())
         self._observation_history = collections.deque(maxlen=self.observation_history_len)
@@ -109,7 +110,9 @@ class Laikago(object):
         """Steps simulation."""
         for i in range(self._action_repeat):
             self._step_internal(action)
-        return self.get_observation()
+        obs = self.last_observation
+        self.last_observation = self.get_observation()
+        return obs
 
     def _step_internal(self, pos_action):
         torque_action = self.position2torque(pos_action)

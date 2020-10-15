@@ -21,6 +21,7 @@ class Transfer(object):
         self.history_observation = collections.deque(maxlen=history_len)
         self._init_history_observation()
         self.laikago = self.robot_class(visual=self.visual, init_pose=init_pose)
+        self.observation = None
 
     def step(self, pos_action):
         """
@@ -29,6 +30,7 @@ class Transfer(object):
         :return:
         """
         obs = self.laikago.step(pos_action)
+        self.observation = obs
         self.collocation_observation(obs)
         return self.get_env_observation()
 
@@ -68,7 +70,7 @@ class Transfer(object):
         return self.get_env_observation()
 
     def get_observation(self):
-        return self.laikago.get_observation()
+        return self.observation
 
     def _init_history_observation(self):
         for i in range(self.history_len):
