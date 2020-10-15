@@ -17,6 +17,22 @@ using namespace laikago;
 using std::cout;
 using std::endl;
 
+// PD parameters
+const float ABDUCTION_P_GAIN = 220.0;
+const float ABDUCTION_D_GAIN = 0.3;
+const float HIP_P_GAIN = 220.0;
+const float HIP_D_GAIN = 2.0;
+const float KNEE_P_GAIN = 220.0;
+const float KNEE_D_GAIN = 2.0;
+float kp[ACTION_SIZE] = {ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
+                         ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
+                         ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
+                         ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN};
+float kd[ACTION_SIZE] = {ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN,
+                         ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN,
+                         ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN,
+                         ABDUCTION_D_GAIN, HIP_D_GAIN, KNEE_D_GAIN};
+
 static long motiontime=0;
 LowCmd cmd = {0};
 LowState state = {0};
@@ -25,7 +41,8 @@ UDP udp(LOW_CMD_LENGTH, LOW_STATE_LENGTH);
 Sensor sensor;
 
 float obs[OBS_SIZE];
-float action[ACTION_SIZE];
+float pos[ACTION_SIZE];
+float cur_torque[ACTION_SIZE];
 
 // socket
 int client_fd = 0;
@@ -45,45 +62,60 @@ void UDPRecv() {
   udp.Recv();
 }
 
-clock_t cur, pre;
+clock_t cur = 0, large_step_pre = 0, small_step_pre = 0;
+int send_obs_flag = 1;
 
 void RobotControl() {
-  cur = clock();
-  printf("%f\n",  (double)(cur - pre)/CLOCKS_PER_SEC);
-
   motiontime ++;
+  cur = clock();
+
+  // Get obs from current state
   udp.GetState(state);
-  PrintMotorState(state);
-
+  // PrintMotorState(state);
   sensor.UpdateSensor(state);
-
   sensor.ConvertSensor2Obs(obs);
 
-  send(client_fd, (char*)obs, OBS_SIZE*sizeof(float), 0);
+  if(send_obs_flag) {
+    send(client_fd, (char*)obs, OBS_SIZE*sizeof(float), 0);
+    send_obs_flag = 0;
+  }
 
-  int len = recv(client_fd, (char*)action, ACTION_SIZE*sizeof(float), 0);
-  assert(len == ACTION_SIZE*sizeof(float));
+  // 每2ms更新一次torque
+  if(((double)(cur - small_step_pre)) / CLOCKS_PER_SEC >= 0.002) {
+    small_step_pre = clock();
+    for(int i = 0; i < N_MOTOR; i++) {
+      // 注意state.motorState下标是从1开始计算的
+      cur_torque[i] = -1 * (kp[i] * (state.motorState[i+1].position - pos[i])) - kd[i] * (state.motorState[i+1].velocity - 0);
+    }
+  }
+
+  // 每20ms更新一次action
+  if(((double)(cur - large_step_pre)) / CLOCKS_PER_SEC >= 0.020) {
+    large_step_pre = clock();
+    int len = recv(client_fd, (char*)pos, ACTION_SIZE*sizeof(float), MSG_DONTWAIT);
+    assert(len == ACTION_SIZE*sizeof(float));
+
+    float tmp = 0;
+    if(recv(client_fd, &tmp, sizeof(float), MSG_DONTWAIT) != -1)  // 检查socket缓冲区是否为空
+      assert(0);
+
+    send_obs_flag = 1;
+  }
 
   // cout << "Get action: ";
   // for(int i = 0; i < ACTION_SIZE; i++)
   //   cout << action[i] << " ";
   // cout << endl;
-  
+
   MotorTorqueState tor;
   for(int i = 1; i <= N_MOTOR; i++)
-    tor.torque[i] = action[i-1];
+    tor.torque[i] = cur_torque[i-1];
   // SetAction(cmd, tor);
 
   control.JointLimit(cmd);
   control.PowerLimit(cmd, state, 1);
 
-  // for(int i = 0; i < 10; i++) {
-  //   udp.GetState(state);
-  //   PrintMotorState(state);
-  // }
-
   udp.Send(cmd);
-  pre = clock();
 }
 
 int main() {
