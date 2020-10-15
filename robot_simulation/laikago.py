@@ -408,7 +408,7 @@ class Laikago(object):
             if len(contact_points) == 0:
                 contacts[i] = 0
             else:
-                contacts[i] = sum([contact_point[9] for contact_point in contact_points])/len(contact_points)
+                contacts[i] = 1
         return contacts
 
     def randomize(self):
