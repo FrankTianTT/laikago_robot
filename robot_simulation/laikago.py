@@ -436,12 +436,16 @@ class Laikago(object):
             self._observation_noise_stdev['motor_velocity'])
 
     def get_toe_contacts(self):
-        contact_ids = [i[3] for i in self._pybullet_client.getContactPoints(bodyA=self.quadruped)]
-        toe_contacts = [0, 0, 0, 0]
+        contacts = [0, 0, 0, 0]
         for i, toe_id in enumerate(self._toe_link_ids):
-            if toe_id in contact_ids:
-                toe_contacts[i] = 1
-        return toe_contacts
+            contact_points = self._pybullet_client.getContactPoints(bodyA=self.quadruped, bodyB=self.ground, linkIndexA=toe_id)
+            if len(contact_points) == 0:
+                contacts[i] = 0
+            else:
+                contacts[i] = sum([contact_point[9] for contact_point in contact_points])/len(contact_points)
+
+        print(contacts)
+        return contacts
 
 
     def randomize(self):
@@ -512,5 +516,13 @@ class Laikago(object):
         print(self._leg_inertia_urdf)
 
 if __name__ == '__main__':
-    laikago = Laikago(visual=False, init_pose=InitPose.LIE)
+    laikago = Laikago(visual=True, init_pose=InitPose.STAND)
     laikago.reset()
+    action = np.array([-10, 40, -75,
+                       10, 40, -75,
+                       -10, 40, -75,
+                       10, 40, -75]) * np.pi / 180
+    # 3 7 11 15
+    while True:
+        laikago.get_toe_contacts()
+        laikago.step(action)
