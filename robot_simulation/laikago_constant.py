@@ -62,6 +62,9 @@ INERTIA_BOUND = [0.5, 1.5]
 # abstract bound
 JOINT_F_BOUND = [0, 0.1]
 TOE_F_BOUND = [0.5, 1.25]
+G_BOUND = [9.7, 9.9]
+
+
 
 OBSERVATION_HISTORY_LEN = 100
 

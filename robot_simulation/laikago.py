@@ -30,8 +30,8 @@ class Laikago(object):
                  mass_bound=laikago_constant.MASS_BOUND,
                  inertia_bound=laikago_constant.INERTIA_BOUND,
                  joint_f_bound=laikago_constant.JOINT_F_BOUND,
-                 toe_f_bound=laikago_constant.TOE_F_BOUND
-                 ):
+                 toe_f_bound=laikago_constant.TOE_F_BOUND,
+                 g_bound=laikago_constant.G_BOUND):
         self.visual = visual
         if self.visual:
             self._pybullet_client = bullet_client.BulletClient(connection_mode=pybullet.GUI)
@@ -57,7 +57,9 @@ class Laikago(object):
         self.inertia_bound = inertia_bound
         self.joint_f_bound = joint_f_bound
         self.toe_f_bound = toe_f_bound
+        self.g_bound = g_bound
 
+        self.now_g = sum(g_bound)/2
         _, self._init_orientation_inv = self._pybullet_client.invertTransform(
             position=[0, 0, 0], orientation=self._get_default_init_orientation())
         self._observation_history = collections.deque(maxlen=self.observation_history_len)
@@ -71,7 +73,6 @@ class Laikago(object):
         if init_reset:
             self._pybullet_client.resetSimulation()
             self._pybullet_client.setTimeStep(self.time_step)
-            self._pybullet_client.setGravity(0, 0, -10)
             self.ground = self._pybullet_client.loadURDF("plane_implicit.urdf")
 
         self._pybullet_client.resetDebugVisualizerCamera(self.camera_setting['camera_distance'],
@@ -99,6 +100,9 @@ class Laikago(object):
         self.reset_pose()
         if self.randomized:
             self.randomize()
+        else:
+            self._pybullet_client.setGravity(0, 0, - self.now_g)
+        # self.print_laikago_info()
         return
 
     def step(self, action):
@@ -443,8 +447,6 @@ class Laikago(object):
                 contacts[i] = 0
             else:
                 contacts[i] = sum([contact_point[9] for contact_point in contact_points])/len(contact_points)
-
-        print(contacts)
         return contacts
 
 
@@ -483,6 +485,10 @@ class Laikago(object):
             np.full(12, self.joint_f_bound[1]))
         self.set_joint_friction(randomized_joint_fraction)
 
+        randomized_g = random.uniform(self.g_bound[0], self.g_bound[1])
+        self._pybullet_client.setGravity(0, 0, - randomized_g)
+        self.now_g = randomized_g
+
     def get_true_observation(self):
         observation = []
         observation.extend(self.get_true_motor_angles())           # [0, 12]
@@ -504,19 +510,16 @@ class Laikago(object):
     def print_laikago_info(self):
         print('-'*50)
         print('Information of Laikago as follows.')
-        print('Name of Motor:')
-        print(self._get_motor_names())
-        print('mass of chassis:')
-        print(self._base_mass_urdf)
+        print('mass of chassis: {}'.format(self._pybullet_client.getDynamicsInfo(self.quadruped, -1)[0]))
         print('mass of legs:')
-        print(self._leg_masses_urdf)
-        print('inertial of chassis:')
-        print(self._base_inertia_urdf)
+        print([self._pybullet_client.getDynamicsInfo(self.quadruped, id)[0] for id in range(16)])
+        print('inertial of chassis: {}'.format(self._pybullet_client.getDynamicsInfo(self.quadruped, -1)[2]))
         print('inertial of legs:')
-        print(self._leg_inertia_urdf)
+        print([self._pybullet_client.getDynamicsInfo(self.quadruped, id)[2] for id in range(16)])
+        print('g: {}',format(self.now_g))
 
 if __name__ == '__main__':
-    laikago = Laikago(visual=True, init_pose=InitPose.STAND)
+    laikago = Laikago(visual=False, init_pose=InitPose.STAND)
     laikago.reset()
     action = np.array([-10, 40, -75,
                        10, 40, -75,
@@ -524,5 +527,9 @@ if __name__ == '__main__':
                        10, 40, -75]) * np.pi / 180
     # 3 7 11 15
     while True:
+        laikago.print_laikago_info()
         laikago.get_toe_contacts()
         laikago.step(action)
+        laikago.step(action)
+        laikago.reset()
+
