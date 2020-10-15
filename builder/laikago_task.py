@@ -74,13 +74,13 @@ class LaikagoTask(object):
         return -math.sqrt(chassis_vel[0] ** 2 + chassis_vel[1] ** 2)
 
     def reward_rotation(self, r):
-        yaw = self._env.get_history_rpy()[0][2]
-        k = 1 - self.precision_cost(yaw, 0.0, 0.5)
+        yaw_rate = self._env.get_history_rpy_rate()[0][2]
+        k = 1 - self.precision_cost(yaw_rate, 0.0, 0.5)
         return min(k * r, r)
 
     def reward_turn(self, dir):
-        yaw = self._env.get_history_rpy()[0][2]
-        return dir * yaw + 0.1 * self.reward_up()
+        yaw_rate = self._env.get_history_rpy_rate()[0][2]
+        return dir * yaw_rate + 0.1 * self.reward_up()
 
     def reward_lift(self, foot):
         toe_height = []
@@ -92,6 +92,8 @@ class LaikagoTask(object):
 
     def reward_chassis(self, walk_dir):
         chassis_vel = self._env.get_history_chassis_velocity()[0]
+        # print('1', walk_dir)
+        # print('2', chassis_vel)
         return self.reward_rotation(np.dot(walk_dir, chassis_vel))
 
     def toe_swing_velocity(self, foot):
