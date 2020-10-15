@@ -105,7 +105,6 @@ class Laikago(object):
         for i in range(self._action_repeat):
             self._step_internal(action)
         obs = self.last_observation
-        self.receive_observation()
         self.last_observation = self.get_observation()
         return obs
 
@@ -113,6 +112,7 @@ class Laikago(object):
         torque_action = self.position2torque(pos_action)
         self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
+        self.receive_observation()
         return
 
     def position2torque(self, target_pos, target_vel=np.zeros(12)):
@@ -464,24 +464,19 @@ class Laikago(object):
         print('Information of Laikago as follows.')
         print('mass of chassis: {}'.format(self._pybullet_client.getDynamicsInfo(self.quadruped, -1)[0]))
         print('mass of legs:')
-        print([self._pybullet_client.getDynamicsInfo(self.quadruped, id)[0] for id in range(16)])
+        print([self._pybullet_client.getDynamicsInfo(self.quadruped, i)[0] for i in range(16)])
         print('inertial of chassis: {}'.format(self._pybullet_client.getDynamicsInfo(self.quadruped, -1)[2]))
         print('inertial of legs:')
-        print([self._pybullet_client.getDynamicsInfo(self.quadruped, id)[2] for id in range(16)])
-        print('g: {}',format(self.now_g))
+        print([self._pybullet_client.getDynamicsInfo(self.quadruped, i)[2] for i in range(16)])
+        print('g: {}'.format(self.now_g))
 
 if __name__ == '__main__':
-    laikago = Laikago(visual=False, init_pose=InitPose.STAND)
+    laikago = Laikago(visual=True, init_pose=InitPose.STAND)
     laikago.reset()
     action = np.array([-10, 40, -75,
                        10, 40, -75,
                        -10, 40, -75,
                        10, 40, -75]) * np.pi / 180
-    # 3 7 11 15
     while True:
-        laikago.print_laikago_info()
-        laikago.get_toe_contacts()
         laikago.step(action)
-        laikago.step(action)
-        laikago.reset()
 
