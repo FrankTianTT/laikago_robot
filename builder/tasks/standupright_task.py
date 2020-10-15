@@ -12,3 +12,10 @@ class LaikagoStandUpright(LaikagoTask):
 
     def reward(self):
         return self.reward_rotation(self.reward_still() + self.reward_up())
+
+    def done(self):
+        if self.steps > 1000:
+            return True
+
+        if self.fall_timer > 20:
+            return True

@@ -33,6 +33,13 @@ class LaikagoTask(object):
         history_rpy = self._env.get_history_rpy()
         rpy_diff = ((np.array(history_rpy[0]) - np.array(history_rpy[-1]))**2).sum()
         self.history_rpy_diff.appendleft(rpy_diff)
+
+
+        roll = self._env.get_history_rpy()[0][0]
+        if roll > 3 or roll < -3:
+            self.fall_timer += 1
+        else:
+            self.fall_timer = 0
         pass
 
     def done(self):
@@ -112,4 +119,5 @@ class LaikagoTask(object):
             height += pos[2]
         height = - height/4
         roll = self._env.get_history_rpy()[0][0]
-        return height * math.cos(roll)
+        pitch = self._env.get_history_rpy()[0][1]
+        return height * math.cos(roll) * math.cos(pitch)
