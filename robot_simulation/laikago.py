@@ -402,11 +402,11 @@ class Laikago(object):
             self._observation_noise_stdev['motor_velocity'])
 
     def get_toe_contacts(self):
-        contacts = [0, 0, 0, 0]
+        contacts = [-1, -1, -1, -1]
         for i, toe_id in enumerate(self._toe_link_ids):
             contact_points = self._pybullet_client.getContactPoints(bodyA=self.quadruped, bodyB=self.ground, linkIndexA=toe_id)
             if len(contact_points) == 0:
-                contacts[i] = 0
+                contacts[i] = -1
             else:
                 contacts[i] = 1
         return contacts

@@ -36,13 +36,13 @@ class Transfer(object):
 
     def get_env_observation(self):
         obs = []
-        obs.extend(np.array(self.history_observation[0][0:12])/(2 * np.pi))
-        obs.extend(np.array(self.history_observation[0][12:24]) / (20 * np.pi))
+        obs.extend(np.array(self.history_observation[0][0:12])/(np.pi))
+        obs.extend(np.array(self.history_observation[0][12:24]) / (10 * np.pi))
         for i in range(self.history_len):
-            obs.extend(np.array(self.history_observation[i][24:27])/(2 * np.pi))
-            obs.extend(np.array(self.history_observation[i][27:30])/(20 * np.pi))
+            obs.extend(np.array(self.history_observation[i][24:27])/(np.pi))
+            obs.extend(np.array(self.history_observation[i][27:30])/(10 * np.pi))
             obs.extend(np.array(self.history_observation[i][30:34]))
-            obs.extend(np.array(self.history_observation[i][34:46]))
+            obs.extend(np.array(self.history_observation[i][34:46]) * 2)
         return obs
 
     def collocation_observation(self, obs):
