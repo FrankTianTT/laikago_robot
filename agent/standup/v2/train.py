@@ -1,10 +1,10 @@
-from builder.tasks.standupright_task import LaikagoStandUpright
+from builder.tasks.standup_task import LaikagoStandUp2
 from builder.gym_env import LaikagoEnv
 from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import EvalCallback
 import torch
 
-task = LaikagoStandUpright()
+task = LaikagoStandUp2()
 env = LaikagoEnv(task=task, visual=False)
 eval_env = LaikagoEnv(task=task, visual=False)
 

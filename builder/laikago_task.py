@@ -45,16 +45,7 @@ class LaikagoTask(object):
         if self.steps > 1000:
             return True
 
-        roll = self._env.get_history_rpy()[0][0]
-        if roll > 3 or roll < -3:
-            self.fall_timer += 1
-        else:
-            self.fall_timer = 0
-
-        if self.fall_timer > 20:
-            return True
-
-        if len(self.history_rpy_diff) == 100 and max(self.history_rpy_diff) < 0.01:
+        if self.fall_timer > 50:
             return True
 
     def reward(self):
