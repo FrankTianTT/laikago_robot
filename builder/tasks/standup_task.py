@@ -7,11 +7,10 @@ class LaikagoStandUp1(LaikagoTask):
         super(LaikagoStandUp1, self).__init__(mode,
                                               init_pose=InitPose.STAND)
         self.fall_timer = 0
-        self.no_move_timer = 0
         pass
 
     def reward(self):
-        return self.reward_stand_high()
+        return self.reward_min_stand_high() * 2.5
 
 class LaikagoStandUp2(LaikagoTask):
 
@@ -19,11 +18,10 @@ class LaikagoStandUp2(LaikagoTask):
         super(LaikagoStandUp2, self).__init__(mode,
                                               init_pose=InitPose.STAND)
         self.fall_timer = 0
-        self.no_move_timer = 0
         pass
 
     def reward(self):
-        return self.reward_stand_high() * 2.5 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5
+        return self.reward_min_stand_high() * 2.5 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5
 
 class LaikagoStandUp3(LaikagoTask):
 
@@ -31,9 +29,30 @@ class LaikagoStandUp3(LaikagoTask):
         super(LaikagoStandUp3, self).__init__(mode,
                                               init_pose=InitPose.STAND)
         self.fall_timer = 0
-        self.no_move_timer = 0
         pass
 
     def reward(self):
-        return self.reward_stand_high() * 2.5 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5\
-            + self.reward_energy() * 0.1
+        return self.reward_min_stand_high() * 2.5 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5 \
+               + self.reward_energy() * 0.1
+
+class LaikagoStandUp4(LaikagoTask):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUp4, self).__init__(mode,
+                                              init_pose=InitPose.STAND)
+        self.fall_timer = 0
+        pass
+
+    def reward(self):
+        return self.reward_average_stand_high() * 2.5
+
+class LaikagoStandUp5(LaikagoTask):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUp5, self).__init__(mode,
+                                              init_pose=InitPose.STAND)
+        self.fall_timer = 0
+        pass
+
+    def reward(self):
+        return self.reward_average_stand_high() * 2.5 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5

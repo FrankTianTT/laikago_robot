@@ -104,12 +104,25 @@ class LaikagoTask(object):
     def reward_walk(self, walk_dir):
         return self.reward_chassis(walk_dir) + 0.5 * self.reward_feet(walk_dir) + 0.1 * self.reward_up()
 
-    def reward_stand_high(self):
-        toe_position = self._env.get_history_toe_position()
+    def reward_min_stand_high(self):
+        toe_position = self._env.get_history_toe_position()[0]
+        height = []
+        for i in [2, 5, 8, 11]:
+            height.append(toe_position[i])
+        height = - max(height)
+        roll = self._env.get_history_rpy()[0][0]
+        pitch = self._env.get_history_rpy()[0][1]
+        if height <= 0:
+            return height
+        else:
+            return height * math.cos(roll) * math.cos(pitch)
+
+    def reward_average_stand_high(self):
+        toe_position = self._env.get_history_toe_position()[0]
         height = 0
-        for pos in toe_position:
-            height += pos[2]
-        height = - height/4
+        for i in [2, 5, 8, 11]:
+            height += toe_position[i]
+        height = - height
         roll = self._env.get_history_rpy()[0][0]
         pitch = self._env.get_history_rpy()[0][1]
         if height <= 0:
