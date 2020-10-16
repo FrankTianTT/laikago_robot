@@ -112,4 +112,7 @@ class LaikagoTask(object):
         height = - height/4
         roll = self._env.get_history_rpy()[0][0]
         pitch = self._env.get_history_rpy()[0][1]
-        return height * math.cos(roll) * math.cos(pitch)
+        if height <= 0:
+            return height
+        else:
+            return height * math.cos(roll) * math.cos(pitch)
