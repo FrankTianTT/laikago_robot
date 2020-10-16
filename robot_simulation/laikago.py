@@ -348,6 +348,7 @@ class Laikago(object):
             orientationA=orientation,
             positionB=[0, 0, 0],
             orientationB=self._init_orientation_inv)
+        self._base_velocity = self._pybullet_client.getBaseVelocity(self.quadruped)[0]
         angular_velocity = self._pybullet_client.getBaseVelocity(self.quadruped)[1]
         self.roll_pitch_yaw_rate = self.transform_angular_velocity2local_frame(angular_velocity, self._base_orientation)
 
@@ -452,6 +453,14 @@ class Laikago(object):
         randomized_g = random.uniform(self.g_bound[0], self.g_bound[1])
         self._pybullet_client.setGravity(0, 0, - randomized_g)
         self.now_g = randomized_g
+
+    # Attention! These function can be used in SIMULATION TRAIN only.
+    def get_position_for_reward(self):
+        return self._base_position
+    def get_orientation_for_reward(self):
+        return self._base_orientation
+    def get_velocity_for_reward(self):
+        return self._base_velocity
 
     def get_observation(self):
         observation = []
