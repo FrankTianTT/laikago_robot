@@ -10,7 +10,7 @@ class LaikagoStandUp1(LaikagoTask):
         pass
 
     def reward(self):
-        return self.reward_min_stand_high() * 2.5
+        return self.reward_min_stand_high() * 4
 
 class LaikagoStandUp2(LaikagoTask):
 
@@ -21,7 +21,7 @@ class LaikagoStandUp2(LaikagoTask):
         pass
 
     def reward(self):
-        return self.reward_min_stand_high() * 2.5 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5
+        return self.reward_min_stand_high() * 2 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5
 
 class LaikagoStandUp3(LaikagoTask):
 
@@ -44,7 +44,7 @@ class LaikagoStandUp4(LaikagoTask):
         pass
 
     def reward(self):
-        return self.reward_average_stand_high() * 2.5
+        return self.reward_average_stand_high() * 4
 
 class LaikagoStandUp5(LaikagoTask):
 
@@ -55,4 +55,4 @@ class LaikagoStandUp5(LaikagoTask):
         pass
 
     def reward(self):
-        return self.reward_average_stand_high() * 2.5 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5
+        return self.reward_average_stand_high() * 2 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5

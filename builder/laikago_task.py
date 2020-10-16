@@ -122,7 +122,7 @@ class LaikagoTask(object):
         height = 0
         for i in [2, 5, 8, 11]:
             height += toe_position[i]
-        height = - height
+        height = - height / 4
         roll = self._env.get_history_rpy()[0][0]
         pitch = self._env.get_history_rpy()[0][1]
         if height <= 0:

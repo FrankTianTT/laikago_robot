@@ -24,8 +24,8 @@ class LaikagoEnv(gym.Env):
         self.transfer = None
         self.transfer = self.transfer_class(visual=self.visual, init_pose=self.task.init_pose)
         self.action_space = spaces.Box(
-            np.array(position_upper_bound),
             np.array(position_lower_bound),
+            np.array(position_upper_bound),
             dtype=np.float32)
         self.observation_space = spaces.Box(
             np.ones(90),
