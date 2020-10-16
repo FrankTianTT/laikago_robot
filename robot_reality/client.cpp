@@ -88,7 +88,8 @@ void RobotControl() {
 
   // 每2ms更新一次torque
   if(((double)(cur - small_step_pre)) / CLOCKS_PER_SEC >= 0.002) {
-    small_step_pre = clock();
+    // small_step_pre = clock();
+    small_step_pre += CLOCKS_PER_SEC * 0.002;
     for(int i = 0; i < N_MOTOR; i++) {
       // 注意state.motorState下标是从1开始计算的
       cur_torque[i] = -1 * (kp[i] * (state.motorState[i+1].position - pos[i])) - kd[i] * (state.motorState[i+1].velocity - 0);
@@ -97,7 +98,8 @@ void RobotControl() {
 
   // 每20ms更新一次action
   if(((double)(cur - large_step_pre)) / CLOCKS_PER_SEC >= 0.020) {
-    large_step_pre = clock();
+    // large_step_pre = clock();
+    large_step_pre += CLOCKS_PER_SEC * 0.020;
     int len = recv(client_fd, (char*)pos, ACTION_SIZE*sizeof(float), MSG_DONTWAIT);
     assert(len == ACTION_SIZE*sizeof(float));
 
