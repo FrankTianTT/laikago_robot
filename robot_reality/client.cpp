@@ -42,7 +42,7 @@ Sensor sensor;
 
 float obs[OBS_SIZE];
 float pos[ACTION_SIZE];
-float cur_torque[ACTION_SIZE];
+float cur_torque[ACTION_SIZE] = {0};
 
 // socket
 int client_fd = 0;
@@ -66,7 +66,7 @@ clock_t cur = 0, large_step_pre = 0, small_step_pre = 0;
 int send_obs_flag = 1;
 
 void RobotControl() {
-  motiontime ++;
+  motiontime ++; 
   cur = clock();
 
   // Get obs from current state
@@ -74,6 +74,12 @@ void RobotControl() {
   // PrintMotorState(state);
   sensor.UpdateSensor(state);
   sensor.ConvertSensor2Obs(obs);
+
+  if(motiontime == 1) {
+    cout << "Get init position" << endl;
+    int len = recv(client_fd, (char*)pos, ACTION_SIZE*sizeof(float), 0);  // 阻塞接受初始pos
+    assert(len == ACTION_SIZE*sizeof(float));
+  }
 
   if(send_obs_flag) {
     send(client_fd, (char*)obs, OBS_SIZE*sizeof(float), 0);

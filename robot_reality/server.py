@@ -15,8 +15,17 @@ s.listen(1)
 
 torque = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+init_pos = np.array([
+    -15, 15, -35,
+    15, 15, -35,
+    -15, 15, -35,
+    15, 15, -35
+]) * np.pi / 180
+
 while True:
     c, addr = s.accept()
+    c.send(pack('f' * ACTION_SIZE, *init_pos))
+
     while True:
         try:
             obs = c.recv(1024)
@@ -36,10 +45,7 @@ while True:
                 15, 15, -35
             ]) * np.pi / 180
 
-            for i in range(12):
-                action[i] = target_pos[i]
-            c.send(pack('f' * ACTION_SIZE, *action))
-
+            c.send(pack('f' * ACTION_SIZE, *target_pos))
             # sleep(0.01)
         except ConnectionResetError:
             break
