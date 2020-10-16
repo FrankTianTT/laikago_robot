@@ -29,10 +29,10 @@ class Transfer(object):
         :param action: 这个action是上层传过来的，应该是position
         :return:
         """
-        obs = self.laikago.step(pos_action)
+        obs, energy = self.laikago.step(pos_action)
         self.observation = obs
         self.collocation_observation(obs)
-        return self.get_env_observation()
+        return self.get_env_observation(), energy
 
     def get_env_observation(self):
         obs = []

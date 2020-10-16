@@ -31,10 +31,12 @@ class LaikagoEnv(gym.Env):
             np.ones(90),
             - np.ones(90),
             dtype=np.float32)
+        self.energy = 0
 
 
     def step(self, action):
-        obs = self.transfer.step(action)
+        obs, energy = self.transfer.step(action)
+        self.energy = energy
         self.task.update()
 
         done = self.task.done()
@@ -66,6 +68,9 @@ class LaikagoEnv(gym.Env):
 
     def get_history_toe_position(self):
         return self.transfer.get_history_toe_position()
+
+    def get_energy(self):
+        return self.energy
 
 if __name__ == '__main__':
     task = LaikagoWalk(direction=env_constant.WALK_RIGHT)

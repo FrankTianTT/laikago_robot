@@ -116,3 +116,7 @@ class LaikagoTask(object):
             return height
         else:
             return height * math.cos(roll) * math.cos(pitch)
+
+    def reward_energy(self):
+        energy = self._env.get_energy()
+        return - energy

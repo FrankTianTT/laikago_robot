@@ -35,4 +35,5 @@ class LaikagoStandUp3(LaikagoTask):
         pass
 
     def reward(self):
-        return self.reward_stand_high() * 2.5 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5
+        return self.reward_stand_high() * 2.5 + self.reward_rotation(self.reward_still() + self.reward_up()) * 0.5\
+            + self.reward_energy() * 0.1
