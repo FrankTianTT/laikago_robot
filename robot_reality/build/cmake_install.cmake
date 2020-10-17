@@ -1,4 +1,4 @@
-# Install script for directory: /home/songlei/Code/cpp/laikago/laikago_socket
+# Install script for directory: /home/songlei/robot_reality
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/songlei/Code/cpp/laikago/laikago_socket/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/songlei/robot_reality/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

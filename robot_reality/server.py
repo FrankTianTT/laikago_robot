@@ -16,15 +16,16 @@ s.listen(1)
 torque = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 init_pos = np.array([
-    -15, 15, -35,
-    15, 15, -35,
-    -15, 15, -35,
-    15, 15, -35
+    -15, 15, -60,
+    15, 15, -45,
+    -15, 15, -45,
+    15, 15, -45
 ]) * np.pi / 180
 
 while True:
     c, addr = s.accept()
     c.send(pack('f' * ACTION_SIZE, *init_pos))
+    t = 0
 
     while True:
         try:
@@ -39,13 +40,15 @@ while True:
 
             # nn计算target_pos
             target_pos = np.array([
-                -15, 15, -35,
-                15, 15, -35,
-                -15, 15, -35,
-                15, 15, -35
+                -15, 15, -60+20 * np.sin(t/20),
+                15, 15, -45,
+                -15, 15, -45,
+                15, 15, -45
             ]) * np.pi / 180
+            t += 1
 
             c.send(pack('f' * ACTION_SIZE, *target_pos))
+            print("Send action")
             # sleep(0.01)
         except ConnectionResetError:
             break

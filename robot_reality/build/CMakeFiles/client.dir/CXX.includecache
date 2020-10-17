@@ -50,11 +50,11 @@ comm.hpp
 pthread.h
 -
 
-/home/songlei/Code/cpp/laikago/laikago_socket/client.cpp
+/home/songlei/robot_reality/client.cpp
 control_api.h
-/home/songlei/Code/cpp/laikago/laikago_socket/control_api.h
+/home/songlei/robot_reality/control_api.h
 laikago_sdk/laikago_sdk.hpp
-/home/songlei/Code/cpp/laikago/laikago_socket/laikago_sdk/laikago_sdk.hpp
+/home/songlei/robot_reality/laikago_sdk/laikago_sdk.hpp
 iostream
 -
 stdlib.h
@@ -72,15 +72,7 @@ assert.h
 time.h
 -
 
-/home/songlei/Code/cpp/laikago/laikago_socket/control_api.cpp
-control_api.h
-/home/songlei/Code/cpp/laikago/laikago_socket/control_api.h
+/home/songlei/robot_reality/control_api.h
 laikago_sdk/laikago_sdk.hpp
-/home/songlei/Code/cpp/laikago/laikago_socket/laikago_sdk/laikago_sdk.hpp
-cstring
--
-
-/home/songlei/Code/cpp/laikago/laikago_socket/control_api.h
-laikago_sdk/laikago_sdk.hpp
-/home/songlei/Code/cpp/laikago/laikago_socket/laikago_sdk/laikago_sdk.hpp
+/home/songlei/robot_reality/laikago_sdk/laikago_sdk.hpp
 

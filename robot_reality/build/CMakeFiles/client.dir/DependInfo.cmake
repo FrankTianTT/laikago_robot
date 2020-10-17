@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/songlei/Code/cpp/laikago/laikago_socket/client.cpp" "/home/songlei/Code/cpp/laikago/laikago_socket/build/CMakeFiles/client.dir/client.cpp.o"
-  "/home/songlei/Code/cpp/laikago/laikago_socket/control_api.cpp" "/home/songlei/Code/cpp/laikago/laikago_socket/build/CMakeFiles/client.dir/control_api.cpp.o"
+  "/home/songlei/robot_reality/client.cpp" "/home/songlei/robot_reality/build/CMakeFiles/client.dir/client.cpp.o"
+  "/home/songlei/robot_reality/control_api.cpp" "/home/songlei/robot_reality/build/CMakeFiles/client.dir/control_api.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
