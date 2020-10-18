@@ -21,7 +21,24 @@ class LaikagoTaskSim(object):
         self.init_pose = init_pose
         self.steps = 0
         self.history_rpy_diff = collections.deque(maxlen=100)
+
+        self.sum_reward = 0
+        self.sum_p = 0
         return
+
+    def add_reward(self, reward, p=1):
+        self.sum_reward += reward
+        self.sum_p += p
+
+    def normalize_reward(self, reward, min_reward, max_reward):
+        return (reward - min_reward)/(max_reward - min_reward)
+
+    def get_sum_reward(self):
+        reward = self.sum_reward / self.sum_p
+        self.sum_reward = 0
+        self.sum_p = 0
+        return reward
+
 
     def reset(self, env):
         self._env = env
@@ -139,3 +156,7 @@ class LaikagoTaskSim(object):
     def reward_height_sim(self):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         return base_pos[2]
+
+    def reward_base_vel_sim(self):
+        base_vel = self._env.transfer.laikago.get_velocity_for_reward()
+        return - math.sqrt(base_vel[0] ** 2 + base_vel[1] ** 2)
