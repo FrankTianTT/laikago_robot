@@ -1,11 +1,11 @@
-from builder.tasks.standup_task import LaikagoStandUp4
+from builder.tasks_sim.standup_task_sim import LaikagoStandUpSim4
 from builder.gym_env import LaikagoEnv
 from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import EvalCallback
 import torch
 import numpy as np
 
-task = LaikagoStandUp4()
+task = LaikagoStandUpSim4()
 env = LaikagoEnv(task=task, visual=True)
 
 model = SAC.load("logs/best_model")

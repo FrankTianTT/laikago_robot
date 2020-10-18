@@ -1,5 +1,6 @@
 from laikago_task_sim import LaikagoTaskSim
 from builder.laikago_task import InitPose
+import math
 
 class LaikagoStandUpSim1(LaikagoTaskSim):
 
@@ -9,8 +10,21 @@ class LaikagoStandUpSim1(LaikagoTaskSim):
         self.fall_timer = 0
         pass
 
+    def done(self):
+        if self.steps > 1000:
+            return True
+
+        if self.fall_timer > 50:
+            return True
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        dis = - math.sqrt(base_pos[0] ** 2 + base_pos[1] ** 2)
+        if dis > 1:
+            return True
+
     def reward(self):
-        return self.reward_height_sim() * 3
+        self.add_reward(self.reward_region_sim(), 1)
+        self.add_reward(self.reward_height_sim(), 3)
+        return self.get_sum_reward()
 
 class LaikagoStandUpSim2(LaikagoTaskSim):
 
@@ -21,7 +35,9 @@ class LaikagoStandUpSim2(LaikagoTaskSim):
         pass
 
     def reward(self):
-        return self.reward_height_sim() * 1.5 + self.reward_up() * 0.5
+        self.add_reward(self.reward_up(), 1)
+        self.add_reward(self.reward_height_sim(), 5)
+        return self.get_sum_reward()
 
 class LaikagoStandUpSim3(LaikagoTaskSim):
 
@@ -32,7 +48,10 @@ class LaikagoStandUpSim3(LaikagoTaskSim):
         pass
 
     def reward(self):
-        return self.reward_height_sim() * 1.5 + self.reward_up() * 0.5 + self.reward_energy() * 0.1
+        self.add_reward(self.reward_up(), 1)
+        self.add_reward(self.reward_height_sim(), 5)
+        self.add_reward(self.reward_energy(), 1)
+        return self.get_sum_reward()
 
 class LaikagoStandUpSim4(LaikagoTaskSim):
 

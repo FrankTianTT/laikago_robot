@@ -157,6 +157,10 @@ class LaikagoTaskSim(object):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         return base_pos[2]
 
+    def reward_region_sim(self):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        return - math.sqrt(base_pos[0] ** 2 + base_pos[1] ** 2)
+
     def reward_base_vel_sim(self):
         base_vel = self._env.transfer.laikago.get_velocity_for_reward()
         return - math.sqrt(base_vel[0] ** 2 + base_vel[1] ** 2)
