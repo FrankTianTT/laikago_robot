@@ -27,7 +27,7 @@ class LaikagoTaskSim(object):
         return
 
     def add_reward(self, reward, p=1):
-        self.sum_reward += reward
+        self.sum_reward += reward * p
         self.sum_p += p
 
     def get_sum_reward(self):
