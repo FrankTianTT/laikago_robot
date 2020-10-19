@@ -1,12 +1,13 @@
 # 这个文件是对laikago的机械特性和电气特性的仿真。
 
-import laikago_constant
-from laikago_constant import InitPose
+import robot_simulation.laikago_constant as laikago_constant
+from robot_simulation.laikago_constant import InitPose
 import pybullet
 import pybullet_utils.bullet_client as bullet_client
 import pybullet_data as pd
 import numpy as np
 import random
+import time
 
 class Laikago(object):
     def __init__(self,
@@ -111,11 +112,15 @@ class Laikago(object):
         return obs, self.energy * self.time_step
 
     def _step_internal(self, pos_action):
+        begin_time = time.time()
         torque_action = self.position2torque(pos_action)
         self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
         self.receive_observation()
         self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_angles()))
+        end_time = time.time()
+        if self.visual:
+            time.sleep(self.time_step - end_time + begin_time)
         return
 
     def position2torque(self, target_pos, target_vel=np.zeros(12)):
@@ -461,6 +466,8 @@ class Laikago(object):
         return self._base_orientation
     def get_velocity_for_reward(self):
         return self._base_velocity
+    def get_rpy_for_reward(self):
+        return self.get_true_base_roll_pitch_yaw()
 
     def get_observation(self):
         observation = []

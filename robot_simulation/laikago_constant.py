@@ -46,10 +46,10 @@ LIE_MOTOR_ANGLES = np.array([0, 90, -155,
                    0, 180, -155,
                    0, 180, -155]) * np.pi / 180
 
-STAND_MOTOR_ANGLES = np.array([0, 40, -75,
-                   0, 40, -75,
-                   0, 40, -75,
-                   0, 40, -75]) * np.pi / 180
+STAND_MOTOR_ANGLES = np.array([-10, 30, -75,
+                   10, 30, -75,
+                   -10, 50, -75,
+                   10, 50, -75]) * np.pi / 180
 
 """
 Randomization:随机化分为两部分，一部分是观测的随机，另一部分是动力学参数的随机。

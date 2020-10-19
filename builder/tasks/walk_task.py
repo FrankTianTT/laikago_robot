@@ -1,4 +1,4 @@
-from laikago_task import LaikagoTask
+from builder.laikago_task import LaikagoTask
 from builder import env_constant
 
 class LaikagoWalk(LaikagoTask):
