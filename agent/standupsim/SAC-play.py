@@ -11,24 +11,24 @@ import builder.tasks_sim as tasks_sim
 import numpy as np
 
 if __name__ == "__main__":
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("-v", "--version", required=True, help="Version of task")
-    #
-    # args = parser.parse_args()
-    # version = args.version
-    version = 1
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--version", required=True, help="Version of task")
+
+    args = parser.parse_args()
+    version = args.version
 
     best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
 
     standup_task_sim = importlib.import_module('builder.tasks_sim.standup_task_sim')
     task = eval('standup_task_sim.LaikagoStandUpSim{}()'.format(version))
     env = LaikagoEnv(task=task, visual=True)
-    print(env.action_space)
-    model = SAC.load(best_model_save_path, env)
+    model = SAC.load(best_model_save_path)
+
     obs = env.reset()
     total_reward = 0
     for i in range(10000):
         action, _states = model.predict(obs, deterministic=True)
+        # print(action * 180 / np.pi)
         # action = np.array([-10, 30, -75,
         #            10, 30, -75,
         #            -10, 50, -75,

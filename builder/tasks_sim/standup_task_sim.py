@@ -25,6 +25,7 @@ class LaikagoStandUpSim1(LaikagoTaskSim):
     def reward(self):
         self.add_reward(self.reward_region_sim(), 1)
         self.add_reward(self.reward_height_sim(), 10)
+        print(self.reward_region_sim(), self.reward_height_sim())
         return self.get_sum_reward()
 
 class LaikagoStandUpSim2(LaikagoTaskSim):

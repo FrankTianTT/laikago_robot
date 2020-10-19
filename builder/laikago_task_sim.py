@@ -76,8 +76,9 @@ class LaikagoTaskSim(object):
         return self.normalize_reward(reward, -10, 0)
 
     def reward_height_sim(self):
-        height = self._env.transfer.laikago.get_position_for_reward()[2]
-        reward = height
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        reward = base_pos[2]
+        # print(self.normalize_reward(reward, 0, 0.4))
         return self.normalize_reward(reward, 0, 0.4)
 
     def reward_region_sim(self):
