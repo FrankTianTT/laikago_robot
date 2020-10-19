@@ -9,8 +9,8 @@ env = LaikagoEnv(task=task, visual=False)
 eval_env = LaikagoEnv(task=task, visual=False)
 
 eval_callback = EvalCallback(eval_env,
-                             best_model_save_path='v1/logs/',
-                             log_path='v1/logs/',
+                             best_model_save_path='SAC-v1/logs/',
+                             log_path='SAC-v1/logs/',
                              eval_freq=10000,
                              deterministic=True,
                              render=False)

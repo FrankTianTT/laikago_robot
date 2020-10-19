@@ -31,9 +31,10 @@ if __name__ == "__main__":
     time_steps = args.time_steps
     net_arch = args.net_arch
 
-    log_path = './v{}/logs/'.format(version)
-    tensorboard_log = './v{}/log/'.format(version)
-    best_model_save_path = './v{}/logs/'.format(version)
+    log_path = './SAC-v{}/logs/'.format(version)
+    tensorboard_log = './SAC-v{}/log/'.format(version)
+    best_model_save_path = './SAC-v{}/logs/'.format(version)
+    best_model_dir = './SAC-v{}/logs/best_model.zip'.format(version)
 
     standup_task_sim = importlib.import_module('builder.tasks_sim.standup_task_sim')
     task = eval('standup_task_sim.LaikagoStandUpSim{}()'.format(version))
@@ -60,6 +61,6 @@ if __name__ == "__main__":
                 ent_coef=ent_coef)
 
     if args.load_from_best:
-        model = SAC.load(best_model_save_path)
+        model = SAC.load(best_model_dir)
         model.set_env(env)
     model.learn(total_timesteps=time_steps, callback=eval_callback)

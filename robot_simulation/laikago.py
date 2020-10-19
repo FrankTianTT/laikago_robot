@@ -112,15 +112,11 @@ class Laikago(object):
         return obs, self.energy * self.time_step
 
     def _step_internal(self, pos_action):
-        begin_time = time.time()
         torque_action = self.position2torque(pos_action)
         self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
         self.receive_observation()
         self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_angles()))
-        end_time = time.time()
-        if self.visual:
-            time.sleep(self.time_step - end_time + begin_time)
         return
 
     def position2torque(self, target_pos, target_vel=np.zeros(12)):

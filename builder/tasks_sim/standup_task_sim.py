@@ -2,6 +2,18 @@ from builder.laikago_task_sim import LaikagoTaskSim
 from builder.laikago_task import InitPose
 import math
 
+class LaikagoStandUpSim0(LaikagoTaskSim):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpSim0, self).__init__(mode,
+                                              init_pose=InitPose.STAND)
+        self.fall_timer = 0
+        pass
+
+    def reward(self):
+        self.add_reward(self.reward_height_sim(), 1)
+        return self.get_sum_reward()
+
 class LaikagoStandUpSim1(LaikagoTaskSim):
 
     def __init__(self, mode='train'):

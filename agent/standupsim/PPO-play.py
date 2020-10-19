@@ -1,4 +1,4 @@
-from stable_baselines3 import SAC
+from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import EvalCallback
 import torch
 import argparse
@@ -18,25 +18,20 @@ if __name__ == "__main__":
 
     version = args.version
 
-    best_model_save_path = './v{}/logs/best_model.zip'.format(version)
+    best_model_save_path = './PPO-v{}/logs/best_model.zip'.format(version)
 
     standup_task_sim = importlib.import_module('builder.tasks_sim.standup_task_sim')
     task = eval('standup_task_sim.LaikagoStandUpSim{}()'.format(version))
     env = LaikagoEnv(task=task, visual=True)
-
-    model = SAC.load(best_model_save_path)
+    print(env.action_space)
+    model = PPO.load(best_model_save_path)
     obs = env.reset()
     total_reward = 0
     for i in range(10000):
         action, _states = model.predict(obs, deterministic=True)
-        # action = np.array([-10, 30, -75,
-        #            10, 30, -75,
-        #            -10, 50, -75,
-        #            10, 50, -75]) * np.pi / 180
         obs, reward, done, info = env.step(action)
 
         total_reward += reward
-        # time.sleep(0.1)
         if done:
           obs = env.reset()
           print('Test reward is {:.3f}.'.format(total_reward))
