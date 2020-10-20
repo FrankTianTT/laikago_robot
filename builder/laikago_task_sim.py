@@ -79,3 +79,8 @@ class LaikagoTaskSim(object):
     def done_rp_sim(self):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
         return r ** 2 > (30 * np.pi / 180) ** 2 or p ** 2 > (30 * np.pi / 180) ** 2
+
+    def done_height_sim(self):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        height = base_pos[2]
+        return height < 0.25

@@ -31,10 +31,10 @@ class LaikagoStandUpSimBase(LaikagoTaskSim):
             return True
         elif self.fall_timer > 50:
             return True
-        elif self.steps < 100:
+        elif self.steps < 50:
             return False
         else:
-            return self.done_rp_sim()
+            return self.done_rp_sim() or self.done_height_sim()
 
 class LaikagoStandUpSim0(LaikagoStandUpSimBase):
 
