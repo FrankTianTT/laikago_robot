@@ -2,6 +2,7 @@
 
 import robot_simulation.laikago_constant as laikago_constant
 from robot_simulation.laikago_constant import InitPose
+from robot_simulation import action_filter
 import pybullet
 import pybullet_utils.bullet_client as bullet_client
 import pybullet_data as pd
@@ -30,7 +31,8 @@ class Laikago(object):
                  inertia_bound=laikago_constant.INERTIA_BOUND,
                  joint_f_bound=laikago_constant.JOINT_F_BOUND,
                  toe_f_bound=laikago_constant.TOE_F_BOUND,
-                 g_bound=laikago_constant.G_BOUND):
+                 g_bound=laikago_constant.G_BOUND,
+                 max_motor_angle_change_per_step=laikago_constant.MAX_MOTOR_ANGLE_CHANGE_PER_STEP):
         self.visual = visual
         if self.visual:
             self._pybullet_client = bullet_client.BulletClient(connection_mode=pybullet.GUI)
@@ -56,12 +58,17 @@ class Laikago(object):
         self.joint_f_bound = joint_f_bound
         self.toe_f_bound = toe_f_bound
         self.g_bound = g_bound
+        self.max_motor_angle_change_per_step = max_motor_angle_change_per_step
 
         self.now_g = sum(g_bound)/2
         self.energy = 0
+        self._step_counter = 0
         self.last_observation = np.zeros(34).tolist()
         _, self._init_orientation_inv = self._pybullet_client.invertTransform(
             position=[0, 0, 0], orientation=self._get_default_init_orientation())
+        self._last_command_position = None
+
+        self._action_filter = self._build_action_filter()
         self.reset(init_reset=True)
         self.receive_observation()
 
@@ -96,6 +103,9 @@ class Laikago(object):
                                                               self._get_default_init_orientation())
         self._pybullet_client.resetBaseVelocity(self.quadruped, [0, 0, 0], [0, 0, 0])
         self.reset_pose()
+        self._step_counter = 0
+        self._action_filter.reset()
+
         if self.randomized:
             self.randomize()
         else:
@@ -105,18 +115,56 @@ class Laikago(object):
     def step(self, action):
         """Steps simulation."""
         self.energy = 0
+        action = self._filter_action(action)
+        self._last_command_position = action
         for i in range(self._action_repeat):
-            self._step_internal(action)
+            proc_action = self._smooth_action(action, i)
+            self._step_internal(proc_action)
         obs = self.last_observation
         self.last_observation = self.get_observation()
+        self._step_counter += 1
         return obs, self.energy * self.time_step
 
+    def _filter_action(self, action):
+        if self._step_counter == 0:
+            default_action = self.get_true_motor_angles()
+            self._action_filter.init_history(default_action)
+
+        filtered_action = self._action_filter.filter(action)
+        return filtered_action
+
+    def _smooth_action(self, action, substep_count):
+        prev_action = self._last_command_position
+
+        lerp = float(substep_count + 1) / self._action_repeat
+        proc_action = prev_action + lerp * (action - prev_action)
+        return proc_action
+
+    def _clip_action(self, action):
+        current_motor_angles = np.array(self.get_true_motor_angles())
+        action = np.clip(action,
+                         current_motor_angles - self.max_motor_angle_change_per_step,
+                         current_motor_angles + self.max_motor_angle_change_per_step)
+        return action
+
     def _step_internal(self, pos_action):
-        torque_action = self.position2torque(pos_action)
+        clipped_pos_action = self._clip_action(pos_action)
+        torque_action = self.position2torque(clipped_pos_action)
         self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
         self.receive_observation()
         self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_angles()))
+        return
+
+    def _build_action_filter(self):
+        sampling_rate = 1 / (self.time_step * self._action_repeat)
+        num_joints = self.num_motors
+        a_filter = action_filter.ActionFilterButter(
+            sampling_rate=sampling_rate, num_joints=num_joints)
+        return a_filter
+
+    def _reset_action_filter(self):
+        self._action_filter.reset()
         return
 
     def position2torque(self, target_pos, target_vel=np.zeros(12)):
