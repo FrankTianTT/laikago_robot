@@ -85,7 +85,7 @@ class LaikagoStandUpSim2(LaikagoStandUpSimBase):
         self.add_reward(self.reward_height_sim(), 2)
         return self.get_sum_reward()
 
-class LaikagoStandUpSim3(LaikagoTaskSim):
+class LaikagoStandUpSim3(LaikagoStandUpSimBase):
 
     def __init__(self, mode='train'):
         super(LaikagoStandUpSim3, self).__init__(mode)
@@ -96,7 +96,7 @@ class LaikagoStandUpSim3(LaikagoTaskSim):
         self.add_reward(self.reward_height_sim(), 3)
         return self.get_sum_reward()
 
-class LaikagoStandUpSim3_1(LaikagoTaskSim):
+class LaikagoStandUpSim3_1(LaikagoStandUpSimBase):
 
     def __init__(self, mode='train'):
         super(LaikagoStandUpSim3_1, self).__init__(mode)
@@ -107,7 +107,7 @@ class LaikagoStandUpSim3_1(LaikagoTaskSim):
         self.add_reward(self.reward_height_sim(), 5)
         return self.get_sum_reward()
 
-class LaikagoStandUpSim4(LaikagoTaskSim):
+class LaikagoStandUpSim4(LaikagoStandUpSimBase):
 
     def __init__(self, mode='train'):
         super(LaikagoStandUpSim4, self).__init__(mode)
@@ -116,7 +116,7 @@ class LaikagoStandUpSim4(LaikagoTaskSim):
         self.add_reward(self.reward_height_sim(), 1)
         return self.get_sum_reward()
 
-class LaikagoStandUpSim4_1(LaikagoTaskSim):
+class LaikagoStandUpSim4_1(LaikagoStandUpSimBase):
 
     def __init__(self, mode='train'):
         super(LaikagoStandUpSim4_1, self).__init__(mode)
@@ -126,7 +126,7 @@ class LaikagoStandUpSim4_1(LaikagoTaskSim):
         self.add_reward(self.reward_height_sim(), 2)
         return self.get_sum_reward()
 
-class LaikagoStandUpSim4_2(LaikagoTaskSim):
+class LaikagoStandUpSim4_2(LaikagoStandUpSimBase):
 
     def __init__(self, mode='train'):
         super(LaikagoStandUpSim4_2, self).__init__(mode)
@@ -136,7 +136,7 @@ class LaikagoStandUpSim4_2(LaikagoTaskSim):
         self.add_reward(self.reward_height_sim(), 3)
         return self.get_sum_reward()
 
-class LaikagoStandUpSim5(LaikagoTaskSim):
+class LaikagoStandUpSim5(LaikagoStandUpSimBase):
 
     def __init__(self, mode='train'):
         super(LaikagoStandUpSim5, self).__init__(mode)

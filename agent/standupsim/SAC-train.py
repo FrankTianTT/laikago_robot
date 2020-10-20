@@ -59,7 +59,6 @@ if __name__ == "__main__":
                 batch_size=batch_size,
                 learning_starts=learning_starts,
                 ent_coef=ent_coef)
-
     if args.load_from_best:
         model = SAC.load(best_model_dir)
         model.set_env(env)
