@@ -33,6 +33,7 @@ if __name__ == "__main__":
         #            10, 30, -75,
         #            -10, 50, -75,
         #            10, 50, -75]) * np.pi / 180
+
         obs, reward, done, info = env.step(action)
 
         total_reward += reward

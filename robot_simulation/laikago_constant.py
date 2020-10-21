@@ -10,13 +10,13 @@ CAMERA_SETTING = {'camera_distance': 2.0,
                   'camera_pitch': -30,
                   'render_width': 480,
                   'render_height': 360}
-TIME_STEP = 0.002
-ACTION_REPEAT = 10
+TIME_STEP = 0.001
+ACTION_REPEAT = 20
 NUM_MOTORS = 12
 DOFS_PER_LEG = 3
 
 ON_RACK_INIT_POSITION = [0, 0, 1]
-STAND_INIT_POSITION = [0, 0, 0.48]
+STAND_INIT_POSITION = [0, 0, 0.43]
 LIE_INIT_POSITION = [0, 0, 0.15]
 
 INIT_ORIENTATION = [0, 0, 0, 1]

@@ -28,6 +28,7 @@ if __name__ == "__main__":
     log_path = './PPO-v{}/logs/'.format(version)
     tensorboard_log = './PPO-v{}/log/'.format(version)
     best_model_save_path = './PPO-v{}/logs/'.format(version)
+    best_model_dir = './PPO-v{}/logs/best_model.zip'.format(version)
 
     standup_task_sim = importlib.import_module('builder.tasks_sim.standup_task_sim')
     task = eval('standup_task_sim.LaikagoStandUpSim{}()'.format(version))
@@ -51,6 +52,6 @@ if __name__ == "__main__":
                 batch_size=batch_size)
 
     if args.load_from_best:
-        model = PPO.load(best_model_save_path)
+        model = PPO.load(best_model_dir)
         model.set_env(env)
     model.learn(total_timesteps=time_steps, callback=eval_callback)

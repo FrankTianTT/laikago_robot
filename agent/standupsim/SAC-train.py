@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--time_steps", default=5000000)
     parser.add_argument("--buffer_size", default=1000000)
-    parser.add_argument("--learning_starts", default=10000)
+    parser.add_argument("--learning_starts", default=100)
     parser.add_argument("--batch_size", default=64)
     parser.add_argument("--ent_coef", default='auto')
     parser.add_argument("--net_arch", default=[256, 256], nargs='+', type=int)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     eval_callback = EvalCallback(eval_env,
                                  best_model_save_path=best_model_save_path,
                                  log_path=log_path,
-                                 eval_freq=10000,
+                                 eval_freq=1000,
                                  deterministic=True,
                                  render=False)
     policy_kwargs = dict(activation_fn=torch.nn.ReLU, net_arch=net_arch)

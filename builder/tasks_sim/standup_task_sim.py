@@ -73,6 +73,8 @@ class LaikagoStandUpSim1_2(LaikagoStandUpSimBase):
     def reward(self):
         self.add_reward(self.reward_region_sim(), 1)
         self.add_reward(self.reward_height_sim(), 2)
+        return self.get_sum_reward()
+
 
 class LaikagoStandUpSim2(LaikagoStandUpSimBase):
 

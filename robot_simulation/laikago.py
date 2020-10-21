@@ -66,9 +66,9 @@ class Laikago(object):
         self.last_observation = np.zeros(34).tolist()
         _, self._init_orientation_inv = self._pybullet_client.invertTransform(
             position=[0, 0, 0], orientation=self._get_default_init_orientation())
-        self._last_command_position = None
 
         self._action_filter = self._build_action_filter()
+        self._last_action = None
         self.reset(init_reset=True)
         self.receive_observation()
 
@@ -105,6 +105,7 @@ class Laikago(object):
         self.reset_pose()
         self._step_counter = 0
         self._action_filter.reset()
+        self._last_action = None
 
         if self.randomized:
             self.randomize()
@@ -115,14 +116,14 @@ class Laikago(object):
     def step(self, action):
         """Steps simulation."""
         self.energy = 0
-        action = self._filter_action(action)
-        self._last_command_position = action
+        # action = self._filter_action(action)
         for i in range(self._action_repeat):
             proc_action = self._smooth_action(action, i)
             self._step_internal(proc_action)
         obs = self.last_observation
         self.last_observation = self.get_observation()
         self._step_counter += 1
+        self._last_action = action
         return obs, self.energy * self.time_step
 
     def _filter_action(self, action):
@@ -134,7 +135,10 @@ class Laikago(object):
         return filtered_action
 
     def _smooth_action(self, action, substep_count):
-        prev_action = self._last_command_position
+        if self._last_action is not None:
+            prev_action = self._last_action
+        else:
+            prev_action = self.get_true_motor_angles()
 
         lerp = float(substep_count + 1) / self._action_repeat
         proc_action = prev_action + lerp * (action - prev_action)
@@ -148,12 +152,15 @@ class Laikago(object):
         return action
 
     def _step_internal(self, pos_action):
+        begin_time = time.time()
         clipped_pos_action = self._clip_action(pos_action)
         torque_action = self.position2torque(clipped_pos_action)
         self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
         self.receive_observation()
         self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_angles()))
+        end_time = time.time()
+        time.sleep(self.time_step - begin_time + end_time)
         return
 
     def _build_action_filter(self):
