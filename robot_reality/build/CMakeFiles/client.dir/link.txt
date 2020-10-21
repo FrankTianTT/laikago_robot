@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/client.dir/client.cpp.o CMakeFiles/client.dir/control_api.cpp.o  -o client -pthread -llaikago_comm -llcm 

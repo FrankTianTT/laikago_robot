@@ -1,3 +1,0 @@
-/home/songlei/robot_reality/build/CMakeFiles/rebuild_cache.dir
-/home/songlei/robot_reality/build/CMakeFiles/client.dir
-/home/songlei/robot_reality/build/CMakeFiles/edit_cache.dir

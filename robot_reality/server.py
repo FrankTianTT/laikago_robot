@@ -39,12 +39,19 @@ while True:
             foot_contact = np.array(obs[30: 34])
 
             # nn计算target_pos
+            # target_pos = np.array([
+            #     -15, 15, -60+20 * np.sin(t/20),
+            #     15, 15, -45,
+            #     -15, 15, -45,
+            #     15, 15, -45
+            # ]) * np.pi / 180
             target_pos = np.array([
-                -15, 15, -60+20 * np.sin(t/20),
+                -15, 15, -45,
                 15, 15, -45,
                 -15, 15, -45,
                 15, 15, -45
             ]) * np.pi / 180
+
             t += 1
 
             c.send(pack('f' * ACTION_SIZE, *target_pos))
