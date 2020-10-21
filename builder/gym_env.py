@@ -27,8 +27,8 @@ class LaikagoEnv(gym.Env):
             np.array(position_lower_bound, dtype=np.float32),
             np.array(position_upper_bound, dtype=np.float32))
         self.observation_space = spaces.Box(
-            np.ones(90),
-            - np.ones(90),
+            np.ones(46*3),
+            - np.ones(46*3),
             dtype=np.float32)
         self.energy = 0
 

@@ -5,13 +5,13 @@ ROBOT_DIR_NAME = os.path.dirname(__file__)
 URDF_DIR_NAME = os.path.join(ROBOT_DIR_NAME, 'laikago_urdf')
 URDF_FILE = os.path.join(URDF_DIR_NAME, 'laikago.urdf')
 
-CAMERA_SETTING = {'camera_distance': 2.0,
+CAMERA_SETTING = {'camera_distance': 1.0,
                   'camera_yaw': 0,
                   'camera_pitch': -30,
                   'render_width': 480,
                   'render_height': 360}
 TIME_STEP = 0.001
-ACTION_REPEAT = 20
+ACTION_REPEAT = 33
 NUM_MOTORS = 12
 DOFS_PER_LEG = 3
 
@@ -55,7 +55,7 @@ STAND_MOTOR_ANGLES = np.array([-10, 30, -75,
 Randomization:随机化分为两部分，一部分是观测的随机，另一部分是动力学参数的随机。
 """
 
-SENSOR_NOISE_STDDEV = {'IMU_angle': 0.01, 'IMU_rate': 0.05, 'motor_angle': 0.01, 'motor_velocity': 0.05}
+SENSOR_NOISE_STDDEV = {'IMU_angle': 0.001, 'IMU_rate': 0.01, 'motor_angle': 0.001, 'motor_velocity': 0.01}
 # related bound
 MASS_BOUND = [0.8, 1.2]
 INERTIA_BOUND = [0.5, 1.5]
