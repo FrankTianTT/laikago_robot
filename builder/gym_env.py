@@ -5,10 +5,10 @@ from builder.laikago_task import LaikagoTask
 import time
 import numpy as np
 from builder import env_constant
-from tasks.standupright_task import LaikagoStandUpright
-from tasks.turn_task import LaikagoTurn
-from tasks.liftfoot_task import LaikagoLiftFoot
-from tasks.walk_task import LaikagoWalk
+from builder.tasks.standupright_task import LaikagoStandUpright
+from builder.tasks.turn_task import LaikagoTurn
+from builder.tasks.liftfoot_task import LaikagoLiftFoot
+from builder.tasks.walk_task import LaikagoWalk
 
 class LaikagoEnv(gym.Env):
     def __init__(self,
@@ -24,12 +24,11 @@ class LaikagoEnv(gym.Env):
         self.transfer = None
         self.transfer = self.transfer_class(visual=self.visual, init_pose=self.task.init_pose)
         self.action_space = spaces.Box(
-            np.array(position_lower_bound),
-            np.array(position_upper_bound),
-            dtype=np.float32)
+            np.array(position_lower_bound, dtype=np.float32),
+            np.array(position_upper_bound, dtype=np.float32))
         self.observation_space = spaces.Box(
-            np.ones(90),
-            - np.ones(90),
+            np.ones(46*3),
+            - np.ones(46*3),
             dtype=np.float32)
         self.energy = 0
 

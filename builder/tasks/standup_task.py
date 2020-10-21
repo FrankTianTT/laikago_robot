@@ -1,4 +1,4 @@
-from laikago_task import LaikagoTask
+from builder.laikago_task import LaikagoTask
 from builder.laikago_task import InitPose
 
 class LaikagoStandUp1(LaikagoTask):

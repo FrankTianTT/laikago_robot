@@ -36,9 +36,9 @@ class Transfer(object):
 
     def get_env_observation(self):
         obs = []
-        obs.extend(np.array(self.history_observation[0][0:12])/(np.pi))
-        obs.extend(np.array(self.history_observation[0][12:24]) / (10 * np.pi))
         for i in range(self.history_len):
+            obs.extend(np.array(self.history_observation[i][0:12]) / (np.pi))
+            obs.extend(np.array(self.history_observation[i][12:24]) / (10 * np.pi))
             obs.extend(np.array(self.history_observation[i][24:27])/(np.pi))
             obs.extend(np.array(self.history_observation[i][27:30])/(10 * np.pi))
             obs.extend(np.array(self.history_observation[i][30:34]))
