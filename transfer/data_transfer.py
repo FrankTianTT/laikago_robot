@@ -1,4 +1,4 @@
-from robot_simulation.laikago import Laikago
+from robot_bullet.laikago import Laikago
 from transfer import transfer_constant
 from transfer.transfer_constant import InitPose
 from transfer.transfer_constant import FL, FR, RL, RR, L1, L2, L3, ROBOT_LENGTH, ROBOT_WIDTH

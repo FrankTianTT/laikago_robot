@@ -7,7 +7,7 @@ import sys
 from os.path import abspath, join, dirname
 sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
 from builder.gym_env import LaikagoEnv
-import builder.tasks_sim as tasks_sim
+import builder.tasks_bullet as tasks_sim
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     best_model_save_path = './PPO-v{}/logs/'.format(version)
     best_model_dir = './PPO-v{}/logs/best_model.zip'.format(version)
 
-    standup_task_sim = importlib.import_module('builder.tasks_sim.standup_task_sim')
+    standup_task_sim = importlib.import_module('builder.tasks_bullet.standup_task_sim')
     task = eval('standup_task_sim.LaikagoStandUpSim{}()'.format(version))
 
     env = LaikagoEnv(task=task, visual=False)

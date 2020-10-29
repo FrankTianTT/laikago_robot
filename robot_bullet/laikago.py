@@ -1,8 +1,8 @@
 # 这个文件是对laikago的机械特性和电气特性的仿真。
 
-import robot_simulation.laikago_constant as laikago_constant
-from robot_simulation.laikago_constant import InitPose
-from robot_simulation import action_filter
+import robot_bullet.laikago_constant as laikago_constant
+from robot_bullet.laikago_constant import InitPose
+from robot_bullet import action_filter
 import pybullet
 import pybullet_utils.bullet_client as bullet_client
 import pybullet_data as pd
@@ -410,7 +410,7 @@ class Laikago(object):
             self.quadruped, self._motor_id_list)
         self._base_position, orientation = (
             self._pybullet_client.getBasePositionAndOrientation(self.quadruped))
-        # Computes the relative orientation relative to the robot_simulation's
+        # Computes the relative orientation relative to the robot_bullet's
         # initial_orientation.
         _, self._base_orientation = self._pybullet_client.multiplyTransforms(
             positionA=[0, 0, 0],
