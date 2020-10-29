@@ -5,9 +5,6 @@ from builder.laikago_task import LaikagoTask
 import time
 import numpy as np
 from builder import env_constant
-from builder.tasks.standupright_task import LaikagoStandUpright
-from builder.tasks.turn_task import LaikagoTurn
-from builder.tasks.liftfoot_task import LaikagoLiftFoot
 from builder.tasks.walk_task import LaikagoWalk
 
 class LaikagoEnv(gym.Env):

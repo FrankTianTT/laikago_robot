@@ -28,25 +28,33 @@ if __name__ == "__main__":
                        -10, 50, -75,
                        10, 50, -75]) * np.pi / 180
     while True:
-        if 0 < i < 200:
-            for j in [1, 4, 7, 10]:
-                action[j] += 0.1 * np.pi / 180
-        elif 200 < i < 400:
-            for j in [1, 4, 7, 10]:
-                action[j] -= 0.1 * np.pi / 180
-        elif 400 < i < 600:
-            for j in [0, 6]:
-                action[j] -= 0.1 * np.pi / 180
-            for j in [3, 9]:
-                action[j] -= 0.1 * np.pi / 180
-        elif 600 < i < 800:
-            for j in [0, 6]:
-                action[j] += 0.1 * np.pi / 180
-            for j in [3, 9]:
-                action[j] += 0.1 * np.pi / 180
+        # step = 0.5
+        # if 0 < i < 20:
+        #     for j in [1, 4, 7, 10]:
+        #         action[j] += step * np.pi / 180
+        # elif 20 < i < 60:
+        #     for j in [1, 4, 7, 10]:
+        #         action[j] -= step * np.pi / 180
+        # elif 60 < i < 80:
+        #     for j in [1, 4, 7, 10]:
+        #         action[j] += step * np.pi / 180
+        # elif 80 < i < 100:
+        #     for j in [0, 6]:
+        #         action[j] -= step * np.pi / 180
+        #     for j in [3, 9]:
+        #         action[j] += step * np.pi / 180
+        # elif 100 < i < 140:
+        #     for j in [0, 6]:
+        #         action[j] += step * np.pi / 180
+        #     for j in [3, 9]:
+        #         action[j] -= step * np.pi / 180
+        # elif 140 < i < 160:
+        #     for j in [0, 6]:
+        #         action[j] -= step * np.pi / 180
+        #     for j in [3, 9]:
+        #         action[j] += step * np.pi / 180
 
         obs, reward, done, info = env.step(action)
-        print(obs)
         total_reward += reward
         i += 1
         if done:

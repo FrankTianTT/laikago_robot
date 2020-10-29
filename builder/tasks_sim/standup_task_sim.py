@@ -7,7 +7,7 @@ class LaikagoStandUpSimBase(LaikagoTaskSim):
 
     def __init__(self, mode='train'):
         super(LaikagoStandUpSimBase, self).__init__(mode,
-                                                 init_pose=InitPose.ON_ROCK)
+                                                 init_pose=InitPose.STAND)
         self.fall_timer = 0
         self.steps = 0
 

@@ -4,6 +4,8 @@ import os
 ROBOT_DIR_NAME = os.path.dirname(__file__)
 URDF_DIR_NAME = os.path.join(ROBOT_DIR_NAME, 'laikago_urdf')
 URDF_FILE = os.path.join(URDF_DIR_NAME, 'laikago.urdf')
+# URDF_DIR_NAME = os.path.join(ROBOT_DIR_NAME, 'laikago_model')
+# URDF_FILE = os.path.join(URDF_DIR_NAME, 'laikago_toes_limits.urdf')
 
 CAMERA_SETTING = {'camera_distance': 1.0,
                   'camera_yaw': 0,
