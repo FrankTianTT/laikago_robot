@@ -39,7 +39,7 @@ if __name__ == "__main__":
     standup_task_sim = importlib.import_module('builder.tasks_sim.standup_task_sim')
     task = eval('standup_task_sim.LaikagoStandUpSim{}()'.format(version))
 
-    env = LaikagoEnv(task=task, visual=True)
+    env = LaikagoEnv(task=task, visual=False)
     eval_env = LaikagoEnv(task=task, visual=False)
 
     eval_callback = EvalCallback(eval_env,

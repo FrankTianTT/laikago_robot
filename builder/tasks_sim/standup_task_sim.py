@@ -8,33 +8,24 @@ class LaikagoStandUpSimBase(LaikagoTaskSim):
     def __init__(self, mode='train'):
         super(LaikagoStandUpSimBase, self).__init__(mode,
                                                  init_pose=InitPose.STAND)
-        self.fall_timer = 0
+        # self.mode = 'no-die'
         self.steps = 0
 
 
     def reset(self, env):
         self._env = env
         self.steps = 0
-        self.fall_timer = 0
 
     def update(self):
         self.steps += 1
 
-        roll = self._env.get_history_rpy()[0][0]
-        if roll > 3 or roll < -3:
-            self.fall_timer += 1
-        else:
-            self.fall_timer = 0
-
     def done(self):
-        if self.steps > 1000:
-            return True
-        elif self.fall_timer > 50:
-            return True
-        elif self.steps < 50:
+        if self.mode=='no-die':
             return False
+        if self.steps > 300:
+            return True
         else:
-            return self.done_rp_sim() or self.done_height_sim()
+            return self.done_rp_sim() or self.done_height_sim() or self.done_region_sim()
 
 class LaikagoStandUpSim0(LaikagoStandUpSimBase):
 
@@ -42,7 +33,7 @@ class LaikagoStandUpSim0(LaikagoStandUpSimBase):
         super(LaikagoStandUpSim0, self).__init__(mode)
 
     def reward(self):
-        self.add_reward(self.reward_height_sim(), 1)
+        self.add_reward(1, 1)
         return self.get_sum_reward()
 
 class LaikagoStandUpSim1(LaikagoStandUpSimBase):
@@ -51,30 +42,8 @@ class LaikagoStandUpSim1(LaikagoStandUpSimBase):
         super(LaikagoStandUpSim1, self).__init__(mode)
 
     def reward(self):
-        self.add_reward(self.reward_region_sim(), 1)
         self.add_reward(self.reward_height_sim(), 1)
         return self.get_sum_reward()
-
-class LaikagoStandUpSim1_1(LaikagoStandUpSimBase):
-
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpSim1_1, self).__init__(mode)
-
-    def reward(self):
-        self.add_reward(self.reward_region_sim(), 1)
-        self.add_reward(self.reward_height_sim(), 1.5)
-        return self.get_sum_reward()
-
-class LaikagoStandUpSim1_2(LaikagoStandUpSimBase):
-
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpSim1_2, self).__init__(mode)
-
-    def reward(self):
-        self.add_reward(self.reward_region_sim(), 1)
-        self.add_reward(self.reward_height_sim(), 2)
-        return self.get_sum_reward()
-
 
 class LaikagoStandUpSim2(LaikagoStandUpSimBase):
 
@@ -82,9 +51,7 @@ class LaikagoStandUpSim2(LaikagoStandUpSimBase):
         super(LaikagoStandUpSim2, self).__init__(mode)
 
     def reward(self):
-        self.add_reward(self.reward_region_sim(), 1)
         self.add_reward(self.reward_energy(), 1)
-        self.add_reward(self.reward_height_sim(), 2)
         return self.get_sum_reward()
 
 class LaikagoStandUpSim3(LaikagoStandUpSimBase):
@@ -94,19 +61,6 @@ class LaikagoStandUpSim3(LaikagoStandUpSimBase):
 
     def reward(self):
         self.add_reward(self.reward_base_vel_sim(), 1)
-        self.add_reward(self.reward_energy(), 1)
-        self.add_reward(self.reward_height_sim(), 3)
-        return self.get_sum_reward()
-
-class LaikagoStandUpSim3_1(LaikagoStandUpSimBase):
-
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpSim3_1, self).__init__(mode)
-
-    def reward(self):
-        self.add_reward(self.reward_base_vel_sim(), 1)
-        self.add_reward(self.reward_energy(), 1)
-        self.add_reward(self.reward_height_sim(), 5)
         return self.get_sum_reward()
 
 class LaikagoStandUpSim4(LaikagoStandUpSimBase):
@@ -115,27 +69,6 @@ class LaikagoStandUpSim4(LaikagoStandUpSimBase):
         super(LaikagoStandUpSim4, self).__init__(mode)
     def reward(self):
         self.add_reward(self.reward_rpy_sim(), 1)
-        self.add_reward(self.reward_height_sim(), 1)
-        return self.get_sum_reward()
-
-class LaikagoStandUpSim4_1(LaikagoStandUpSimBase):
-
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpSim4_1, self).__init__(mode)
-
-    def reward(self):
-        self.add_reward(self.reward_rpy_sim(), 1)
-        self.add_reward(self.reward_height_sim(), 2)
-        return self.get_sum_reward()
-
-class LaikagoStandUpSim4_2(LaikagoStandUpSimBase):
-
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpSim4_2, self).__init__(mode)
-
-    def reward(self):
-        self.add_reward(self.reward_rpy_sim(), 1)
-        self.add_reward(self.reward_height_sim(), 3)
         return self.get_sum_reward()
 
 class LaikagoStandUpSim5(LaikagoStandUpSimBase):
@@ -144,7 +77,5 @@ class LaikagoStandUpSim5(LaikagoStandUpSimBase):
         super(LaikagoStandUpSim5, self).__init__(mode)
 
     def reward(self):
-        self.add_reward(self.reward_rpy_sim(), 1)
         self.add_reward(self.reward_region_sim(), 1)
-        self.add_reward(self.reward_height_sim(), 3)
         return self.get_sum_reward()

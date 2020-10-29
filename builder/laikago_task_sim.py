@@ -76,11 +76,18 @@ class LaikagoTaskSim(object):
         reward = - (r ** 2 + p ** 2)
         return self.normalize_reward(reward, -1, 0)
 
-    def done_rp_sim(self):
+    def done_rp_sim(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        return r ** 2 > (30 * np.pi / 180) ** 2 or p ** 2 > (30 * np.pi / 180) ** 2
+        # print('done rp: ', max(abs(r * 180/np.pi), abs(p * 180/np.pi)))
+        return abs(r) > abs(threshold * np.pi / 180) or abs(p) > abs(threshold * np.pi / 180)
 
-    def done_height_sim(self):
+    def done_height_sim(self, threshold=0.35):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         height = base_pos[2]
-        return height < 0.25
+        # print('done h: ', height)
+        return height < threshold
+
+    def done_region_sim(self, threshold=0.5):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        x = base_pos[0] ** 2 + base_pos[1] ** 2
+        return x > threshold ** 2
