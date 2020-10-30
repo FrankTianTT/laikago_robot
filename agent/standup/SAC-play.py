@@ -7,6 +7,7 @@ import sys
 from os.path import abspath, join, dirname
 sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
 from builder.gym_env import LaikagoEnv
+import builder.tasks_sim as tasks_sim
 import numpy as np
 
 if __name__ == "__main__":
@@ -18,8 +19,8 @@ if __name__ == "__main__":
 
     best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
 
-    standup_task_bullet = importlib.import_module('builder.tasks.standup_task')
-    task = eval('standup_task.LaikagoStandUp{}()'.format(version))
+    standup_task_sim = importlib.import_module('builder.tasks_sim.standup_task_sim')
+    task = eval('standup_task_sim.LaikagoStandUpSim{}()'.format(version))
     env = LaikagoEnv(task=task, visual=True)
     model = SAC.load(best_model_save_path)
 

@@ -76,6 +76,19 @@ class LaikagoTaskBullet(object):
         reward = - (r ** 2 + p ** 2)
         return self.normalize_reward(reward, -1, 0)
 
+    def reward_toe_contact(self):
+        contact = self._env.get_history_toe_collision()[0]
+        reward = 1 if sum(contact) == 4 else 0
+        return self.normalize_reward(reward, 0, 1)
+
+    def reward_toe_position(self):
+        position = self._env.get_history_toe_position()[0]
+        # front_min_distance = min([math.sqrt(position[3 * i] ** 2 + position[3 * i + 1] ** 2) for i in [0, 1]])
+        # rear_min_distance = min([math.sqrt(position[3 * i] ** 2 + position[3 * i + 1] ** 2) for i in [2, 3]])
+        min_distance = min([math.sqrt(position[3 * i] ** 2 + position[3 * i + 1] ** 2) for i in range(4)])
+        reward = 0.25 if min_distance > 0.25 else min_distance
+        return self.normalize_reward(reward, 0, 0.25)
+
     def done_rp_bullet(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
         # print('done rp: ', max(abs(r * 180/np.pi), abs(p * 180/np.pi)))
@@ -92,5 +105,3 @@ class LaikagoTaskBullet(object):
         x = base_pos[0] ** 2 + base_pos[1] ** 2
         return x > threshold ** 2
 
-    def done_height(self):
-        return 0

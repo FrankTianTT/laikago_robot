@@ -6,7 +6,6 @@ from os.path import abspath, join, dirname
 
 sys.path.insert(0, dirname(dirname(abspath(__file__))))
 from builder.gym_env import LaikagoEnv
-import builder.tasks_bullet as tasks_sim
 import numpy as np
 
 if __name__ == "__main__":
@@ -16,8 +15,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     version = args.version
 
-    standup_task_sim = importlib.import_module('builder.tasks_bullet.standup_task_sim')
-    task = eval('standup_task_sim.LaikagoStandUpSim{}()'.format(version))
+    standup_task_bullet = importlib.import_module('builder.tasks_bullet.standup_task_bullet')
+    task = eval('standup_task_bullet.LaikagoStandUpBullet{}()'.format(version))
     env = LaikagoEnv(task=task, visual=True)
 
     obs = env.reset()
@@ -28,8 +27,8 @@ if __name__ == "__main__":
                        -10, 50, -75,
                        10, 50, -75]) * np.pi / 180
     while True:
-        step = 0.5
-        length = 200
+        step = 2
+        length = 20
         if 0 * length < i < 1 * length:
             for j in [1, 4, 7, 10]:
                 action[j] += step * np.pi / 180

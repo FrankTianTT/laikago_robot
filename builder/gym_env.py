@@ -65,6 +65,9 @@ class LaikagoEnv(gym.Env):
     def get_history_toe_position(self):
         return self.transfer.get_history_toe_position()
 
+    def get_history_toe_collision(self):
+        return self.transfer.get_history_toe_collision()
+
     def get_energy(self):
         return self.energy
 
