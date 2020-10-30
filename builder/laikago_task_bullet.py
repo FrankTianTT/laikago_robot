@@ -91,3 +91,6 @@ class LaikagoTaskBullet(object):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         x = base_pos[0] ** 2 + base_pos[1] ** 2
         return x > threshold ** 2
+
+    def done_height(self):
+        return 0

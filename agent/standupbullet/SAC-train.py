@@ -45,7 +45,7 @@ if __name__ == "__main__":
     eval_callback = EvalCallback(eval_env,
                                  best_model_save_path=best_model_save_path,
                                  log_path=log_path,
-                                 eval_freq=10000,
+                                 eval_freq=1000,
                                  deterministic=True,
                                  render=False)
     policy_kwargs = dict(activation_fn=torch.nn.ReLU, net_arch=net_arch)

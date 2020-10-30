@@ -17,36 +17,16 @@ class LaikagoTask(object):
         self._env = None
         self.mode = mode
         self.init_pose = init_pose
-        self.steps = 0
-        self.history_rpy_diff = collections.deque(maxlen=100)
         return
 
     def reset(self, env):
-        self._env = env
-        self.steps = 0
-        self.fall_timer = 0
-        self.history_rpy_diff.clear()
         pass
 
     def update(self):
-        self.steps += 1
-        history_rpy = self._env.get_history_rpy()
-        rpy_diff = ((np.array(history_rpy[0]) - np.array(history_rpy[-1]))**2).sum()
-        self.history_rpy_diff.appendleft(rpy_diff)
-
-        roll = self._env.get_history_rpy()[0][0]
-        if roll > 3 or roll < -3:
-            self.fall_timer += 1
-        else:
-            self.fall_timer = 0
         pass
 
     def done(self):
-        if self.steps > 1000:
-            return True
-
-        if self.fall_timer > 50:
-            return True
+        return False
 
     def reward(self):
         return 0
@@ -133,3 +113,8 @@ class LaikagoTask(object):
     def reward_energy(self):
         energy = self._env.get_energy()
         return - energy
+
+    def done_rp(self, threshold=15):
+        r, p, y = self._env.get_history_rpy()[0]
+        # print('done rp: ', max(abs(r * 180/np.pi), abs(p * 180/np.pi)))
+        return abs(r) > abs(threshold * np.pi / 180) or abs(p) > abs(threshold * np.pi / 180)
