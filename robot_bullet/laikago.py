@@ -249,7 +249,9 @@ class Laikago(object):
         self._toe_link_ids.sort()
 
         self._leg_link_ids = self._hip_link_ids + self._upper_link_ids + self._lower_link_ids + self._toe_link_ids
+        self._leg_link_ids.sort()
         self._movable_joint_ids = self._hip_link_ids + self._upper_link_ids + self._lower_link_ids
+        self._movable_joint_ids.sort()
         return
 
     def get_toe_link_ids(self):
@@ -407,7 +409,9 @@ class Laikago(object):
 
     def receive_observation(self):
         self._joint_states = self._pybullet_client.getJointStates(
-            self.quadruped, self._motor_id_list)
+            self.quadruped, self._movable_joint_ids)
+        self._link_states = self._pybullet_client.getLinkStates(
+            self.quadruped, self._leg_link_ids)
         self._base_position, orientation = (
             self._pybullet_client.getBasePositionAndOrientation(self.quadruped))
         # Computes the relative orientation relative to the robot_bullet's
@@ -532,6 +536,10 @@ class Laikago(object):
         return self._base_velocity
     def get_rpy_for_reward(self):
         return self.get_true_base_roll_pitch_yaw()
+    def get_toe_height_for_reward(self):
+        toe_position = [self._link_states[i][0] for i in [3, 7, 11, 15]]
+        toe_height = [toe_position[i][2] for i in range(4)]
+        return toe_height
 
     def get_observation(self):
         observation = []
@@ -562,4 +570,5 @@ if __name__ == '__main__':
                        10, 40, -75]) * np.pi / 180
     while True:
         laikago.step(action)
+        laikago.get_toe_height_for_reward()
 

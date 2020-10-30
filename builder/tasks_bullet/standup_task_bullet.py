@@ -107,6 +107,44 @@ class LaikagoStandUpBullet6(LaikagoStandUpBulletBase):
         super(LaikagoStandUpBullet6, self).__init__(mode)
 
     def reward(self):
-        self.add_reward(self.reward_toe_position(), 1)
+        self.add_reward(self.reward_toe_distance(), 1)
         self.add_reward(self.reward_energy(), 1)
+        return self.get_sum_reward()
+
+class LaikagoStandUpBullet6_1(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet6_1, self).__init__(mode)
+
+    def reward(self):
+        self.add_reward(self.reward_toe_distance(), 1)
+        self.add_reward(self.reward_toe_contact(), 1)
+        self.add_reward(self.reward_energy(), 1)
+        return self.get_sum_reward()
+
+class LaikagoStandUpBullet7(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet7, self).__init__(mode)
+
+    def reward(self):
+        self.add_reward(self.reward_toe_height_bullet(), 1)
+        self.add_reward(self.reward_energy(), 1)
+        return self.get_sum_reward()
+
+class LaikagoStandUpBullet8(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet8, self).__init__(mode)
+    def reward(self):
+        self.add_reward(self.reward_toe_contact_soft(), 1)
+        self.add_reward(self.reward_energy(), 1)
+        return self.get_sum_reward()
+
+class LaikagoStandUpBullet8_1(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet8_1, self).__init__(mode)
+    def reward(self):
+        self.add_reward(self.reward_toe_contact_soft(), 1)
         return self.get_sum_reward()
