@@ -5,9 +5,13 @@ import argparse
 import importlib
 import sys
 from os.path import abspath, join, dirname
-sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
+sys.path.insert(0, dirname(dirname(dirname(dirname(abspath(__file__))))))
 from builder.gym_env import LaikagoEnv
 import numpy as np
+
+TASK_NAME = 'standimitation'
+ClASS_NAME = 'StandImitation'
+MODE = 'no-die'
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -18,8 +22,8 @@ if __name__ == "__main__":
 
     best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
 
-    standup_task = importlib.import_module('builder.tasks.standup_task')
-    task = eval('standup_task.LaikagoStandUp{}()'.format(version))
+    standup_task_bullet = importlib.import_module('builder.tasks_bullet.' + TASK_NAME + '_task_bullet')
+    task = eval('standup_task_bullet.Laikago' + ClASS_NAME + 'Bullet{}(mode="'.format(version) + MODE + '")')
     env = LaikagoEnv(task=task, visual=True)
     model = SAC.load(best_model_save_path)
 
@@ -34,7 +38,7 @@ if __name__ == "__main__":
                    10, 50, -75]) * np.pi / 180
 
         obs, reward, done, info = env.step(action)
-
+        print(reward)
         total_reward += reward
         if done:
           obs = env.reset()
