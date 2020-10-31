@@ -6,7 +6,7 @@ class LaikagoStandUpBase(LaikagoTask):
     def __init__(self, mode='train'):
         super(LaikagoStandUpBase, self).__init__(mode,
                                                  init_pose=InitPose.STAND)
-        self.mode = 'no-die'
+        # self.mode = 'no-die'
         self.steps = 0
 
     def reset(self, env):

@@ -168,5 +168,4 @@ class LaikagoTask(object):
         max_height = - max(height)
         roll = self._env.get_history_rpy()[0][0]
         pitch = self._env.get_history_rpy()[0][1]
-        print(max_height * math.cos(roll) * math.cos(pitch))
         return max_height * math.cos(roll) * math.cos(pitch) < threshold
