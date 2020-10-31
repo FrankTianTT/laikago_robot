@@ -17,6 +17,8 @@ class LaikagoTask(object):
         self._env = None
         self.mode = mode
         self.init_pose = init_pose
+        self.sum_reward = 0
+        self.sum_p = 0
         return
 
     def reset(self, env):
@@ -30,6 +32,19 @@ class LaikagoTask(object):
 
     def reward(self):
         return 0
+
+    def add_reward(self, reward, p=1):
+        self.sum_reward += reward * p
+        self.sum_p += p
+
+    def get_sum_reward(self):
+        reward = self.sum_reward / self.sum_p
+        self.sum_reward = 0
+        self.sum_p = 0
+        return reward
+
+    def normalize_reward(self, reward, min_reward, max_reward):
+        return (reward - min_reward)/(max_reward - min_reward)
 
     def precision_cost(self, v, t, m):
         w = math.atanh(math.sqrt(0.95)) / m
@@ -84,6 +99,16 @@ class LaikagoTask(object):
     def reward_walk(self, walk_dir):
         return self.reward_chassis(walk_dir) + 0.5 * self.reward_feet(walk_dir) + 0.1 * self.reward_up()
 
+    def reward_toe_contact(self):
+        contact = self._env.get_history_toe_collision()[0]
+        reward = 1 if sum(contact) == 4 else 0
+        return self.normalize_reward(reward, 0, 1)
+
+    def reward_toe_contact_soft(self):
+        contact = self._env.get_history_toe_collision()[0]
+        reward = sum(contact)
+        return self.normalize_reward(reward, -4, 4)
+
     def reward_min_stand_high(self):
         toe_position = self._env.get_history_toe_position()[0]
         height = []
@@ -110,6 +135,24 @@ class LaikagoTask(object):
         else:
             return height * math.cos(roll) * math.cos(pitch)
 
+    def reward_toe_distance(self, threshold=0.2):
+        """
+        no, x,  y
+        0   +   -
+        1   +   +
+        2   -   -
+        3   -   +
+        """
+        signal = [[1, -1], [1, 1], [-1, -1], [-1, 1]]
+        position = self._env.get_history_toe_position()[0]
+        x_y_pos = [[position[3 * i], position[3 * i + 1]]for i in range(4)]
+        min_distance = min([math.sqrt(position[3 * i] ** 2 + position[3 * i + 1] ** 2) for i in range(4)])
+        reward = threshold if min_distance > threshold else min_distance
+        for i in range(4):
+            if x_y_pos[i][0] * signal[i][0] < 0 or x_y_pos[i][1] * signal[i][1] < 0:
+                reward = 0
+        return self.normalize_reward(reward, 0, threshold)
+
     def reward_energy(self):
         energy = self._env.get_energy()
         return - energy
@@ -118,3 +161,12 @@ class LaikagoTask(object):
         r, p, y = self._env.get_history_rpy()[0]
         # print('done rp: ', max(abs(r * 180/np.pi), abs(p * 180/np.pi)))
         return abs(r) > abs(threshold * np.pi / 180) or abs(p) > abs(threshold * np.pi / 180)
+
+    def done_min_stand_high(self, threshold=0.2):
+        toe_position = self._env.get_history_toe_position()[0]
+        height = [toe_position[i] for i in [2, 5, 8, 11]]
+        max_height = - max(height)
+        roll = self._env.get_history_rpy()[0][0]
+        pitch = self._env.get_history_rpy()[0][1]
+        print(max_height * math.cos(roll) * math.cos(pitch))
+        return max_height * math.cos(roll) * math.cos(pitch) < threshold
