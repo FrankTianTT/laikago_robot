@@ -20,7 +20,7 @@ if __name__ == "__main__":
     best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
 
     standup_task_bullet = importlib.import_module('builder.tasks_bullet.standup_task_bullet')
-    task = eval('standup_task_bullet.LaikagoStandUpBullet{}()'.format(version))
+    task = eval('standup_task_bullet.LaikagoStandUpBullet{}(mode="no-die")'.format(version))
     env = LaikagoEnv(task=task, visual=True)
     model = SAC.load(best_model_save_path)
 

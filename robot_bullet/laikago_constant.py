@@ -13,7 +13,7 @@ CAMERA_SETTING = {'camera_distance': 1.0,
                   'render_width': 480,
                   'render_height': 360}
 TIME_STEP = 0.001
-ACTION_REPEAT = 33
+ACTION_REPEAT = 20
 NUM_MOTORS = 12
 DOFS_PER_LEG = 3
 

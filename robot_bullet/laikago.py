@@ -123,20 +123,20 @@ class Laikago(object):
             time_to_sleep = self.time_step * self._action_repeat - time_spent
             if time_to_sleep > 0:
                 time.sleep(time_to_sleep)
-        base_pos = self.get_base_position()
-        [yaw, pitch,
-         dist] = self._pybullet_client.getDebugVisualizerCamera()[8:11]
-        self._pybullet_client.resetDebugVisualizerCamera(dist, yaw, pitch,
-                                                         base_pos)
+            base_pos = self.get_base_position()
+            [yaw, pitch,
+             dist] = self._pybullet_client.getDebugVisualizerCamera()[8:11]
+            self._pybullet_client.resetDebugVisualizerCamera(dist, yaw, pitch,
+                                                             base_pos)
 
         self.energy = 0
-        # action = self._filter_action(action)
+        action = self._filter_action(action)
         for i in range(self._action_repeat):
             proc_action = self._smooth_action(action, i)
             self._step_internal(proc_action)
-        # obs = self._last_observation
-        # self._last_observation = self.get_observation()
-        obs = self.get_observation()
+        obs = self._last_observation
+        self._last_observation = self.get_observation()
+        # obs = self.get_observation()
 
         self._step_counter += 1
         self._last_action = action

@@ -2,6 +2,9 @@ from builder.laikago_task_bullet import LaikagoTaskBullet
 from builder.laikago_task import InitPose
 import math
 
+"""
+version 6-1 is the best from then on.
+"""
 
 class LaikagoStandUpBulletBase(LaikagoTaskBullet):
 
@@ -122,6 +125,18 @@ class LaikagoStandUpBullet6_1(LaikagoStandUpBulletBase):
         self.add_reward(self.reward_energy(), 1)
         return self.get_sum_reward()
 
+class LaikagoStandUpBullet6_2(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet6_2, self).__init__(mode)
+
+    def reward(self):
+        self.add_reward(self.reward_toe_distance(), 1)
+        self.add_reward(self.reward_toe_contact(), 1)
+        self.add_reward(self.reward_rpy_bullet(), 1)
+        self.add_reward(self.reward_energy(), 1)
+        return self.get_sum_reward()
+
 class LaikagoStandUpBullet7(LaikagoStandUpBulletBase):
 
     def __init__(self, mode='train'):
@@ -129,6 +144,17 @@ class LaikagoStandUpBullet7(LaikagoStandUpBulletBase):
 
     def reward(self):
         self.add_reward(self.reward_toe_height_bullet(), 1)
+        self.add_reward(self.reward_energy(), 1)
+        return self.get_sum_reward()
+
+class LaikagoStandUpBullet7_1(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet7_1, self).__init__(mode)
+
+    def reward(self):
+        self.add_reward(self.reward_toe_height_bullet(), 1)
+        self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
         self.add_reward(self.reward_energy(), 1)
         return self.get_sum_reward()
 
