@@ -130,13 +130,13 @@ class Laikago(object):
                                                              base_pos)
 
         self.energy = 0
-        action = self._filter_action(action)
+        # action = self._filter_action(action)
         for i in range(self._action_repeat):
             proc_action = self._smooth_action(action, i)
             self._step_internal(proc_action)
-        obs = self._last_observation
-        self._last_observation = self.get_observation()
-        # obs = self.get_observation()
+        # obs = self._last_observation
+        # self._last_observation = self.get_observation()
+        obs = self.get_observation()
 
         self._step_counter += 1
         self._last_action = action

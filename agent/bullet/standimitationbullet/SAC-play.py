@@ -11,7 +11,7 @@ import numpy as np
 
 TASK_NAME = 'standimitation'
 ClASS_NAME = 'StandImitation'
-MODE = 'no-die'
+MODE = 'train'
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -30,15 +30,12 @@ if __name__ == "__main__":
     obs = env.reset()
     total_reward = 0
     for i in range(10000):
-        # action, _states = model.predict(obs, deterministic=True)
+        action, _states = model.predict(obs, deterministic=True)
         # print(action * 180 / np.pi)
-        action = np.array([-10, 30, -75,
-                   10, 30, -75,
-                   -10, 50, -75,
-                   10, 50, -75]) * np.pi / 180
+
 
         obs, reward, done, info = env.step(action)
-        print(reward)
+        # print(reward)
         total_reward += reward
         if done:
           obs = env.reset()

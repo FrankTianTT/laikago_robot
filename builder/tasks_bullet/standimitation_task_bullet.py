@@ -44,7 +44,7 @@ class LaikagoStandImitationBulletBase(LaikagoTaskBullet):
         if self.steps > 300:
             return True
         else:
-            return self.done_rp_bullet(threshold=30)
+            return self.done_rp_bullet(threshold=30) + self.done_height_bullet(threshold=0.3)
 
     def reward_imitation(self):
         pos = np.array(self._env.get_history_angle()[0])
@@ -52,9 +52,8 @@ class LaikagoStandImitationBulletBase(LaikagoTaskBullet):
         target_pos = self.imit_action
         target_vel = np.zeros(12)
         motor_torques = -1 * (self._kp * (pos - target_pos)) - self._kd * (vel - target_vel)
-        motor_torques = np.clip(motor_torques, -1 * self._torque_limits, self._torque_limits)
         reward = - np.sum(np.abs(motor_torques))
-        return self.normalize_reward(reward, -40 * 12, 0)
+        return 2/(1+math.exp(-reward/100))
 
 class LaikagoStandImitationBullet0(LaikagoStandImitationBulletBase):
 

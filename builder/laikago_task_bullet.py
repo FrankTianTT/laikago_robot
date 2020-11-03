@@ -21,6 +21,7 @@ class LaikagoTaskBullet(object):
         self.init_pose = init_pose
         self.sum_reward = 0
         self.sum_p = 0
+        self.steps = 0
         return
 
     def add_reward(self, reward, p=1):
@@ -39,10 +40,10 @@ class LaikagoTaskBullet(object):
 
     def reset(self, env):
         self._env = env
-        pass
+        self.steps = 0
 
     def update(self):
-        pass
+        self.steps += 1
 
     def done(self):
         return False
@@ -124,6 +125,13 @@ class LaikagoTaskBullet(object):
         height = base_pos[2]
         # print('done h: ', height)
         return height < threshold
+
+    def done_height_adaptation_bullet(self, threshold=0.35, time=100):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        height = base_pos[2]
+        # print('done h: ', height)
+        ada = 1 if self.steps>time else self.steps/time
+        return height < threshold * ada
 
     def done_region_bullet(self, threshold=0.5):
         base_pos = self._env.transfer.laikago.get_position_for_reward()

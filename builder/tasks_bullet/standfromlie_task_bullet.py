@@ -27,7 +27,7 @@ class LaikagoStandFromLieBulletBase(LaikagoTaskBullet):
         if self.steps > 300:
             return True
         else:
-            return self.done_rp_bullet(threshold=30)
+            return self.done_rp_bullet(threshold=30) or self.done_height_adaptation_bullet()
 
 class LaikagoStandFromLieBullet0(LaikagoStandFromLieBulletBase):
 
