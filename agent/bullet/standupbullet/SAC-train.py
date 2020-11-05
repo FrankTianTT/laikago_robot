@@ -42,8 +42,8 @@ if __name__ == "__main__":
     standup_task_bullet = importlib.import_module('builder.tasks_bullet.' + TASK_NAME + '_task_bullet')
     task = eval('standup_task_bullet.Laikago' + ClASS_NAME + 'Bullet{}(mode="'.format(version) + MODE + '")')
 
-    env = LaikagoEnv(task=task, visual=False)
-    eval_env = LaikagoEnv(task=task, visual=False)
+    env = LaikagoEnv(task=task, visual=False, obs_delay=False, action_repeat=33)
+    eval_env = LaikagoEnv(task=task, visual=False, obs_delay=False, action_repeat=33)
 
     eval_callback = EvalCallback(eval_env,
                                  best_model_save_path=best_model_save_path,

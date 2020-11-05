@@ -5,27 +5,37 @@ from builder.laikago_task import LaikagoTask
 import time
 import numpy as np
 from builder import env_constant
-from builder.tasks.walk_task import LaikagoWalk
 
 class LaikagoEnv(gym.Env):
     def __init__(self,
                  task,
                  visual=True,
                  transfer_class=Transfer,
+                 obs_delay=False,
+                 action_repeat=33,
                  position_upper_bound=env_constant.POSITION_UPPER_BOUND,
                  position_lower_bound=env_constant.POSITION_LOWER_BOUND):
         self.task = task
         self.task.reset(self)
         self.visual = visual
         self.transfer_class = transfer_class
+        self.obs_delay = obs_delay
+        self.action_repeat = action_repeat
         self.transfer = None
-        self.transfer = self.transfer_class(visual=self.visual, init_pose=self.task.init_pose)
+        self.transfer = self.transfer_class(visual=self.visual,
+                                            init_pose=self.task.init_pose,
+                                            action_repeat=self.action_repeat,
+                                            obs_delay=self.obs_delay)
         self.action_space = spaces.Box(
             np.array(position_lower_bound, dtype=np.float32),
             np.array(position_upper_bound, dtype=np.float32))
+        if self.obs_delay:
+            obs_size = 46 * 3 + 12
+        else:
+            obs_size = 46 * 3
         self.observation_space = spaces.Box(
-            np.ones(46*3),
-            - np.ones(46*3),
+            np.ones(obs_size),
+            - np.ones(obs_size),
             dtype=np.float32)
         self.energy = 0
 
@@ -72,13 +82,17 @@ class LaikagoEnv(gym.Env):
         return self.energy
 
 if __name__ == '__main__':
-    task = LaikagoWalk(direction=env_constant.WALK_RIGHT)
-    laikago_env = LaikagoEnv(task=task, visual=False)
+    from builder.tasks_bullet.standup_task_bullet import LaikagoStandUpBullet7_1 as Task
+    task = Task()
+    laikago_env = LaikagoEnv(task=task, visual=False,
+                             obs_delay=True)
 
     a = np.array([-50, 15, -35,
                    50, 15, -35,
                    -50, 15, -35,
                    50, 15, -35]) * np.pi / 180
-    while True:
-        o, r, d, _ = laikago_env.step(a)
-        # print(laikago_env.transfer.get_chassis_vel_by_toe())
+
+    print(len(laikago_env.observation_space.sample()))
+    # while True:
+    #     o, r, d, _ = laikago_env.step(a)
+    #     # print(laikago_env.transfer.get_chassis_vel_by_toe())

@@ -20,6 +20,8 @@ class Laikago(object):
                  urdf_filename=laikago_constant.URDF_FILE,
                  init_pose=InitPose.ON_ROCK,
                  self_collision_enabled=False,
+                 action_filter_enabled=False,
+                 obs_delay=False,
                  action_repeat=laikago_constant.ACTION_REPEAT,
                  randomized=True,
                  observation_noise_stdev=laikago_constant.SENSOR_NOISE_STDDEV,
@@ -46,6 +48,8 @@ class Laikago(object):
         self._urdf_filename = urdf_filename
         self._init_pose = init_pose
         self._self_collision_enabled = self_collision_enabled
+        self.action_filter_enabled = action_filter_enabled
+        self.obs_delay = obs_delay
         self._action_repeat = action_repeat
         self.randomized = randomized
         self._observation_noise_stdev = observation_noise_stdev
@@ -130,13 +134,17 @@ class Laikago(object):
                                                              base_pos)
 
         self.energy = 0
-        # action = self._filter_action(action)
+        if self.action_filter_enabled:
+            action = self._filter_action(action)
+
         for i in range(self._action_repeat):
             proc_action = self._smooth_action(action, i)
             self._step_internal(proc_action)
-        # obs = self._last_observation
-        # self._last_observation = self.get_observation()
-        obs = self.get_observation()
+        if self.obs_delay:
+            obs = self._last_observation
+            self._last_observation = self.get_observation()
+        else:
+            obs = self.get_observation()
 
         self._step_counter += 1
         self._last_action = action
