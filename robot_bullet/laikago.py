@@ -148,7 +148,7 @@ class Laikago(object):
 
         self._step_counter += 1
         self._last_action = action
-        return obs, self.energy * self.time_step
+        return obs, self.energy * self.time_step / self._action_repeat
 
     def _filter_action(self, action):
         if self._step_counter == 0:

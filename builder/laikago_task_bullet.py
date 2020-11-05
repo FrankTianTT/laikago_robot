@@ -54,7 +54,7 @@ class LaikagoTaskBullet(object):
     def reward_energy(self):
         energy = self._env.get_energy()
         reward = - energy
-        return self.normalize_reward(reward, -10, 0)
+        return self.normalize_reward(reward, -0.5, 0)
 
     def reward_height_bullet(self):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
