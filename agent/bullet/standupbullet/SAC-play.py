@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     standup_task_bullet = importlib.import_module('builder.tasks_bullet.' + TASK_NAME + '_task_bullet')
     task = eval('standup_task_bullet.Laikago' + ClASS_NAME + 'Bullet{}(mode="'.format(version) + MODE + '")')
-    env = LaikagoEnv(task=task, visual=True)
+    env = LaikagoEnv(task=task, visual=True, obs_delay=True, action_repeat=20)
     model = SAC.load(best_model_save_path)
 
     obs = env.reset()
