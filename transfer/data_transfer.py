@@ -10,14 +10,14 @@ class Transfer(object):
     def __init__(self,
                  init_pose=InitPose.STAND,
                  robot_class=Laikago,
-                 obs_delay=False,
+                 ctrl_delay=False,
                  action_repeat=33,
                  visual=False,
                  history_len=transfer_constant.HISTORY_LEN):
 
         self.laikago = None
         self.robot_class = robot_class
-        self.obs_delay = obs_delay
+        self.ctrl_delay = ctrl_delay
         self.action_repeat = action_repeat
         self.visual = visual
         self.history_len = history_len
@@ -26,12 +26,8 @@ class Transfer(object):
         self.laikago = self.robot_class(visual=self.visual,
                                         init_pose=init_pose,
                                         action_repeat=self.action_repeat,
-                                        obs_delay=self.obs_delay)
+                                        ctrl_delay=self.ctrl_delay)
         self.observation = None
-        if init_pose == InitPose.LIE:
-            self.last_action = LIE_MOTOR_ANGLES
-        else:
-            self.last_action = STAND_MOTOR_ANGLES
 
     def step(self, pos_action):
         """
@@ -42,10 +38,10 @@ class Transfer(object):
         robot_obs, energy = self.laikago.step(pos_action)
         self.observation = robot_obs
         self.collocation_observation(robot_obs)
-        env_obs = self.get_env_observation(pos_action)
+        env_obs = self.get_env_observation()
         return env_obs, energy
 
-    def get_env_observation(self, action):
+    def get_env_observation(self):
         obs = []
         for i in range(self.history_len):
             obs.extend(np.array(self.history_observation[i][0:12]) / np.pi)
@@ -54,9 +50,6 @@ class Transfer(object):
             obs.extend(np.array(self.history_observation[i][27:30])/(10 * np.pi))
             obs.extend(np.array(self.history_observation[i][30:34]))
             obs.extend(np.array(self.history_observation[i][34:46]) * 2)
-        if self.obs_delay:
-            obs.extend(np.array(self.last_action) / np.pi)
-            self.last_action = action
         return obs
 
 
@@ -82,7 +75,7 @@ class Transfer(object):
     def reset(self):
         self.laikago.reset(init_reset=False)
         self._init_history_observation()
-        return self.get_env_observation(self.last_action)
+        return self.get_env_observation()
 
     def get_observation(self):
         return self.observation

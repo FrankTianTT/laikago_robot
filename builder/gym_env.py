@@ -11,7 +11,7 @@ class LaikagoEnv(gym.Env):
                  task,
                  visual=True,
                  transfer_class=Transfer,
-                 obs_delay=False,
+                 ctrl_delay=False,
                  action_repeat=33,
                  position_upper_bound=env_constant.POSITION_UPPER_BOUND,
                  position_lower_bound=env_constant.POSITION_LOWER_BOUND):
@@ -19,20 +19,17 @@ class LaikagoEnv(gym.Env):
         self.task.reset(self)
         self.visual = visual
         self.transfer_class = transfer_class
-        self.obs_delay = obs_delay
+        self.ctrl_delay = ctrl_delay
         self.action_repeat = action_repeat
         self.transfer = None
         self.transfer = self.transfer_class(visual=self.visual,
                                             init_pose=self.task.init_pose,
                                             action_repeat=self.action_repeat,
-                                            obs_delay=self.obs_delay)
+                                            ctrl_delay=self.ctrl_delay)
         self.action_space = spaces.Box(
             np.array(position_lower_bound, dtype=np.float32),
             np.array(position_upper_bound, dtype=np.float32))
-        if self.obs_delay:
-            obs_size = 46 * 3 + 12
-        else:
-            obs_size = 46 * 3
+        obs_size = 46 * 3
         self.observation_space = spaces.Box(
             np.ones(obs_size),
             - np.ones(obs_size),
