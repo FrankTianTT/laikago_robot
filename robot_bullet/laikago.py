@@ -545,6 +545,11 @@ class Laikago(object):
         toe_position = [self._link_states[i][0] for i in [3, 7, 11, 15]]
         toe_height = [toe_position[i][2] for i in range(4)]
         return toe_height
+    def apply_force(self, force):
+        body_pos = self._pybullet_client.getBasePositionAndOrientation(self.quadruped)[0]
+        self._pybullet_client.applyExternalForce(
+            objectUniqueId=self.quadruped, linkIndex=-1,
+            forceObj=force, posObj=body_pos, flags=self._pybullet_client.WORLD_FRAME)
 
     def get_observation(self):
         observation = []
