@@ -116,7 +116,7 @@ class LaikagoTaskBullet(object):
 
     def reward_x_velocity(self, threshold=3):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
-        reward = x_vel if x_vel > threshold else threshold
+        reward = x_vel if x_vel < threshold else threshold
         return self.normalize_reward(reward, 0, threshold)
 
 

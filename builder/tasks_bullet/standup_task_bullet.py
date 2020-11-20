@@ -18,14 +18,19 @@ class LaikagoStandUpBulletBase(LaikagoTaskBullet):
     def update(self):
         self.steps += 1
 
+    @property
+    def is_healthy(self):
+        return not (self.done_rp_bullet(threshold=30) or
+                    self.done_height_bullet(threshold=0.3) or
+                    self.done_region_bullet(threshold=3))
+
     def done(self):
         if self.mode == 'no-die':
             return False
         if self.steps > 300:
             return True
         else:
-            return self.done_rp_bullet(threshold=30) or self.done_height_bullet(threshold=0.3) or\
-                   self.done_region_bullet(threshold=3)
+            return not self.is_healthy
 
 class LaikagoStandUpBullet0(LaikagoStandUpBulletBase):
 
@@ -43,14 +48,11 @@ class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
     def __init__(self, mode='train'):
         super(LaikagoStandUpBullet1, self).__init__(mode)
 
-    def done(self):
-        if self.mode == 'no-die':
-            return False
-        if self.steps > 300:
-            return True
-        else:
-            return self.done_rp_bullet(threshold=60) or self.done_height_bullet(threshold=0.15) or\
-                   self.done_region_bullet(threshold=3)
+    @property
+    def is_healthy(self):
+        return not (self.done_rp_bullet(threshold=60) or
+                    self.done_height_bullet(threshold=0.15) or
+                    self.done_region_bullet(threshold=3))
 
     def reward(self):
         self.add_reward(self.reward_toe_height_bullet(), 1)
@@ -85,7 +87,6 @@ class LaikagoStandUpBullet1_2(LaikagoStandUpBullet1):
 
 
 class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
-
     def __init__(self,
                  mode='train',
                  force=True,
@@ -96,7 +97,6 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
         self._get_force_ori()
         self.max_force = max_force
         self.force_delay_steps = force_delay_steps
-
         self.now_force = None
         return
 
@@ -105,7 +105,7 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
         f_ori = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]
         for i in f_ori:
             for j in f_ori:
-                ori = [o[0]+o[1] for o in zip(i, j)]
+                ori = [o[0] + o[1] for o in zip(i, j)]
                 self.force_ori.append(ori)
 
     def _give_force(self):
@@ -116,11 +116,36 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
         return self.now_force
 
     def update(self):
+        self.steps += 1
         if not self.force:
             return
         else:
             force = self._give_force()
             self._env.transfer.laikago.apply_force(force)
+
+    @property
+    def is_healthy(self):
+        return not (self.done_rp_bullet(threshold=45) or
+                    self.done_height_bullet(threshold=0.25) or
+                    self.done_region_bullet(threshold=3))
+
+    def reward(self):
+        self.add_reward(self.reward_toe_height_bullet(), 1)
+        self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
+        self.add_reward(self.reward_energy(), 1)
+        return self.get_sum_reward()
+
+
+class LaikagoStandUpBullet3(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet3, self).__init__(mode)
+
+    @property
+    def is_healthy(self):
+        return not (self.done_rp_bullet(threshold=30) or
+                    self.done_height_bullet(threshold=0.3) or
+                    self.done_region_bullet(threshold=3))
 
     def done(self):
         if self.mode == 'no-die':
@@ -128,11 +153,13 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
         if self.steps > 300:
             return True
         else:
-            return self.done_rp_bullet(threshold=45) or self.done_height_bullet(threshold=0.25) or\
-                   self.done_region_bullet(threshold=3)
+            return False
 
     def reward(self):
         self.add_reward(self.reward_toe_height_bullet(), 1)
         self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
         self.add_reward(self.reward_energy(), 1)
-        return self.get_sum_reward()
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1
