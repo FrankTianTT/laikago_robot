@@ -3,10 +3,6 @@ from builder.laikago_task import InitPose
 import math
 import random
 
-"""
-version 6-1 is the best from then on.
-"""
-
 class LaikagoStandUpBulletBase(LaikagoTaskBullet):
 
     def __init__(self, mode='train'):
@@ -28,7 +24,8 @@ class LaikagoStandUpBulletBase(LaikagoTaskBullet):
         if self.steps > 300:
             return True
         else:
-            return self.done_rp_bullet(threshold=30) or self.done_height_bullet(threshold=0.3) or self.done_region_bullet(threshold=3)
+            return self.done_rp_bullet(threshold=30) or self.done_height_bullet(threshold=0.3) or\
+                   self.done_region_bullet(threshold=3)
 
 class LaikagoStandUpBullet0(LaikagoStandUpBulletBase):
 
@@ -52,11 +49,13 @@ class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
         if self.steps > 300:
             return True
         else:
-            return self.done_rp_bullet(threshold=60) or self.done_height_bullet(threshold=0.15) or self.done_region_bullet(threshold=3)
+            return self.done_rp_bullet(threshold=60) or self.done_height_bullet(threshold=0.15) or\
+                   self.done_region_bullet(threshold=3)
 
     def reward(self):
         self.add_reward(self.reward_toe_height_bullet(), 1)
         self.add_reward(self.reward_energy(), 1)
+        self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
         self.add_reward(self.reward_height_bullet(), 3)
         return self.get_sum_reward()
 
@@ -68,6 +67,7 @@ class LaikagoStandUpBullet1_1(LaikagoStandUpBullet1):
     def reward(self):
         self.add_reward(self.reward_toe_height_bullet(), 1)
         self.add_reward(self.reward_energy(), 1)
+        self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
         self.add_reward(self.reward_height_bullet(), 5)
         return self.get_sum_reward()
 
@@ -79,6 +79,7 @@ class LaikagoStandUpBullet1_2(LaikagoStandUpBullet1):
     def reward(self):
         self.add_reward(self.reward_toe_height_bullet(), 1)
         self.add_reward(self.reward_energy(), 1)
+        self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
         self.add_reward(self.reward_height_bullet(), 10)
         return self.get_sum_reward()
 
@@ -127,7 +128,8 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
         if self.steps > 300:
             return True
         else:
-            return self.done_rp_bullet(threshold=45) or self.done_height_bullet(threshold=0.25)
+            return self.done_rp_bullet(threshold=45) or self.done_height_bullet(threshold=0.25) or\
+                   self.done_region_bullet(threshold=3)
 
     def reward(self):
         self.add_reward(self.reward_toe_height_bullet(), 1)

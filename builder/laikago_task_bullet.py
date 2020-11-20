@@ -114,6 +114,11 @@ class LaikagoTaskBullet(object):
         reward = - threshold if max_height > threshold else - max_height
         return self.normalize_reward(reward, - threshold, 0)
 
+    def reward_x_velocity(self, threshold=3):
+        x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
+        reward = x_vel if x_vel > threshold else threshold
+        return self.normalize_reward(reward, 0, threshold)
+
 
     def done_rp_bullet(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
