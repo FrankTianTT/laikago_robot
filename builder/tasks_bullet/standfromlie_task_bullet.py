@@ -21,13 +21,19 @@ class LaikagoStandFromLieBulletBase(LaikagoTaskBullet):
     def update(self):
         self.steps += 1
 
+    @property
+    def is_healthy(self):
+        return not (self.done_rp_bullet(threshold=30) or
+                    self.done_height_bullet(threshold=0.3) or
+                    self.done_region_bullet(threshold=3))
+
     def done(self):
         if self.mode=='no-die':
             return False
-        if self.steps > 300:
+        if self.steps > 1000:
             return True
         else:
-            return self.done_rp_bullet(threshold=30) or self.done_height_adaptation_bullet()
+            return False
 
 class LaikagoStandFromLieBullet0(LaikagoStandFromLieBulletBase):
 
@@ -35,5 +41,10 @@ class LaikagoStandFromLieBullet0(LaikagoStandFromLieBulletBase):
         super(LaikagoStandFromLieBullet0, self).__init__(mode)
 
     def reward(self):
-        self.add_reward(self.reward_energy(), 1)
-        return self.get_sum_reward()
+        self.add_reward(self.reward_toe_height_bullet(), 1)
+        self.add_reward(self.reward_toe_distance(), 1)
+        self.add_reward(self.reward_energy(), 3)
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1

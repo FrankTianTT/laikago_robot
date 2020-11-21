@@ -11,7 +11,7 @@ import numpy as np
 
 TASK_NAME = 'standup'
 ClASS_NAME = 'StandUp'
-MODE = 'train'
+MODE = 'no-die'
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
