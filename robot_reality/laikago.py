@@ -41,6 +41,7 @@ class Laikago(object):
 
     @staticmethod
     def transfer(self, obs):
+        """"Convert the real number contact force to a boolean number"""
         for i in range(4):
             obs[30+i] = 1 if obs[30+i] > 1 else -1
         return obs
