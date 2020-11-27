@@ -43,10 +43,25 @@ MOTOR_NAMES = [
     "RL_lower_leg_2_upper_leg_joint",
 ]
 
-LIE_MOTOR_ANGLES = np.array([0, 90, -155,
-                   0, 90, -155,
-                   0, 180, -155,
-                   0, 180, -155]) * np.pi / 180
+JOINT_NAMES = [
+    "FR_hip_joint",
+    "FR_thigh_joint",
+    "FR_calf_joint",
+    "FL_hip_joint",
+    "FL_thigh_joint",
+    "FL_calf_joint",
+    "RR_hip_joint",
+    "RR_thigh_joint",
+    "RR_calf_joint",
+    "RL_hip_joint",
+    "RL_thigh_joint",
+    "RL_calf_joint",
+]
+
+LIE_MOTOR_ANGLES = np.array([0, 88, -155,
+                   0, 88, -155,
+                   0, 88, -155,
+                   0, 88, -155]) * np.pi / 180
 
 STAND_MOTOR_ANGLES = np.array([-10, 30, -75,
                    10, 30, -75,
@@ -79,11 +94,13 @@ class InitPose(Enum):
     ON_ROCK = 3
 
 ABDUCTION_P_GAIN = 220.0
-ABDUCTION_D_GAIN = 0.3
+ABDUCTION_D_GAIN = 8.0
 HIP_P_GAIN = 220.0
-HIP_D_GAIN = 2.0
+HIP_D_GAIN = 8.0
 KNEE_P_GAIN = 220.0
-KNEE_D_GAIN = 2.0
+KNEE_D_GAIN = 8.0
+
+
 KP = [ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
             ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
             ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
