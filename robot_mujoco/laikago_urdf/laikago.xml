@@ -7,6 +7,7 @@
         <mesh name="thigh_mirror" file="thigh_mirror.stl" />
         <mesh name="calf" file="calf.stl" />
         <mesh name="thigh" file="thigh.stl" />
+<!--        <mesh name="stair" file="stair.stl" />-->
  	<texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/>
         <texture name="texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>
         <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278"
@@ -14,12 +15,15 @@
         <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"/>
         <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1"/>
     </asset>
+<!--    <option gravity="0 0 0"/>-->
     <worldbody>
 	<geom name="floor" pos="0 0 0" size="0 0 .25" type="plane" material="matplane" condim="3"/>
+<!--    <geom type="mesh" pos="5 0 0" quat="0.5 0.5 -0.5 -0.5" rgba="1 1 0 1" mesh="stair" material="matgeom" />-->
 	<light directional="false" diffuse=".2 .2 .2" specular="0 0 0" pos="0 0 5" dir="0 0 -1" castshadow="false"/>
         <light mode="targetbodycom" target="trunk" directional="false" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 0 4.0" dir="0 0 -1"/>
-        <body name="trunk" pos="0 0 0.7">
-		<freejoint name="root"/>
+        <body name="trunk" pos="0 0 0.45">
+<!--		<joint name="root"/>-->
+        <freejoint name="root"/>
             <inertial pos="0.002284 -4.1e-05 0.025165" quat="-0.00605949 0.710803 -0.00734309 0.703327" mass="13.733" diaginertia="0.254491 0.250684 0.0733281" />
             <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 0.423529 0.0392157 1" mesh="trunk" />
             <geom size="0.2808 0.086 0.09375" pos="0 0 0.01675" type="box" rgba="1 0.423529 0.0392157 0" />
@@ -98,17 +102,19 @@
         </body>
     </worldbody>
    <actuator>
-        <motor name="RL_calf_joint"       gear="800" joint="RL_calf_joint" />
-        <motor name="RL_thigh_joint"       gear="800" joint="RL_thigh_joint" />
-        <motor name="RL_hip_joint"       gear="800" joint="RL_hip_joint" />
-        <motor name="RR_calf_joint"       gear="800" joint="RR_calf_joint" />
-        <motor name="RR_thigh_joint"       gear="800" joint="RR_thigh_joint" />
-	<motor name="RR_hip_joint"       gear="800" joint="RR_hip_joint" />
-        <motor name="FL_calf_joint"       gear="800" joint="FL_calf_joint" />
-        <motor name="FL_thigh_joint"       gear="800" joint="FL_thigh_joint" />
-        <motor name="FL_hip_joint"       gear="800" joint="FL_hip_joint" />
-        <motor name="FR_calf_joint"       gear="800" joint="FR_calf_joint" />
-        <motor name="FR_thigh_joint"       gear="800" joint="FR_thigh_joint" />
-        <motor name="FR_hip_joint"       gear="800" joint="FR_hip_joint" />
+    <motor name="FR_hip_joint"       gear="1" joint="FR_hip_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="FR_thigh_joint"       gear="1" joint="FR_thigh_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="FR_calf_joint"       gear="1" joint="FR_calf_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="FL_hip_joint"       gear="1" joint="FL_hip_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="FL_thigh_joint"       gear="1" joint="FL_thigh_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="FL_calf_joint"       gear="1" joint="FL_calf_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="RR_hip_joint"       gear="1" joint="RR_hip_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="RR_thigh_joint"       gear="1" joint="RR_thigh_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="RR_calf_joint"       gear="1" joint="RR_calf_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="RL_hip_joint"       gear="1" joint="RL_hip_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="RL_thigh_joint"       gear="1" joint="RL_thigh_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="RL_calf_joint"       gear="1" joint="RL_calf_joint" ctrlrange="-20 20" ctrllimited="true"/>
+
+
     </actuator>
 </mujoco>

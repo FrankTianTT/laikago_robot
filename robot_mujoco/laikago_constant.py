@@ -21,32 +21,34 @@ ON_RACK_INIT_POSITION = [0, 0, 1]
 STAND_INIT_POSITION = [0, 0, 0.43]
 LIE_INIT_POSITION = [0, 0, 0.15]
 
-INIT_ORIENTATION = [0, 0, 0, 1]
+INIT_ORIENTATION = [0, 0, 0, 0]
 
 HIP_NAME_PATTERN = re.compile(r"\w{2}_hip_motor_2_chassis_joint")
 UPPER_NAME_PATTERN = re.compile(r"\w{2}_upper_leg_2_hip_motor_joint")
 LOWER_NAME_PATTERN = re.compile(r"\w{2}_lower_leg_2_upper_leg_joint")
 TOE_NAME_PATTERN = re.compile(r"jtoe\w{2}")
 
-MOTOR_NAMES = [
-    "FR_hip_motor_2_chassis_joint",
-    "FR_upper_leg_2_hip_motor_joint",
-    "FR_lower_leg_2_upper_leg_joint",
-    "FL_hip_motor_2_chassis_joint",
-    "FL_upper_leg_2_hip_motor_joint",
-    "FL_lower_leg_2_upper_leg_joint",
-    "RR_hip_motor_2_chassis_joint",
-    "RR_upper_leg_2_hip_motor_joint",
-    "RR_lower_leg_2_upper_leg_joint",
-    "RL_hip_motor_2_chassis_joint",
-    "RL_upper_leg_2_hip_motor_joint",
-    "RL_lower_leg_2_upper_leg_joint",
+JOINT_NAMES = [
+    "FR_hip_joint",
+    "FR_thigh_joint",
+    "FR_calf_joint",
+    "FL_hip_joint",
+    "FL_thigh_joint",
+    "FL_calf_joint",
+    "RR_hip_joint",
+    "RR_thigh_joint",
+    "RR_calf_joint",
+    "RL_hip_joint",
+    "RL_thigh_joint",
+    "RL_calf_joint",
 ]
 
-LIE_MOTOR_ANGLES = np.array([0, 90, -155,
-                   0, 90, -155,
-                   0, 180, -155,
-                   0, 180, -155]) * np.pi / 180
+TOE_GEOM_ID = [8, 14, 20, 26]
+
+LIE_MOTOR_ANGLES = np.array([0, 88, -155,
+                   0, 88, -155,
+                   0, 88, -155,
+                   0, 88, -155]) * np.pi / 180
 
 STAND_MOTOR_ANGLES = np.array([-10, 30, -75,
                    10, 30, -75,
@@ -79,11 +81,13 @@ class InitPose(Enum):
     ON_ROCK = 3
 
 ABDUCTION_P_GAIN = 220.0
-ABDUCTION_D_GAIN = 0.3
+ABDUCTION_D_GAIN = 8.0
 HIP_P_GAIN = 220.0
-HIP_D_GAIN = 2.0
+HIP_D_GAIN = 8.0
 KNEE_P_GAIN = 220.0
-KNEE_D_GAIN = 2.0
+KNEE_D_GAIN = 8.0
+
+
 KP = [ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
             ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
             ABDUCTION_P_GAIN, HIP_P_GAIN, KNEE_P_GAIN,
