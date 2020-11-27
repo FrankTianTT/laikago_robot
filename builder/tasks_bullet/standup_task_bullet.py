@@ -62,7 +62,10 @@ class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
         self.add_reward(self.reward_energy(), 1)
         self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
         self.add_reward(self.reward_height_bullet(), 3)
-        return self.get_sum_reward()
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1
 
 class LaikagoStandUpBullet1_1(LaikagoStandUpBullet1):
 
@@ -138,3 +141,23 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
         self.add_reward(self.reward_energy(), 1)
         return self.get_sum_reward()
 
+class LaikagoStandUpBullet3(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet3, self).__init__(mode)
+
+    @property
+    def is_healthy(self):
+        return not (self.done_rp_bullet(threshold=10) or
+                    self.done_y_bullet(threshold=10) or
+                    self.done_height_bullet(threshold=0.3) or
+                    self.done_region_bullet(threshold=0.1))
+
+    def reward(self):
+        self.add_reward(self.reward_toe_height_bullet(), 1)
+        self.add_reward(self.reward_energy(), 1)
+        self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1

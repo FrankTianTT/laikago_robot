@@ -43,3 +43,23 @@ class LaikagoRunStraightBullet0(LaikagoRunStraightBulletBase):
             return self.get_sum_reward()
         else:
             return self.get_sum_reward() - 1
+
+class LaikagoRunStraightBullet1(LaikagoRunStraightBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoRunStraightBullet1, self).__init__(mode)
+
+    @property
+    def is_healthy(self):
+        return not (self.done_rp_bullet(threshold=45) or
+                    self.done_height_bullet(threshold=0.25) or
+                    self.done_rp_bullet(threshold=15) or
+                    self.done_x_velocity(threshold=0))
+
+    def reward(self):
+        self.add_reward(self.reward_x_velocity(), 5)
+        self.add_reward(self.reward_energy(), 1)
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1
