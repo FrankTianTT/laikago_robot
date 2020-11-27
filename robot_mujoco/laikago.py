@@ -33,15 +33,16 @@ class Laikago(object):
                  toe_f_bound=laikago_constant.TOE_F_BOUND,
                  g_bound=laikago_constant.G_BOUND,
                  max_motor_angle_change_per_step=laikago_constant.MAX_MOTOR_ANGLE_CHANGE_PER_STEP):
+        self.time_step = time_step
         self.visual = visual
         self.model = mj.load_model_from_path(urdf_filename)
         self.sim = mj.MjSim(self.model)
+        self.sim.model.opt.timestep = self.time_step
         if self.visual:
             self.viewer = mj.MjViewer(self.sim)
             self.viewer.cam.type = mj_const.CAMERA_TRACKING
             self.viewer.cam.trackbodyid = 1
         self.data = self.sim.data
-        self.time_step = time_step
         self.num_motors = num_motors
         self.num_legs = num_motors / dofs_per_leg
         self._urdf_filename = urdf_filename
@@ -72,26 +73,34 @@ class Laikago(object):
         # selresetf._action_filter = self._build_action_filter()
         self._last_action = None
         self.reset(init_reset=True)
+        self._base_rotation_rpy = [0., 0., 0.]
+        self._last_base_rotation_rpy = [0., 0., 0.]
         self.receive_observation()
 
     def reset(self, init_reset=False):
         self.sim.reset()
+        init_qpos = []
         if self._init_pose.value == laikago_constant.InitPose.LIE.value:
-            self.sim.data.set_joint_qpos('root', [0., 0., 0.15, 1.0, 0.0, 0.0, 0.0])
+            init_qpos.extend(laikago_constant.LIE_INIT_POSITION)
             for joint, rad in zip(laikago_constant.JOINT_NAMES, laikago_constant.LIE_MOTOR_ANGLES):
                 self.sim.data.set_joint_qpos(joint, rad)
 
         elif self._init_pose.value == laikago_constant.InitPose.STAND.value:
+            init_qpos.extend(laikago_constant.STAND_INIT_POSITION)
             for joint, rad in zip(laikago_constant.JOINT_NAMES, laikago_constant.STAND_MOTOR_ANGLES):
                 self.sim.data.set_joint_qpos(joint, rad)
+        elif self._init_pose.value == laikago_constant.InitPose.ON_ROCK.value:
+            raise NotImplementedError
         else:
-            assert 0
+            raise RuntimeError('Unknown initial pose')
+        init_qpos.extend(laikago_constant.INIT_ORIENTATION)
+        self.sim.data.set_joint_qpos('root', init_qpos)
 
         self.sim.forward()
         if self.visual:
             self.viewer.render()
-        # if self.randomized:
-            # raise NotImplementedError
+        if self.randomized:
+            raise NotImplementedError
             # self.randomize()
         return
 
@@ -191,12 +200,15 @@ class Laikago(object):
         observation.extend(self.get_base_roll_pitch_yaw())          # [24, 27]
         observation.extend(self.get_base_roll_pitch_yaw_rate())     # [27, 30]
         observation.extend(self.get_toe_contacts())                 # [30, 34]
+        # print('observation', observation)
         return observation
 
     def receive_observation(self):
         self._joint_pos = [self.sim.data.get_joint_qpos(joint) for joint in laikago_constant.JOINT_NAMES]
         self._joint_vel = [self.sim.data.get_joint_qvel(joint) for joint in laikago_constant.JOINT_NAMES]
         self._base_rotation_mat = self.sim.data.get_body_xmat('trunk')
+        self._last_base_rotation_rpy = self._base_rotation_rpy
+        self._base_rotation_rpy = self._get_rpy_from_mat(self._base_rotation_mat)
 
     def get_motor_angles(self):
         return self._add_sensor_noise(np.array(self.get_true_motor_angles()),
@@ -212,12 +224,16 @@ class Laikago(object):
             self._observation_noise_stdev['IMU_angle'])
 
     def get_base_roll_pitch_yaw_rate(self):
-        # TODO
-        return np.array([0., 0., 0.])
+        return self._add_sensor_noise(self.get_true_base_roll_pitch_yaw_rate(),
+            self._observation_noise_stdev['IMU_rate'])
 
     def get_toe_contacts(self):
-        # TODO
-        return np.array([0, 0, 0, 0])
+        contacts = [-1, -1, -1, -1]
+        for i in range(self.sim.data.ncon):
+            if self.sim.data.contact[i].geom2 in laikago_constant.TOE_GEOM_ID:
+                contacts[(self.sim.data.contact[i].geom2 - 8) // 6] = 1
+        # print('contacts:', contacts)
+        return contacts
 
     def get_true_motor_angles(self):
         return self._joint_pos
@@ -227,8 +243,13 @@ class Laikago(object):
 
     def get_true_base_roll_pitch_yaw(self):
         orientation_mat = self._base_rotation_mat
-        roll_pitch_yaw = self.get_rpy_from_mat(orientation_mat)
+        roll_pitch_yaw = self._get_rpy_from_mat(orientation_mat)
         return roll_pitch_yaw
+
+    def get_true_base_roll_pitch_yaw_rate(self):
+        rpy_rate = (self._base_rotation_rpy - self._last_base_rotation_rpy) / self.time_step
+        # print('rpy_rate', rpy_rate)
+        return np.array(rpy_rate)
 
     def _add_sensor_noise(self, sensor_values, noise_stdev):
         if noise_stdev <= 0:
@@ -237,43 +258,65 @@ class Laikago(object):
             scale=noise_stdev, size=sensor_values.shape)
         return observation
 
-    def get_rpy_from_mat(self, R):
+    def _get_rpy_from_mat(self, R):
         sy = math.sqrt(R[0, 0] * R[0, 0] + R[1, 0] * R[1, 0])
         singular = sy < 1e-6
         if not singular:
-            x = math.atan2(R[2, 1], R[2, 2])
-            y = math.atan2(-R[2, 0], sy)
-            z = math.atan2(R[1, 0], R[0, 0])
+            roll = math.atan2(R[2, 1], R[2, 2])
+            pitch = math.atan2(-R[2, 0], sy)
+            yaw = math.atan2(R[1, 0], R[0, 0])
         else:
-            x = math.atan2(-R[1, 2], R[1, 1])
-            y = math.atan2(-R[2, 0], sy)
-            z = 0
-        return np.array([x, y, z])
+            roll = math.atan2(-R[1, 2], R[1, 1])
+            pitch = math.atan2(-R[2, 0], sy)
+            yaw = 0
+        return np.array([roll, pitch, yaw])
 
-# def gait(x):
-#     x = x % (np.pi * 2)
-#     if np.pi * (3/4) < x < np.pi * (5/4):
-#         return np.sin(2*(x-np.pi/2))
-#     elif x <= np.pi * (3/4):
-#         return np.sin((2/3)*x)
-#     else:
-#         return np.sin((2/3)*(x+np.pi))
+    def _get_rpy_from_quat(self, Q):
+        [w, x, y, z] = Q
+        sqw = w * w
+        sqx = x * x
+        sqy = y * y
+        sqz = z * z
+        yaw = math.atan2(2.0 * (x * y + z * w), (sqx - sqy - sqz + sqw))
+        yaw = self._rpy_correction(yaw)
+        roll = math.atan2(2.0 * (y * z + x * w), (-sqx - sqy + sqz + sqw))
+        roll = self._rpy_correction(roll)
+        pitch = math.asin(-2.0 * (x * z - y * w))
+        pitch = self._rpy_correction(pitch)
+        return np.array([roll, pitch, yaw])
+
+    def _rpy_correction(self, x):
+        if x > math.pi:
+            return x - 2 * math.pi
+        elif x < -np.pi:
+            return x + 2 * math.pi
+        else:
+            return x
+
+    def _gait(self, x):
+        x = x % (np.pi * 2)
+        if np.pi * (3/4) < x < np.pi * (5/4):
+            return np.sin(2*(x-np.pi/2))
+        elif x <= np.pi * (3/4):
+            return np.sin((2/3)*x)
+        else:
+            return np.sin((2/3)*(x+np.pi))
 
 
 if __name__ == '__main__':
 
-    laikago = Laikago(visual=True, init_pose=InitPose.LIE)
+    laikago = Laikago(visual=True, init_pose=InitPose.LIE, randomized=False)
     laikago.reset()
     t = 0
-    T = 1
+    T = 2
     while True:
-        # print(laikago.sim.data.body_xpos)
+        # print('trunk position' , laikago.sim.data.body_xpos[1])
         t += 1
         action = np.array([[-10, 30, -75],
                            [10, 30, -75],
                            [-10, 50, -75],
                            [10, 50, -75]], dtype=np.float64)
-        if t > 55:
+        if t > 60:
             action[[0, 3], 1] += np.sin(t/T)*15
             action[[1, 2], 1] += np.sin(t/T + np.pi)*15
             action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20

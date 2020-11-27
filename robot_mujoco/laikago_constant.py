@@ -21,27 +21,12 @@ ON_RACK_INIT_POSITION = [0, 0, 1]
 STAND_INIT_POSITION = [0, 0, 0.43]
 LIE_INIT_POSITION = [0, 0, 0.15]
 
-INIT_ORIENTATION = [0, 0, 0, 1]
+INIT_ORIENTATION = [0, 0, 0, 0]
 
 HIP_NAME_PATTERN = re.compile(r"\w{2}_hip_motor_2_chassis_joint")
 UPPER_NAME_PATTERN = re.compile(r"\w{2}_upper_leg_2_hip_motor_joint")
 LOWER_NAME_PATTERN = re.compile(r"\w{2}_lower_leg_2_upper_leg_joint")
 TOE_NAME_PATTERN = re.compile(r"jtoe\w{2}")
-
-MOTOR_NAMES = [
-    "FR_hip_motor_2_chassis_joint",
-    "FR_upper_leg_2_hip_motor_joint",
-    "FR_lower_leg_2_upper_leg_joint",
-    "FL_hip_motor_2_chassis_joint",
-    "FL_upper_leg_2_hip_motor_joint",
-    "FL_lower_leg_2_upper_leg_joint",
-    "RR_hip_motor_2_chassis_joint",
-    "RR_upper_leg_2_hip_motor_joint",
-    "RR_lower_leg_2_upper_leg_joint",
-    "RL_hip_motor_2_chassis_joint",
-    "RL_upper_leg_2_hip_motor_joint",
-    "RL_lower_leg_2_upper_leg_joint",
-]
 
 JOINT_NAMES = [
     "FR_hip_joint",
@@ -57,6 +42,8 @@ JOINT_NAMES = [
     "RL_thigh_joint",
     "RL_calf_joint",
 ]
+
+TOE_GEOM_ID = [8, 14, 20, 26]
 
 LIE_MOTOR_ANGLES = np.array([0, 88, -155,
                    0, 88, -155,
