@@ -9,6 +9,7 @@ import random
 import time
 from mujoco_py.generated import const as mj_const
 
+
 class Laikago(object):
     def __init__(self,
                  visual=False,
@@ -37,11 +38,12 @@ class Laikago(object):
         self.visual = visual
         self.model = mj.load_model_from_path(urdf_filename)
         self.sim = mj.MjSim(self.model)
-        self.sim.model.opt.timestep = self.time_step
+        self.model.opt.timestep = self.time_step
         if self.visual:
             self.viewer = mj.MjViewer(self.sim)
             self.viewer.cam.type = mj_const.CAMERA_TRACKING
-            self.viewer.cam.trackbodyid = 1
+            self.viewer.cam.trackbodyid = self.model.body_name2id('trunk')
+        # print('init trunk mass:', self.sim.model.body_mass[1])
         self.data = self.sim.data
         self.num_motors = num_motors
         self.num_legs = num_motors / dofs_per_leg
@@ -70,7 +72,7 @@ class Laikago(object):
         self._last_frame_time = 0
         self._last_observation = np.zeros(34).tolist()
 
-        # selresetf._action_filter = self._build_action_filter()
+        # self._action_filter = self._build_action_filter()
         self._last_action = None
         self.reset(init_reset=True)
         self._base_rotation_rpy = [0., 0., 0.]
@@ -78,6 +80,9 @@ class Laikago(object):
         self.receive_observation()
 
     def reset(self, init_reset=False):
+        if init_reset:
+            self._record_mass_info_from_urdf()
+            self._record_inertia_info_from_urdf()
         self.sim.reset()
         init_qpos = []
         if self._init_pose.value == laikago_constant.InitPose.LIE.value:
@@ -95,13 +100,12 @@ class Laikago(object):
             raise RuntimeError('Unknown initial pose')
         init_qpos.extend(laikago_constant.INIT_ORIENTATION)
         self.sim.data.set_joint_qpos('root', init_qpos)
-
         self.sim.forward()
+
         if self.visual:
             self.viewer.render()
         if self.randomized:
-            raise NotImplementedError
-            # self.randomize()
+            self.randomize()
         return
 
     def step(self, action):
@@ -155,10 +159,6 @@ class Laikago(object):
     def _set_torque_control(self, torque):
         for i in range(len(torque)):
             self.sim.data.ctrl[i] = torque[i]
-
-    def _reset_action_filter(self):
-        self._action_filter.reset()
-        return
 
     def position2torque(self, target_pos, target_vel=np.zeros(12)):
         """
@@ -229,9 +229,9 @@ class Laikago(object):
 
     def get_toe_contacts(self):
         contacts = [-1, -1, -1, -1]
-        for i in range(self.sim.data.ncon):
-            if self.sim.data.contact[i].geom2 in laikago_constant.TOE_GEOM_ID:
-                contacts[(self.sim.data.contact[i].geom2 - 8) // 6] = 1
+        for i in range(self.data.ncon):
+            if self.data.contact[i].geom2 in laikago_constant.TOE_GEOM_ID:
+                contacts[(self.data.contact[i].geom2 - 8) // 6] = 1
         # print('contacts:', contacts)
         return contacts
 
@@ -293,6 +293,59 @@ class Laikago(object):
         else:
             return x
 
+    def _record_mass_info_from_urdf(self):
+        self._body_mass_urdf = []
+        for body_id in range(self.model.nbody):
+            self._body_mass_urdf.append(self.model.body_mass[body_id])
+        # print('body mass', self._body_mass_urdf)
+
+    def _record_inertia_info_from_urdf(self):
+        self._body_inertia_urdf = []
+        for body_id in range(self.model.nbody):
+            self._body_inertia_urdf.append(self.model.body_inertia[body_id])
+
+    def set_body_mass(self, body_name, value):
+        body_id = self.model.body_name2id(body_name)
+        self.model.body_mass[body_id] = value
+
+    def set_body_inertia(self, body_name, value):
+        body_id = self.model.body_name2id(body_name)
+        self.model.body_inertia[body_id] = value
+
+    def set_all_body_mass(self, mass_list):
+        assert len(mass_list) == self.model.nbody
+        for i in range(1, self.model.nbody):         # body 0 is the worldbody
+            self.model.body_mass[i] = mass_list[i]
+
+    def set_all_body_inertia(self, inertia_list):
+        assert len(inertia_list) == self.model.nbody
+        for i in range(1, self.model.nbody):         # body 0 is the worldbody
+            self.model.body_inertia[i] = inertia_list[i]
+
+    def randomize(self):
+        self.randomize_body_mass()
+        self.randomize_body_inertia()
+        self.randomize_gravity()
+
+    def randomize_body_mass(self):
+        body_mass = self._body_mass_urdf
+        randomized_body_mass = random.uniform(
+            np.array(body_mass) * (1.0 + self.mass_bound[0]),
+            np.array(body_mass) * (1.0 + self.mass_bound[1]))
+        self.set_all_body_mass(randomized_body_mass.tolist())
+
+    def randomize_body_inertia(self):
+        body_inertia = self._body_inertia_urdf
+        randomized_body_inertia = random.uniform(
+            np.array(body_inertia) * (1.0 + self.inertia_bound[0]),
+            np.array(body_inertia) * (1.0 + self.inertia_bound[1]))
+        self.set_all_body_inertia(randomized_body_inertia.tolist())
+
+    def randomize_gravity(self):
+        randomized_g = random.uniform(self.g_bound[0], self.g_bound[1])
+        self.model.opt.gravity[-1] = - randomized_g
+        self.now_g = randomized_g
+
     def _gait(self, x):
         x = x % (np.pi * 2)
         if np.pi * (3/4) < x < np.pi * (5/4):
@@ -305,7 +358,7 @@ class Laikago(object):
 
 if __name__ == '__main__':
 
-    laikago = Laikago(visual=True, init_pose=InitPose.LIE, randomized=False)
+    laikago = Laikago(visual=True, init_pose=InitPose.LIE, randomized=True)
     laikago.reset()
     t = 0
     T = 2
@@ -328,3 +381,4 @@ if __name__ == '__main__':
             t = 0
             laikago.reset()
 
+        # print('trunk mass:', laikago.sim.model.body_mass[laikago.model.body_name2id('trunk')])
