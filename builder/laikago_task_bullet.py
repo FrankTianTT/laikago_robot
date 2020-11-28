@@ -56,17 +56,6 @@ class LaikagoTaskBullet(object):
         reward = - energy
         return self.normalize_reward(reward, -0.5, 0)
 
-    def reward_height_bullet(self):
-        base_pos = self._env.transfer.laikago.get_position_for_reward()
-        reward = base_pos[2]
-        # print(self.normalize_reward(reward, 0, 0.4))
-        return self.normalize_reward(reward, 0, 0.4)
-
-    def reward_region_bullet(self):
-        base_pos = self._env.transfer.laikago.get_position_for_reward()
-        reward = - math.sqrt(base_pos[0] ** 2 + base_pos[1] ** 2)
-        return self.normalize_reward(reward, -3, 0)
-
     def reward_base_vel_bullet(self):
         base_vel = self._env.transfer.laikago.get_velocity_for_reward()
         reward = - math.sqrt(base_vel[0] ** 2 + base_vel[1] ** 2)
@@ -119,20 +108,40 @@ class LaikagoTaskBullet(object):
         reward = x_vel if x_vel < threshold else threshold
         return self.normalize_reward(reward, 0, threshold)
 
-    def done_rp_bullet(self, threshold=15):
+    def done_r_bullet(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        # print('done rp: ', max(abs(r * 180/np.pi), abs(p * 180/np.pi)))
-        return abs(r) > abs(threshold * np.pi / 180) or abs(p) > abs(threshold * np.pi / 180)
+        return abs(r) > abs(threshold * np.pi / 180)
+
+    def reward_r_bullet(self, threshold=15):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return 1/(1 + math.exp(5*(abs(r)-1)))
+
+    def done_p_bullet(self, threshold=15):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return abs(p) > abs(threshold * np.pi / 180)
+
+    def reward_p_bullet(self, threshold=15):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return 1 / (1 + math.exp(5 * (abs(p) - 1)))
 
     def done_y_bullet(self, threshold=30):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
         return abs(y) > abs(threshold * np.pi / 180)
+
+    def reward_y_bullet(self, threshold=15):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return 1 / (1 + math.exp(5 * (abs(y) - 1)))
 
     def done_height_bullet(self, threshold=0.35):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         height = base_pos[2]
         # print('done h: ', height)
         return height < threshold
+
+    def reward_height_bullet(self):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        h = base_pos[2]
+        return 1/(1 + math.exp(-20*(h-0.3)))
 
     def done_x_velocity(self, threshold=0.1):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
@@ -149,3 +158,8 @@ class LaikagoTaskBullet(object):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         x = base_pos[0] ** 2 + base_pos[1] ** 2
         return x > threshold ** 2
+
+    def reward_region_bullet(self, threshold=15):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        x = base_pos[0] ** 2 + base_pos[1] ** 2
+        return 1 / (1 + math.exp(5 * (x - 0.5)))
