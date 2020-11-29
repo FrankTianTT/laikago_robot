@@ -209,6 +209,10 @@ class Laikago(object):
         self._base_rotation_mat = self.sim.data.get_body_xmat('trunk')
         self._last_base_rotation_rpy = self._base_rotation_rpy
         self._base_rotation_rpy = self._get_rpy_from_mat(self._base_rotation_mat)
+        self._base_position = self.data.get_joint_qpos('root')[:3]
+        self._base_orientation = self.data.get_joint_qpos('root')[3:7]
+        self._base_velocity = self.data.get_joint_qvel('root')[:3]
+        # print(self._base_position, self._base_orientation, self._base_velocity)
 
     def get_motor_angles(self):
         return self._add_sensor_noise(np.array(self.get_true_motor_angles()),
@@ -358,9 +362,19 @@ class Laikago(object):
     def get_toe_link_ids(self):
         return [3, 7, 11, 15]
 
+    # Attention! These function can be used in SIMULATION TRAIN only.
+    def get_position_for_reward(self):
+        return self._base_position
+    def get_orientation_for_reward(self):
+        return self._base_orientation
+    def get_velocity_for_reward(self):
+        return self._base_velocity
+    def get_rpy_for_reward(self):
+        return self.get_true_base_roll_pitch_yaw()
+
 if __name__ == '__main__':
 
-    laikago = Laikago(visual=True, init_pose=InitPose.LIE, randomized=True)
+    laikago = Laikago(visual=True, init_pose=InitPose.STAND, randomized=True)
     laikago.reset()
     t = 0
     T = 2

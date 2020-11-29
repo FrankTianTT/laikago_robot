@@ -102,18 +102,18 @@
         </body>
     </worldbody>
    <actuator>
-    <motor name="FR_hip_joint"       gear="1" joint="FR_hip_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="FR_thigh_joint"       gear="1" joint="FR_thigh_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="FR_calf_joint"       gear="1" joint="FR_calf_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="FL_hip_joint"       gear="1" joint="FL_hip_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="FL_thigh_joint"       gear="1" joint="FL_thigh_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="FL_calf_joint"       gear="1" joint="FL_calf_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="RR_hip_joint"       gear="1" joint="RR_hip_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="RR_thigh_joint"       gear="1" joint="RR_thigh_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="RR_calf_joint"       gear="1" joint="RR_calf_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="RL_hip_joint"       gear="1" joint="RL_hip_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="RL_thigh_joint"       gear="1" joint="RL_thigh_joint" ctrlrange="-20 20" ctrllimited="true"/>
-    <motor name="RL_calf_joint"       gear="1" joint="RL_calf_joint" ctrlrange="-20 20" ctrllimited="true"/>
+    <motor name="FR_hip_joint"       gear="1" joint="FR_hip_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="FR_thigh_joint"       gear="1" joint="FR_thigh_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="FR_calf_joint"       gear="1" joint="FR_calf_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="FL_hip_joint"       gear="1" joint="FL_hip_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="FL_thigh_joint"       gear="1" joint="FL_thigh_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="FL_calf_joint"       gear="1" joint="FL_calf_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="RR_hip_joint"       gear="1" joint="RR_hip_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="RR_thigh_joint"       gear="1" joint="RR_thigh_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="RR_calf_joint"       gear="1" joint="RR_calf_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="RL_hip_joint"       gear="1" joint="RL_hip_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="RL_thigh_joint"       gear="1" joint="RL_thigh_joint" ctrlrange="-40 40" ctrllimited="true"/>
+    <motor name="RL_calf_joint"       gear="1" joint="RL_calf_joint" ctrlrange="-40 40" ctrllimited="true"/>
 
 
     </actuator>
