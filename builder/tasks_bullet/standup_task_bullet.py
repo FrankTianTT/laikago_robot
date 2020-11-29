@@ -47,6 +47,18 @@ class LaikagoStandUpBullet0(LaikagoStandUpBulletBase):
         else:
             return self.get_sum_reward() - 1
 
+class LaikagoStandUpBullet0_1(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet0_1, self).__init__(mode)
+
+    def reward(self):
+        self.add_reward(1, 1)
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1
+
 class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
 
     def __init__(self, mode='train'):
@@ -67,6 +79,19 @@ class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
             return self.get_sum_reward()
         else:
             return self.get_sum_reward() - 1
+
+class LaikagoStandUpBullet1_1(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet1_1, self).__init__(mode)
+
+    def reward(self):
+        self.add_reward(1, 1)
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1
+
 
 class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
     def __init__(self,

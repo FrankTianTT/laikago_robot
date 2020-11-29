@@ -47,6 +47,18 @@ class LaikagoStandUpMujoco0(LaikagoStandUpMujocoBase):
         else:
             return self.get_sum_reward() - 1
 
+class LaikagoStandUpMujoco0_1(LaikagoStandUpMujocoBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpMujoco0_1, self).__init__(mode)
+
+    def reward(self):
+        self.add_reward(1, 1)
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1
+
 class LaikagoStandUpMujoco1(LaikagoStandUpMujocoBase):
 
     def __init__(self, mode='train'):
@@ -62,6 +74,18 @@ class LaikagoStandUpMujoco1(LaikagoStandUpMujocoBase):
                     self.done_toe_contact())
     def reward(self):
         self.add_reward(self.reward_energy(), 1)
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1
+
+class LaikagoStandUpMujoco1_1(LaikagoStandUpMujocoBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpMujoco1_1, self).__init__(mode)
+
+    def reward(self):
+        self.add_reward(1, 1)
         if self.is_healthy:
             return self.get_sum_reward()
         else:
