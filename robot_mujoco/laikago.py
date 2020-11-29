@@ -43,7 +43,6 @@ class Laikago(object):
             self.viewer = mj.MjViewer(self.sim)
             self.viewer.cam.type = mj_const.CAMERA_TRACKING
             self.viewer.cam.trackbodyid = self.model.body_name2id('trunk')
-        # print('init trunk mass:', self.sim.model.body_mass[1])
         self.data = self.sim.data
         self.num_motors = num_motors
         self.num_legs = num_motors / dofs_per_leg
@@ -212,7 +211,8 @@ class Laikago(object):
         self._base_position = self.data.get_joint_qpos('root')[:3]
         self._base_orientation = self.data.get_joint_qpos('root')[3:7]
         self._base_velocity = self.data.get_joint_qvel('root')[:3]
-        # print(self._base_position, self._base_orientation, self._base_velocity)
+        self._toe_force = self.get_toe_force()
+        self.get_toe_height_for_reward() ####
 
     def get_motor_angles(self):
         return self._add_sensor_noise(np.array(self.get_true_motor_angles()),
@@ -234,10 +234,27 @@ class Laikago(object):
     def get_toe_contacts(self):
         contacts = [-1, -1, -1, -1]
         for i in range(self.data.ncon):
-            if self.data.contact[i].geom2 in laikago_constant.TOE_GEOM_ID:
-                contacts[(self.data.contact[i].geom2 - 8) // 6] = 1
+            geom_id = self.data.contact[i].geom2
+            geom_name = self.model.geom_id2name(geom_id)
+            if geom_name in laikago_constant.TOE_GEOM_NAME:
+                contacts[laikago_constant.TOE_GEOM_NAME.index(geom_name)] = 1
         # print('contacts:', contacts)
         return contacts
+
+    def get_toe_force(self):
+        # print(self.sim.data.cfrc_ext[self.model.body_name2id('FR_calf')])
+        toe_force = [0, 0, 0, 0]
+        for i in range(self.data.ncon):
+            geom_id = self.data.contact[i].geom2
+            geom_name = self.model.geom_id2name(geom_id)
+            if geom_name in laikago_constant.TOE_GEOM_NAME:
+                trans = np.array(self.data.contact[i].frame).reshape(3, 3).transpose()
+                cfrc = np.zeros(6, dtype=np.float64)
+                mj.functions.mj_contactForce(self.model, self.data, i, cfrc)
+                f = trans.dot(np.array(cfrc[0: 3]).reshape(3, 1)).flatten()
+                toe_force[laikago_constant.TOE_GEOM_NAME.index(geom_name)] = f[2]
+        # print('toe force:', toe_force)
+        return toe_force
 
     def get_true_motor_angles(self):
         return self._joint_pos
@@ -301,7 +318,6 @@ class Laikago(object):
         self._body_mass_urdf = []
         for body_id in range(self.model.nbody):
             self._body_mass_urdf.append(self.model.body_mass[body_id])
-        # print('body mass', self._body_mass_urdf)
 
     def _record_inertia_info_from_urdf(self):
         self._body_inertia_urdf = []
@@ -359,9 +375,6 @@ class Laikago(object):
         else:
             return np.sin((2/3)*(x+np.pi))
 
-    def get_toe_link_ids(self):
-        return [3, 7, 11, 15]
-
     # Attention! These function can be used in SIMULATION TRAIN only.
     def get_position_for_reward(self):
         return self._base_position
@@ -371,6 +384,11 @@ class Laikago(object):
         return self._base_velocity
     def get_rpy_for_reward(self):
         return self.get_true_base_roll_pitch_yaw()
+    def get_toe_height_for_reward(self):
+        toe_height = [self.data.get_geom_xpos(t)[2] for t in laikago_constant.TOE_GEOM_NAME]
+        # print('toe_height', toe_height)
+        return toe_height
+
 
 if __name__ == '__main__':
 
@@ -379,7 +397,6 @@ if __name__ == '__main__':
     t = 0
     T = 2
     while True:
-        # print('trunk position' , laikago.sim.data.body_xpos[1])
         t += 1
         action = np.array([[-10, 30, -75],
                            [10, 30, -75],
@@ -390,6 +407,7 @@ if __name__ == '__main__':
             action[[1, 2], 1] += np.sin(t/T + np.pi)*15
             action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20
             action[[1, 2], 2] += np.sin(t/T + np.pi/2 + np.pi)*20
+
         action *= (np.pi/180)
         laikago.step(action.flatten())
 
