@@ -152,7 +152,7 @@ class Laikago(object):
         self._set_torque_control(torque_action)
         self.sim.step()
         self.receive_observation()
-        self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_angles()))
+        self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_velocities()))
         return
 
     def _set_torque_control(self, torque):

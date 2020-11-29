@@ -178,7 +178,7 @@ class Laikago(object):
         self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
         self.receive_observation()
-        self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_angles()))
+        self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_velocities()))
         return
 
     def _build_action_filter(self):
