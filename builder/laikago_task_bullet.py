@@ -54,7 +54,7 @@ class LaikagoTaskBullet(object):
     def reward_energy(self):
         energy = self._env.get_energy()
         reward = - energy
-        return self.normalize_reward(reward, -0.5, 0)
+        return self.normalize_reward(reward, -1, 0)
 
     def reward_base_vel_bullet(self):
         base_vel = self._env.transfer.laikago.get_velocity_for_reward()

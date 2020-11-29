@@ -572,11 +572,29 @@ class Laikago(object):
         print('g: {}'.format(self.now_g))
 
 if __name__ == '__main__':
-    laikago = Laikago(visual=True, init_pose=InitPose.STAND)
-    laikago.reset()
-    action = np.array([-10, 40, -75,
-                       10, 40, -75,
-                       -10, 40, -75,
-                       10, 40, -75]) * np.pi / 180
-    print(laikago.get_toe_link_ids())
+    # laikago = Laikago(visual=True, init_pose=InitPose.STAND)
+    # laikago.reset()
+    # action = np.array([-10, 40, -75,
+    #                    10, 40, -75,
+    #                    -10, 40, -75,
+    #                    10, 40, -75]) * np.pi / 180
+    # print(laikago.get_toe_link_ids())
 
+
+    laikago = Laikago(visual=True, init_pose=InitPose.STAND, randomized=True)
+    laikago.reset()
+    while True:
+        action = np.array([[-10, 30, -75],
+                           [10, 30, -75],
+                           [-10, 50, -75],
+                           [10, 50, -75]], dtype=np.float64)
+
+        action *= (np.pi / 180)
+        obs, energy = laikago.step(action.flatten())
+        # print(laikago.get_true_motor_angles())
+        # [-0.1776476167427747, 0.5199600350892223, -1.347948729438316,
+        # 0.17758113902762623, 0.5199905412066227, -1.3483212993915157,
+        # -0.1762153022000584, 0.874037868883262, -1.3485090953891483,
+        # 0.17659940486545053, 0.8740501645502535, -1.348774396458213]
+
+        print(energy) # 0.0001294498134172297 ~ 7.686974392791151e-05

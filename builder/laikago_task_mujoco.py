@@ -152,7 +152,8 @@ class LaikagoTaskMujoco(object):
 
     def reward_energy(self):
         energy = self._env.get_energy()
-        return - energy
+        reward = - energy
+        return self.normalize_reward(reward, -1, 0)
 
     def reward_x_velocity(self, threshold=3):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
