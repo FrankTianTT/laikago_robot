@@ -18,13 +18,22 @@ class LaikagoStandUpMujocoBase(LaikagoTaskMujoco):
     def update(self):
         self.steps += 1
 
+    @property
+    def is_healthy(self):
+        return not (self.done_r_bullet(threshold=10) or
+                    self.done_p_bullet(threshold=10) or
+                    self.done_y_bullet(threshold=10) or
+                    self.done_height_bullet(threshold=0.3) or
+                    self.done_region_bullet(threshold=0.1) or
+                    self.done_toe_contact())
+
     def done(self):
         if self.mode == 'no-die':
             return False
-        if self.steps > 300:
+        if self.steps > 1000:
             return True
         else:
-            return False # self.done_rp(threshold=30) or self.done_min_stand_high(threshold=0.2)
+            return False
 
 class LaikagoStandUpMujoco0(LaikagoStandUpMujocoBase):
 
@@ -32,6 +41,8 @@ class LaikagoStandUpMujoco0(LaikagoStandUpMujocoBase):
         super(LaikagoStandUpMujoco0, self).__init__(mode)
 
     def reward(self):
-        self.add_reward(self.reward_toe_contact_soft(), 1)
         self.add_reward(self.reward_energy(), 1)
-        return self.get_sum_reward()
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1

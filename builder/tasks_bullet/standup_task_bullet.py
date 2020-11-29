@@ -24,7 +24,7 @@ class LaikagoStandUpBulletBase(LaikagoTaskBullet):
                     self.done_p_bullet(threshold=10) or
                     self.done_y_bullet(threshold=10) or
                     self.done_height_bullet(threshold=0.3) or
-                    self.done_region_bullet(threshold=0.1) or
+                    # self.done_region_bullet(threshold=0.1) or
                     self.done_toe_contact())
 
     def done(self):
@@ -58,7 +58,7 @@ class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
                     self.done_p_bullet(threshold=60) or
                     self.done_y_bullet(threshold=60) or
                     self.done_height_bullet(threshold=0.15) or
-                    self.done_region_bullet(threshold=1) or
+                    # self.done_region_bullet(threshold=1) or
                     self.done_toe_contact())
 
     def reward(self):
@@ -67,32 +67,6 @@ class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
             return self.get_sum_reward()
         else:
             return self.get_sum_reward() - 1
-
-
-class LaikagoStandUpBullet1_1(LaikagoStandUpBullet1):
-
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpBullet1_1, self).__init__(mode)
-
-    def reward(self):
-        self.add_reward(self.reward_toe_height_bullet(), 1)
-        self.add_reward(self.reward_energy(), 1)
-        self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
-        self.add_reward(self.reward_height_bullet(), 5)
-        return self.get_sum_reward()
-
-class LaikagoStandUpBullet1_2(LaikagoStandUpBullet1):
-
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpBullet1_2, self).__init__(mode)
-
-    def reward(self):
-        self.add_reward(self.reward_toe_height_bullet(), 1)
-        self.add_reward(self.reward_energy(), 1)
-        self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
-        self.add_reward(self.reward_height_bullet(), 10)
-        return self.get_sum_reward()
-
 
 class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
     def __init__(self,
@@ -165,3 +139,24 @@ class LaikagoStandUpBullet3(LaikagoStandUpBulletBase):
             return self.get_sum_reward()
         else:
             return self.get_sum_reward() - 1
+
+class LaikagoStandUpBullet4(LaikagoStandUpBulletBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpBullet4, self).__init__(mode)
+
+    def done(self):
+        if self.mode == 'no-die':
+            return False
+        if self.steps > 1000:
+            return True
+        else:
+            return (self.done_r_bullet(threshold=10) or
+                    self.done_p_bullet(threshold=10) or
+                    self.done_height_bullet(threshold=0.15) or
+                    self.done_region_bullet(threshold=3))
+
+    def reward(self):
+        self.add_reward(self.reward_height_bullet(threshold=0.3), 1)
+        self.add_reward(self.reward_region_bullet(threshold=0.5), 1)
+        self.add_reward(self.reward_energy(), 1)

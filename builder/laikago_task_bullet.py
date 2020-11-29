@@ -133,10 +133,11 @@ class LaikagoTaskBullet(object):
         # print('done h: ', height)
         return height < threshold
 
-    def reward_height_bullet(self):
+    def reward_height_bullet(self, threshold=0.3):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         h = base_pos[2]
-        return 1/(1 + math.exp(-20*(h-0.3)))
+        reward = 1 if h > threshold else h / threshold
+        return reward
 
     def done_x_velocity(self, threshold=0.1):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
@@ -154,10 +155,11 @@ class LaikagoTaskBullet(object):
         x = base_pos[0] ** 2 + base_pos[1] ** 2
         return x > threshold ** 2
 
-    def reward_region_bullet(self, threshold=15):
+    def reward_region_bullet(self, threshold=1):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         x = base_pos[0] ** 2 + base_pos[1] ** 2
-        return 1 / (1 + math.exp(5 * (x - 0.5)))
+        reward = 1 if x < threshold else threshold/x
+        return reward
 
     def done_toe_contact(self):
         contact = self._env.get_history_toe_collision()[0]
