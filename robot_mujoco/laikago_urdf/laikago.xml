@@ -41,7 +41,8 @@
                         <inertial pos="-0.002196 -0.000381 -0.12338" quat="0.712765 0.000467477 -0.000119366 0.701402" mass="0.241" diaginertia="0.00619655 0.00618196 3.47683e-05" />
                         <joint name="FR_calf_joint" pos="0 0 0" axis="0 1 0" limited="true" range="-2.77507 -0.610865" />
                         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.913725 0.913725 0.847059 1" mesh="calf" />
-                        <geom size="0.125 0.008 0.008" pos="0 0 -0.125" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
+                        <geom name="FR_calf_skeleton" size="0.117 0.008 0.008" pos="0 0 -0.117" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
+                        <geom name="FR_toe" size="0.008 0.008 0.008" pos="0 0 -0.242" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
                     </body>
                 </body>
             </body>
@@ -59,7 +60,8 @@
                         <inertial pos="-0.002196 -0.000381 -0.12338" quat="0.712765 0.000467477 -0.000119366 0.701402" mass="0.241" diaginertia="0.00619655 0.00618196 3.47683e-05" />
                         <joint name="FL_calf_joint" pos="0 0 0" axis="0 1 0" limited="true" range="-2.77507 -0.610865" />
                         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.913725 0.913725 0.847059 1" mesh="calf" />
-                        <geom size="0.125 0.008 0.008" pos="0 0 -0.125" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
+                        <geom name="FL_calf_skeleton" size="0.117 0.008 0.008" pos="0 0 -0.117" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
+                        <geom name="FL_toe" size="0.008 0.008 0.008" pos="0 0 -0.242" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
                     </body>
                 </body>
             </body>
@@ -77,7 +79,8 @@
                         <inertial pos="-0.002196 -0.000381 -0.12338" quat="0.712765 0.000467477 -0.000119366 0.701402" mass="0.241" diaginertia="0.00619655 0.00618196 3.47683e-05" />
                         <joint name="RR_calf_joint" pos="0 0 0" axis="0 1 0" limited="true" range="-2.77507 -0.610865" />
                         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.913725 0.913725 0.847059 1" mesh="calf" />
-                        <geom size="0.125 0.008 0.008" pos="0 0 -0.125" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
+                        <geom name="RR_calf_skeleton" size="0.117 0.008 0.008" pos="0 0 -0.117" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
+                        <geom name="RR_toe" size="0.008 0.008 0.008" pos="0 0 -0.242" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
                     </body>
                 </body>
             </body>
@@ -95,7 +98,8 @@
                         <inertial pos="-0.002196 -0.000381 -0.12338" quat="0.712765 0.000467477 -0.000119366 0.701402" mass="0.241" diaginertia="0.00619655 0.00618196 3.47683e-05" />
                         <joint name="RL_calf_joint" pos="0 0 0" axis="0 1 0" limited="true" range="-2.77507 -0.610865" />
                         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.913725 0.913725 0.847059 1" mesh="calf" />
-                        <geom size="0.125 0.008 0.008" pos="0 0 -0.125" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
+                        <geom name="RL_calf_skeleton" size="0.117 0.008 0.008" pos="0 0 -0.117" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
+                        <geom name="RL_toe" size="0.008 0.008 0.008" pos="0 0 -0.242" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1" />
                     </body>
                 </body>
             </body>
