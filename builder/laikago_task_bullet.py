@@ -66,11 +66,6 @@ class LaikagoTaskBullet(object):
         reward = (r ** 2 + p ** 2)
         return 1 - math.log10(reward + 1)
 
-    def reward_toe_contact(self):
-        contact = self._env.get_history_toe_collision()[0]
-        reward = 1 if sum(contact) == 4 else 0
-        return self.normalize_reward(reward, 0, 1)
-
     def reward_toe_contact_soft(self):
         contact = self._env.get_history_toe_collision()[0]
         reward = sum(contact)
@@ -163,3 +158,12 @@ class LaikagoTaskBullet(object):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         x = base_pos[0] ** 2 + base_pos[1] ** 2
         return 1 / (1 + math.exp(5 * (x - 0.5)))
+
+    def done_toe_contact(self):
+        contact = self._env.get_history_toe_collision()[0]
+        return sum(contact) != 4
+
+    def reward_toe_contact(self):
+        contact = self._env.get_history_toe_collision()[0]
+        reward = 1 if sum(contact) == 4 else 0
+        return self.normalize_reward(reward, 0, 1)

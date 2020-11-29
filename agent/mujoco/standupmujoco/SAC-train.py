@@ -65,10 +65,10 @@ if __name__ == "__main__":
         model = SAC('MlpPolicy',
                     env,
                     verbose=1,
-                    tensorboard_log=tensorboard_log,)
-                    # policy_kwargs=policy_kwargs,
-                    # buffer_size=buffer_size,
-                    # batch_size=batch_size,
-                    # learning_starts=learning_starts,
-                    # ent_coef=ent_coef)
+                    tensorboard_log=tensorboard_log,
+                    policy_kwargs=policy_kwargs,
+                    buffer_size=buffer_size,
+                    batch_size=batch_size,
+                    learning_starts=learning_starts,
+                    ent_coef=ent_coef)
     model.learn(total_timesteps=time_steps, callback=eval_callback)
