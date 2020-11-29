@@ -7,7 +7,6 @@ import sys
 from os.path import abspath, join, dirname
 sys.path.insert(0, dirname(dirname(dirname(dirname(abspath(__file__))))))
 from builder.gym_env import LaikagoEnv
-from robot_bullet.laikago import Laikago
 
 TASK_NAME = 'standup'
 ClASS_NAME = 'StandUp'
@@ -44,11 +43,11 @@ if __name__ == "__main__":
     else:
         best_model_dir = './SAC-v{}/logs/best_model.zip'.format(args.load_version)
 
-    standup_task_bullet = importlib.import_module('builder.tasks_bullet.' + TASK_NAME + '_task_bullet')
-    task = eval('standup_task_bullet.Laikago' + ClASS_NAME + 'Bullet{}(mode="'.format(version) + MODE + '")')
+    standup_task_mujoco = importlib.import_module('builder.tasks_mujoco.' + TASK_NAME + '_task_mujoco')
+    task = eval('standup_task_mujoco.Laikago' + ClASS_NAME + 'Mujoco{}(mode="'.format(version) + MODE + '")')
 
-    env = LaikagoEnv(task=task, visual=False, ctrl_delay=False, action_repeat=20, simulator='bullet')
-    eval_env = LaikagoEnv(task=task, visual=False, ctrl_delay=False, action_repeat=20, simulator='bullet')
+    env = LaikagoEnv(task=task, visual=False, ctrl_delay=False, action_repeat=20, simulator='mujoco')
+    eval_env = LaikagoEnv(task=task, visual=False, ctrl_delay=False, action_repeat=20, simulator='mujoco')
 
     eval_callback = EvalCallback(eval_env,
                                  best_model_save_path=best_model_save_path,

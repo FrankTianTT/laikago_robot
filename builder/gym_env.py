@@ -14,7 +14,8 @@ class LaikagoEnv(gym.Env):
                  ctrl_delay=False,
                  action_repeat=33,
                  position_upper_bound=env_constant.POSITION_UPPER_BOUND,
-                 position_lower_bound=env_constant.POSITION_LOWER_BOUND):
+                 position_lower_bound=env_constant.POSITION_LOWER_BOUND,
+                 simulator='bullet'):
         self.task = task
         self.task.reset(self)
         self.visual = visual
@@ -25,7 +26,8 @@ class LaikagoEnv(gym.Env):
         self.transfer = self.transfer_class(visual=self.visual,
                                             init_pose=self.task.init_pose,
                                             action_repeat=self.action_repeat,
-                                            ctrl_delay=self.ctrl_delay)
+                                            ctrl_delay=self.ctrl_delay,
+                                            simulator=simulator)
         self.action_space = spaces.Box(
             np.array(position_lower_bound, dtype=np.float32),
             np.array(position_upper_bound, dtype=np.float32))

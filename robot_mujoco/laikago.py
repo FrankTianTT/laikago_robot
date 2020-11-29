@@ -20,7 +20,7 @@ class Laikago(object):
                  init_pose=InitPose.ON_ROCK,
                  self_collision_enabled=False,
                  action_filter_enabled=False,
-                 obs_delay=False,
+                 ctrl_delay=False,
                  action_repeat=laikago_constant.ACTION_REPEAT,
                  randomized=True,
                  observation_noise_stdev=laikago_constant.SENSOR_NOISE_STDDEV,
@@ -51,7 +51,7 @@ class Laikago(object):
         self._init_pose = init_pose
         self._self_collision_enabled = self_collision_enabled
         self.action_filter_enabled = action_filter_enabled
-        self.obs_delay = obs_delay
+        self.ctrl_delay = ctrl_delay
         self._action_repeat = action_repeat
         self.randomized = randomized
         self._observation_noise_stdev = observation_noise_stdev
@@ -355,6 +355,8 @@ class Laikago(object):
         else:
             return np.sin((2/3)*(x+np.pi))
 
+    def get_toe_link_ids(self):
+        return [3, 7, 11, 15]
 
 if __name__ == '__main__':
 

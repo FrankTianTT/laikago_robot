@@ -1,4 +1,5 @@
-from robot_bullet.laikago import Laikago
+import robot_mujoco
+import robot_bullet
 from transfer import transfer_constant
 from transfer.transfer_constant import *
 import collections
@@ -9,14 +10,17 @@ class Transfer(object):
 
     def __init__(self,
                  init_pose=InitPose.STAND,
-                 robot_class=Laikago,
                  ctrl_delay=False,
                  action_repeat=33,
                  visual=False,
-                 history_len=transfer_constant.HISTORY_LEN):
+                 history_len=transfer_constant.HISTORY_LEN,
+                 simulator='bullet'):
 
         self.laikago = None
-        self.robot_class = robot_class
+        if simulator == 'bullet':
+            self.robot_class = robot_bullet.laikago.Laikago
+        else:
+            self.robot_class = robot_mujoco.laikago.Laikago
         self.ctrl_delay = ctrl_delay
         self.action_repeat = action_repeat
         self.visual = visual

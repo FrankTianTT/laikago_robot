@@ -57,20 +57,21 @@ class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
 
     @property
     def is_healthy(self):
-        return not (self.done_r_bullet(threshold=60) or
-                    self.done_p_bullet(threshold=60) or
-                    self.done_height_bullet(threshold=0.15) or
-                    self.done_region_bullet(threshold=3))
+        return not (self.done_r_bullet(threshold=30) or
+                    self.done_p_bullet(threshold=30) or
+                    self.done_y_bullet(threshold=30) or
+                    self.done_height_bullet(threshold=0.2) or
+                    self.done_region_bullet(threshold=0.5))
 
     def reward(self):
         self.add_reward(self.reward_toe_height_bullet(), 1)
         self.add_reward(self.reward_energy(), 1)
         self.add_reward(self.reward_toe_distance(threshold=0.15), 1)
-        self.add_reward(self.reward_height_bullet(), 3)
         if self.is_healthy:
             return self.get_sum_reward()
         else:
             return self.get_sum_reward() - 1
+
 
 class LaikagoStandUpBullet1_1(LaikagoStandUpBullet1):
 

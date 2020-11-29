@@ -22,9 +22,9 @@ if __name__ == "__main__":
 
     best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
 
-    standup_task_bullet = importlib.import_module('builder.tasks_bullet.' + TASK_NAME + '_task_bullet')
-    task = eval('standup_task_bullet.Laikago' + ClASS_NAME + 'Bullet{}(mode="'.format(version) + MODE + '")')
-    env = LaikagoEnv(task=task, visual=True, ctrl_delay=False, action_repeat=20, simulator='bullet')
+    standup_task_mujoco = importlib.import_module('builder.tasks_mujoco.' + TASK_NAME + '_task_mujoco')
+    task = eval('standup_task_mujoco.Laikago' + ClASS_NAME + 'Mujoco{}(mode="'.format(version) + MODE + '")')
+    env = LaikagoEnv(task=task, visual=True, ctrl_delay=False, action_repeat=20, simulator='mujoco')
     model = SAC.load(best_model_save_path)
 
     obs = env.reset()

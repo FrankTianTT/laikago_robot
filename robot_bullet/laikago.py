@@ -578,7 +578,5 @@ if __name__ == '__main__':
                        10, 40, -75,
                        -10, 40, -75,
                        10, 40, -75]) * np.pi / 180
-    while True:
-        laikago.step(action)
-        laikago.get_toe_height_for_reward()
+    print(laikago.get_toe_link_ids())
 
