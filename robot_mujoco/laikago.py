@@ -397,6 +397,7 @@ if __name__ == '__main__':
     t = 0
     T = 2
     while True:
+        print(laikago.get_true_base_roll_pitch_yaw()[2])
         t += 1
         action = np.array([[-10, 30, -75],
                            [10, 30, -75],

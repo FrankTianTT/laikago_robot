@@ -160,3 +160,5 @@ class LaikagoStandUpBullet4(LaikagoStandUpBulletBase):
         self.add_reward(self.reward_height_bullet(threshold=0.3), 1)
         self.add_reward(self.reward_region_bullet(threshold=0.5), 1)
         self.add_reward(self.reward_energy(), 1)
+
+        return self.get_sum_reward()

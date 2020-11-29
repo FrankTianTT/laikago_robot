@@ -20,11 +20,11 @@ class LaikagoStandUpMujocoBase(LaikagoTaskMujoco):
 
     @property
     def is_healthy(self):
-        return not (self.done_r_bullet(threshold=10) or
-                    self.done_p_bullet(threshold=10) or
-                    self.done_y_bullet(threshold=10) or
-                    self.done_height_bullet(threshold=0.3) or
-                    self.done_region_bullet(threshold=0.1) or
+        return not (self.done_r_mujoco(threshold=10) or
+                    self.done_p_mujoco(threshold=10) or
+                    self.done_y_mujoco(threshold=10) or
+                    self.done_height_mujoco(threshold=0.3) or
+                    # self.done_region_mujoco(threshold=0.1) or
                     self.done_toe_contact())
 
     def done(self):
@@ -46,3 +46,46 @@ class LaikagoStandUpMujoco0(LaikagoStandUpMujocoBase):
             return self.get_sum_reward()
         else:
             return self.get_sum_reward() - 1
+
+class LaikagoStandUpMujoco1(LaikagoStandUpMujocoBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpMujoco1, self).__init__(mode)
+
+    @property
+    def is_healthy(self):
+        return not (self.done_r_mujoco(threshold=60) or
+                    self.done_p_mujoco(threshold=60) or
+                    self.done_y_mujoco(threshold=60) or
+                    self.done_height_mujoco(threshold=0.15) or
+                    # self.done_region_mujoco(threshold=0.1) or
+                    self.done_toe_contact())
+    def reward(self):
+        self.add_reward(self.reward_energy(), 1)
+        if self.is_healthy:
+            return self.get_sum_reward()
+        else:
+            return self.get_sum_reward() - 1
+
+class LaikagoStandUpMujoco4(LaikagoStandUpMujocoBase):
+
+    def __init__(self, mode='train'):
+        super(LaikagoStandUpMujoco4, self).__init__(mode)
+
+    def done(self):
+        if self.mode == 'no-die':
+            return False
+        if self.steps > 1000:
+            return True
+        else:
+            return (self.done_r_mujoco(threshold=10) or
+                    self.done_p_mujoco(threshold=10) or
+                    self.done_height_mujoco(threshold=0.15) or
+                    self.done_region_mujoco(threshold=3))
+
+    def reward(self):
+        self.add_reward(self.reward_height_mujoco(threshold=0.3), 1)
+        self.add_reward(self.reward_region_mujoco(threshold=0.5), 1)
+        self.add_reward(self.reward_energy(), 1)
+
+        return self.get_sum_reward()

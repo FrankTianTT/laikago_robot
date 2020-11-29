@@ -147,7 +147,7 @@ class Transfer(object):
 
     def get_toe_position(self):
         pos = []
-        toe_links = self.laikago.get_toe_link_ids()
+        toe_links = [3, 7, 11, 15]
         motor_angle = self.get_observation()[0:12]
         id2id = {3: 0, 7: 1, 11: 2, 15: 3}
         for toe_id in toe_links:

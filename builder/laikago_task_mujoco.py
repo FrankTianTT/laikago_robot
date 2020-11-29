@@ -159,15 +159,16 @@ class LaikagoTaskMujoco(object):
         reward = x_vel if x_vel < threshold else threshold
         return self.normalize_reward(reward, 0, threshold)
 
-    def done_r_bullet(self, threshold=15):
+    def done_r_mujoco(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        # print(r,p,y)
         return abs(r) > abs(threshold * np.pi / 180)
 
     def reward_r_bullet(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
         return 1/(1 + math.exp(5*(abs(r)-1)))
 
-    def done_p_bullet(self, threshold=15):
+    def done_p_mujoco(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
         return abs(p) > abs(threshold * np.pi / 180)
 
@@ -175,7 +176,7 @@ class LaikagoTaskMujoco(object):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
         return 1 / (1 + math.exp(5 * (abs(p) - 1)))
 
-    def done_y_bullet(self, threshold=30):
+    def done_y_mujoco(self, threshold=30):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
         return abs(y) > abs(threshold * np.pi / 180)
 
@@ -183,16 +184,17 @@ class LaikagoTaskMujoco(object):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
         return 1 / (1 + math.exp(5 * (abs(y) - 1)))
 
-    def done_height_bullet(self, threshold=0.35):
+    def done_height_mujoco(self, threshold=0.35):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         height = base_pos[2]
         # print('done h: ', height)
         return height < threshold
 
-    def reward_height_bullet(self):
+    def reward_height_mujoco(self, threshold=0.3):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         h = base_pos[2]
-        return 1/(1 + math.exp(-20*(h-0.3)))
+        reward = 1 if h > threshold else h / threshold
+        return reward
 
     def done_x_velocity(self, threshold=0.1):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
@@ -205,15 +207,16 @@ class LaikagoTaskMujoco(object):
         ada = 1 if self.steps>time else self.steps/time
         return height < threshold * ada
 
-    def done_region_bullet(self, threshold=0.5):
+    def done_region_mujoco(self, threshold=0.5):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         x = base_pos[0] ** 2 + base_pos[1] ** 2
         return x > threshold ** 2
 
-    def reward_region_bullet(self, threshold=15):
+    def reward_region_mujoco(self, threshold=1):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         x = base_pos[0] ** 2 + base_pos[1] ** 2
-        return 1 / (1 + math.exp(5 * (x - 0.5)))
+        reward = 1 if x < threshold else threshold/x
+        return reward
 
     def done_toe_contact(self):
         contact = self._env.get_history_toe_collision()[0]
