@@ -24,7 +24,7 @@ class LaikagoStandUpMujocoBase(LaikagoTaskMujoco):
         if self.steps > 300:
             return True
         else:
-            return self.done_rp(threshold=30) or self.done_min_stand_high(threshold=0.2)
+            return False # self.done_rp(threshold=30) or self.done_min_stand_high(threshold=0.2)
 
 class LaikagoStandUpMujoco0(LaikagoStandUpMujocoBase):
 
