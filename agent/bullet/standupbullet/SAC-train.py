@@ -59,12 +59,13 @@ if __name__ == "__main__":
     policy_kwargs = dict(activation_fn=torch.nn.ReLU, net_arch=net_arch)
 
     if args.load_from_best:
-        model = SAC.load(best_model_dir)
+        model = SAC.load(best_model_dir, device=torch.device('cuda:0'))
         model.set_env(env)
         model.tensorboard_log = tensorboard_log
     else:
         model = SAC('MlpPolicy',
                     env,
+                    device=torch.device('cuda:0'),
                     verbose=1,
                     tensorboard_log=tensorboard_log,)
                     # policy_kwargs=policy_kwargs,

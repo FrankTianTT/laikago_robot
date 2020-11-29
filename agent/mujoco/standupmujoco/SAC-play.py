@@ -25,7 +25,7 @@ if __name__ == "__main__":
     standup_task_mujoco = importlib.import_module('builder.tasks_mujoco.' + TASK_NAME + '_task_mujoco')
     task = eval('standup_task_mujoco.Laikago' + ClASS_NAME + 'Mujoco{}(mode="'.format(version) + MODE + '")')
     env = LaikagoEnv(task=task, visual=True, ctrl_delay=False, action_repeat=20, simulator='mujoco')
-    model = SAC.load(best_model_save_path)
+    model = SAC.load(best_model_save_path, device=torch.device('cuda:0'))
 
     obs = env.reset()
     total_reward = 0
