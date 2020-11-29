@@ -19,13 +19,15 @@ class LaikagoTask(object):
         self.init_pose = init_pose
         self.sum_reward = 0
         self.sum_p = 0
+        self.steps = 0
         return
 
     def reset(self, env):
-        pass
+        self._env = env
+        self.steps = 0
 
     def update(self):
-        pass
+        self.steps += 1
 
     def done(self):
         return False
@@ -99,11 +101,6 @@ class LaikagoTask(object):
     def reward_walk(self, walk_dir):
         return self.reward_chassis(walk_dir) + 0.5 * self.reward_feet(walk_dir) + 0.1 * self.reward_up()
 
-    def reward_toe_contact(self):
-        contact = self._env.get_history_toe_collision()[0]
-        reward = 1 if sum(contact) == 4 else 0
-        return self.normalize_reward(reward, 0, 1)
-
     def reward_toe_contact_soft(self):
         contact = self._env.get_history_toe_collision()[0]
         reward = sum(contact)
@@ -157,15 +154,72 @@ class LaikagoTask(object):
         energy = self._env.get_energy()
         return - energy
 
-    def done_rp(self, threshold=15):
-        r, p, y = self._env.get_history_rpy()[0]
-        # print('done rp: ', max(abs(r * 180/np.pi), abs(p * 180/np.pi)))
-        return abs(r) > abs(threshold * np.pi / 180) or abs(p) > abs(threshold * np.pi / 180)
+    def reward_x_velocity(self, threshold=3):
+        x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
+        reward = x_vel if x_vel < threshold else threshold
+        return self.normalize_reward(reward, 0, threshold)
 
-    def done_min_stand_high(self, threshold=0.2):
-        toe_position = self._env.get_history_toe_position()[0]
-        height = [toe_position[i] for i in [2, 5, 8, 11]]
-        max_height = - max(height)
-        roll = self._env.get_history_rpy()[0][0]
-        pitch = self._env.get_history_rpy()[0][1]
-        return max_height * math.cos(roll) * math.cos(pitch) < threshold
+    def done_r_bullet(self, threshold=15):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return abs(r) > abs(threshold * np.pi / 180)
+
+    def reward_r_bullet(self, threshold=15):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return 1/(1 + math.exp(5*(abs(r)-1)))
+
+    def done_p_bullet(self, threshold=15):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return abs(p) > abs(threshold * np.pi / 180)
+
+    def reward_p_bullet(self, threshold=15):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return 1 / (1 + math.exp(5 * (abs(p) - 1)))
+
+    def done_y_bullet(self, threshold=30):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return abs(y) > abs(threshold * np.pi / 180)
+
+    def reward_y_bullet(self, threshold=15):
+        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
+        return 1 / (1 + math.exp(5 * (abs(y) - 1)))
+
+    def done_height_bullet(self, threshold=0.35):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        height = base_pos[2]
+        # print('done h: ', height)
+        return height < threshold
+
+    def reward_height_bullet(self):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        h = base_pos[2]
+        return 1/(1 + math.exp(-20*(h-0.3)))
+
+    def done_x_velocity(self, threshold=0.1):
+        x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
+        return x_vel < threshold
+
+    def done_height_adaptation_bullet(self, threshold=0.35, time=100):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        height = base_pos[2]
+        # print('done h: ', height)
+        ada = 1 if self.steps>time else self.steps/time
+        return height < threshold * ada
+
+    def done_region_bullet(self, threshold=0.5):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        x = base_pos[0] ** 2 + base_pos[1] ** 2
+        return x > threshold ** 2
+
+    def reward_region_bullet(self, threshold=15):
+        base_pos = self._env.transfer.laikago.get_position_for_reward()
+        x = base_pos[0] ** 2 + base_pos[1] ** 2
+        return 1 / (1 + math.exp(5 * (x - 0.5)))
+
+    def done_toe_contact(self):
+        contact = self._env.get_history_toe_collision()[0]
+        return sum(contact) != 4
+
+    def reward_toe_contact(self):
+        contact = self._env.get_history_toe_collision()[0]
+        reward = 1 if sum(contact) == 4 else 0
+        return self.normalize_reward(reward, 0, 1)
