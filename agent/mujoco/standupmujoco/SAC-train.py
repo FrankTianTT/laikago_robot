@@ -19,9 +19,9 @@ if __name__ == "__main__":
     parser.add_argument("-lv", "--load_version", default='none')
 
     parser.add_argument("--time_steps", default=5000000)
-    parser.add_argument("--buffer_size", default=100000)
+    parser.add_argument("--buffer_size", default=1000000)
     parser.add_argument("--learning_starts", default=1000)
-    parser.add_argument("--batch_size", default=64)
+    parser.add_argument("--batch_size", default=256)
     parser.add_argument("--ent_coef", default='auto')
     parser.add_argument("--net_arch", default=[256, 256], nargs='+', type=int)
 

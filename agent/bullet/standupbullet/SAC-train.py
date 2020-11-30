@@ -20,9 +20,9 @@ if __name__ == "__main__":
     parser.add_argument("-lv", "--load_version", default='none')
 
     parser.add_argument("--time_steps", default=5000000)
-    parser.add_argument("--buffer_size", default=100000)
+    parser.add_argument("--buffer_size", default=1000000)
     parser.add_argument("--learning_starts", default=1000)
-    parser.add_argument("--batch_size", default=64)
+    parser.add_argument("--batch_size", default=256)
     parser.add_argument("--ent_coef", default='auto')
     parser.add_argument("--net_arch", default=[256, 256], nargs='+', type=int)
 
@@ -67,10 +67,10 @@ if __name__ == "__main__":
                     env,
                     device=torch.device('cuda:0'),
                     verbose=1,
-                    tensorboard_log=tensorboard_log,)
-                    # policy_kwargs=policy_kwargs,
-                    # buffer_size=buffer_size,
-                    # batch_size=batch_size,
-                    # learning_starts=learning_starts,
-                    # ent_coef=ent_coef)
+                    tensorboard_log=tensorboard_log,
+                    policy_kwargs=policy_kwargs,
+                    buffer_size=buffer_size,
+                    batch_size=batch_size,
+                    learning_starts=learning_starts,
+                    ent_coef=ent_coef)
     model.learn(total_timesteps=time_steps, callback=eval_callback)
