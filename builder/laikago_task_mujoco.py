@@ -221,6 +221,7 @@ class LaikagoTaskMujoco(object):
 
     def done_toe_contact(self):
         contact = self._env.get_history_toe_collision()[0]
+        # print(sum(contact))
         return sum(contact) != 4
 
     def reward_toe_contact(self):
