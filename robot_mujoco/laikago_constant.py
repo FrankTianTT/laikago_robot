@@ -45,7 +45,6 @@ JOINT_NAMES = [
 
 TOE_GEOM_NAME = ["FR_toe", "FL_toe", "RR_toe", "RL_toe"]
 
-TOE_GEOM_ID = [8, 14, 20, 26]
 
 LIE_MOTOR_ANGLES = np.array([0, 88, -155,
                    0, 88, -155,

@@ -234,11 +234,10 @@ class Laikago(object):
     def get_toe_contacts(self):
         contacts = [-1, -1, -1, -1]
         for i in range(self.data.ncon):
-            geom_id = self.data.contact[i].geom2
-            geom_name = self.model.geom_id2name(geom_id)
-            if geom_name in laikago_constant.TOE_GEOM_NAME:
-                contacts[laikago_constant.TOE_GEOM_NAME.index(geom_name)] = 1
-        # print('contacts:', contacts)
+            geom1_name = self.model.geom_id2name(self.data.contact[i].geom1)
+            geom2_name = self.model.geom_id2name(self.data.contact[i].geom2)
+            if geom1_name == 'floor' and geom2_name in laikago_constant.TOE_GEOM_NAME:
+                contacts[laikago_constant.TOE_GEOM_NAME.index(geom2_name)] = 1
         return contacts
 
     def get_toe_force(self):
@@ -392,45 +391,46 @@ class Laikago(object):
 
 if __name__ == '__main__':
 
+    laikago = Laikago(visual=True, init_pose=InitPose.STAND, randomized=True)
+    laikago.reset()
+    t = 0
+    T = 2
+    while True:
+        # print(laikago.get_true_base_roll_pitch_yaw()[2])
+        print(laikago.get_toe_contacts())
+        t += 1
+        action = np.array([[-10, 50, -95],
+                           [10, 30, -75],
+                           [-10, 40, -75],
+                           [10, 40, -75]], dtype=np.float64)
+        # if t > 60:
+        #     action[[0, 3], 1] += np.sin(t/T)*15
+        #     action[[1, 2], 1] += np.sin(t/T + np.pi)*15
+        #     action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20
+        #     action[[1, 2], 2] += np.sin(t/T + np.pi/2 + np.pi)*20
+
+        action *= (np.pi/180)
+        laikago.step(action.flatten())
+
+        if t > 400:
+            t = 0
+            laikago.reset()
+    # print('trunk mass:', laikago.sim.model.body_mass[laikago.model.body_name2id('trunk')])
+
     # laikago = Laikago(visual=True, init_pose=InitPose.STAND, randomized=True)
     # laikago.reset()
-    # t = 0
-    # T = 2
     # while True:
-    #     print(laikago.get_true_base_roll_pitch_yaw()[2])
-    #     t += 1
-    #     action = np.array([[-10, 30, -75],
+    #     action = np.array([[-10, 50, -95],
     #                        [10, 30, -75],
     #                        [-10, 50, -75],
     #                        [10, 50, -75]], dtype=np.float64)
-    #     if t > 60:
-    #         action[[0, 3], 1] += np.sin(t/T)*15
-    #         action[[1, 2], 1] += np.sin(t/T + np.pi)*15
-    #         action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20
-    #         action[[1, 2], 2] += np.sin(t/T + np.pi/2 + np.pi)*20
     #
-    #     action *= (np.pi/180)
-    #     laikago.step(action.flatten())
+    #     action *= (np.pi / 180)
+    #     obs, energy = laikago.step(action.flatten())
+    #     # print(laikago.get_true_motor_angles())
+    #     # [-0.20100116119550868, 0.5048444062115267, -1.3666156247856345,
+    #     # 0.20140317079395917, 0.5056824273938537, -1.3658279272744467,
+    #     # -0.1996661836035335, 0.8956897524147039, -1.3410772891739449,
+    #     # 0.1991685897493906, 0.8924938030053465, -1.3429027022847266]
     #
-    #     if t > 400:
-    #         t = 0
-    #         laikago.reset()
-    # print('trunk mass:', laikago.sim.model.body_mass[laikago.model.body_name2id('trunk')])
-
-    laikago = Laikago(visual=True, init_pose=InitPose.STAND, randomized=True)
-    laikago.reset()
-    while True:
-        action = np.array([[-10, 30, -75],
-                           [10, 30, -75],
-                           [-10, 50, -75],
-                           [10, 50, -75]], dtype=np.float64)
-
-        action *= (np.pi / 180)
-        obs, energy = laikago.step(action.flatten())
-        # print(laikago.get_true_motor_angles())
-        # [-0.20100116119550868, 0.5048444062115267, -1.3666156247856345,
-        # 0.20140317079395917, 0.5056824273938537, -1.3658279272744467,
-        # -0.1996661836035335, 0.8956897524147039, -1.3410772891739449,
-        # 0.1991685897493906, 0.8924938030053465, -1.3429027022847266]
-
-        print(energy) # 0.00027238470007931437 ~ 0.0004135868723044259
+    #     # print(energy) # 0.00027238470007931437 ~ 0.0004135868723044259
