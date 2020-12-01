@@ -31,6 +31,8 @@ class Laikago(object):
                  mass_bound=laikago_constant.MASS_BOUND,
                  inertia_bound=laikago_constant.INERTIA_BOUND,
                  joint_f_bound=laikago_constant.JOINT_F_BOUND,
+                 joint_frictionloss_bound=laikago_constant.JOINT_FRICTIONLOSS_BOUND,
+                 friction_bound=laikago_constant.FRICTION_BOUND,
                  toe_f_bound=laikago_constant.TOE_F_BOUND,
                  g_bound=laikago_constant.G_BOUND,
                  max_motor_angle_change_per_step=laikago_constant.MAX_MOTOR_ANGLE_CHANGE_PER_STEP):
@@ -61,6 +63,8 @@ class Laikago(object):
         self.mass_bound = mass_bound
         self.inertia_bound = inertia_bound
         self.joint_f_bound = joint_f_bound
+        self.joint_frictionloss_bound = joint_frictionloss_bound
+        self.friction_bound = friction_bound
         self.toe_f_bound = toe_f_bound
         self.g_bound = g_bound
         self.max_motor_angle_change_per_step = max_motor_angle_change_per_step
@@ -212,7 +216,7 @@ class Laikago(object):
         self._base_orientation = self.data.get_joint_qpos('root')[3:7]
         self._base_velocity = self.data.get_joint_qvel('root')[:3]
         self._toe_force = self.get_toe_force()
-        self.get_toe_height_for_reward() ####
+        # print(self.get_toe_contacts())
 
     def get_motor_angles(self):
         return self._add_sensor_noise(np.array(self.get_true_motor_angles()),
@@ -341,10 +345,21 @@ class Laikago(object):
         for i in range(1, self.model.nbody):         # body 0 is the worldbody
             self.model.body_inertia[i] = inertia_list[i]
 
+    def set_all_joint_frictionloss(self, frictionloss_list):
+        for i, joint in enumerate(laikago_constant.JOINT_NAMES):
+            self.model.dof_frictionloss[self.model.joint_name2id(joint) + 6 - 1] = frictionloss_list[i]
+
+    def set_toe_friction(self, toe_friction_list):
+        self.model.geom_friction[self.model.geom_name2id('floor')][0] = np.random.uniform(0.05, 0.5)
+        for i, toe in enumerate(laikago_constant.TOE_GEOM_NAME):
+            self.model.geom_friction[self.model.geom_name2id(toe)][0] = toe_friction_list[i]
+
     def randomize(self):
         self.randomize_body_mass()
         self.randomize_body_inertia()
         self.randomize_gravity()
+        self.randomize_joint_friction()
+        self.randomize_toe_friction()
 
     def randomize_body_mass(self):
         body_mass = self._body_mass_urdf
@@ -364,6 +379,18 @@ class Laikago(object):
         randomized_g = random.uniform(self.g_bound[0], self.g_bound[1])
         self.model.opt.gravity[-1] = - randomized_g
         self.now_g = randomized_g
+
+    def randomize_joint_friction(self):
+        randomized_joint_friction = np.random.uniform(
+            self.joint_frictionloss_bound[0],
+            self.joint_frictionloss_bound[1],
+            12
+        )
+        self.set_all_joint_frictionloss(randomized_joint_friction.tolist())
+
+    def randomize_toe_friction(self):
+        randomized_toe_friction = np.random.uniform(self.friction_bound[0], self.friction_bound[1], 4)
+        self.set_toe_friction(randomized_toe_friction)
 
     def _gait(self, x):
         x = x % (np.pi * 2)
@@ -385,7 +412,6 @@ class Laikago(object):
         return self.get_true_base_roll_pitch_yaw()
     def get_toe_height_for_reward(self):
         toe_height = [self.data.get_geom_xpos(t)[2] for t in laikago_constant.TOE_GEOM_NAME]
-        # print('toe_height', toe_height)
         return toe_height
 
 
@@ -397,17 +423,17 @@ if __name__ == '__main__':
     T = 2
     while True:
         # print(laikago.get_true_base_roll_pitch_yaw()[2])
-        print(laikago.get_toe_contacts())
+        # print(laikago.get_toe_contacts())
         t += 1
-        action = np.array([[-10, 50, -95],
+        action = np.array([[-10, 30, -75],
                            [10, 30, -75],
                            [-10, 40, -75],
                            [10, 40, -75]], dtype=np.float64)
-        # if t > 60:
-        #     action[[0, 3], 1] += np.sin(t/T)*15
-        #     action[[1, 2], 1] += np.sin(t/T + np.pi)*15
-        #     action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20
-        #     action[[1, 2], 2] += np.sin(t/T + np.pi/2 + np.pi)*20
+        if t > 60:
+            action[[0, 3], 1] += np.sin(t/T)*15
+            action[[1, 2], 1] += np.sin(t/T + np.pi)*15
+            action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20
+            action[[1, 2], 2] += np.sin(t/T + np.pi/2 + np.pi)*20
 
         action *= (np.pi/180)
         laikago.step(action.flatten())
@@ -415,7 +441,8 @@ if __name__ == '__main__':
         if t > 400:
             t = 0
             laikago.reset()
-    # print('trunk mass:', laikago.sim.model.body_mass[laikago.model.body_name2id('trunk')])
+        # print('joint friction', laikago.model.dof_frictionloss)
+        # print('geom friction', laikago.model.geom_friction)
 
     # laikago = Laikago(visual=True, init_pose=InitPose.STAND, randomized=True)
     # laikago.reset()

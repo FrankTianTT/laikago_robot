@@ -66,8 +66,10 @@ MASS_BOUND = [-0.2, 0.2]
 INERTIA_BOUND = [-0.5, 0.5]
 # abstract bound
 JOINT_F_BOUND = [0, 0.1]
+JOINT_FRICTIONLOSS_BOUND = [1, 10]
 TOE_F_BOUND = [0.5, 1.25]
 G_BOUND = [9.7, 9.9]
+FRICTION_BOUND = [0.01, 0.1]
 
 
 
