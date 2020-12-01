@@ -38,7 +38,7 @@ class LaikagoTask(object):
         else:
             return False
 
-    def add_reward(self, reward, p=1):
+    def add_reward(self, reward, p = 1):
         self.sum_reward += reward * p
         self.sum_p += p
 
@@ -58,7 +58,8 @@ class LaikagoTask(object):
         return True
 
     def reward(self):
-        reward = self.cal_reward()
+        self.cal_reward()
+        reward = self.get_sum_reward()
         if self.die_if_unhealthy:
             return reward
         else:

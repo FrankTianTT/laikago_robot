@@ -4,7 +4,7 @@ import numpy as np
 from enum import Enum
 from builder import env_constant
 import collections
-from laikago_task import LaikagoTask
+from builder.laikago_task import LaikagoTask
 
 class InitPose(Enum):
     STAND = 1
