@@ -161,7 +161,9 @@ class LaikagoTaskBullet(object):
         reward = 1 if x < threshold else threshold/x
         return reward
 
-    def done_toe_contact(self):
+    def done_toe_contact(self, threshold=5):
+        if self.steps < threshold:
+            return False
         contact = self._env.get_history_toe_collision()[0]
         return sum(contact) != 4
 
