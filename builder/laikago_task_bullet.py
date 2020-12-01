@@ -22,6 +22,8 @@ class LaikagoTaskBullet(object):
         self.sum_reward = 0
         self.sum_p = 0
         self.steps = 0
+        self.max_episode_steps = 1000
+        self.die_if_unhealthy = False
         return
 
     def add_reward(self, reward, p=1):
@@ -30,6 +32,7 @@ class LaikagoTaskBullet(object):
 
     def get_sum_reward(self):
         reward = self.sum_reward / self.sum_p
+        # print(reward)
         self.sum_reward = 0
         self.sum_p = 0
         return reward
@@ -46,7 +49,12 @@ class LaikagoTaskBullet(object):
         self.steps += 1
 
     def done(self):
-        return False
+        if self.mode == 'no-die':
+            return False
+        if self.die_if_unhealthy and not self.is_healthy:
+            return True
+        else:
+            return False
 
     def reward(self):
         return 0

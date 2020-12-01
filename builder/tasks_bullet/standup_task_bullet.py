@@ -9,6 +9,7 @@ class LaikagoStandUpBulletBase(LaikagoTaskBullet):
         super(LaikagoStandUpBulletBase, self).__init__(mode,
                                                        init_pose=InitPose.STAND)
         # self.mode = 'no-die'
+        self.max_episode_steps = 1000
         self.steps = 0
 
     def reset(self, env):
@@ -26,14 +27,6 @@ class LaikagoStandUpBulletBase(LaikagoTaskBullet):
                     self.done_height_bullet(threshold=0.3) or
                     # self.done_region_bullet(threshold=0.1) or
                     self.done_toe_contact())
-
-    def done(self):
-        if self.mode == 'no-die':
-            return False
-        if self.steps > 1000:
-            return True
-        else:
-            return False
 
 class LaikagoStandUpBullet0(LaikagoStandUpBulletBase):
 
@@ -178,14 +171,11 @@ class LaikagoStandUpBullet4(LaikagoStandUpBulletBase):
 
     def __init__(self, mode='train'):
         super(LaikagoStandUpBullet4, self).__init__(mode)
+        self.die_if_unhealthy = True
 
-    def done(self):
-        if self.mode == 'no-die':
-            return False
-        if self.steps > 1000:
-            return True
-        else:
-            return (self.done_r_bullet(threshold=10) or
+    @property
+    def is_healthy(self):
+        return not (self.done_r_bullet(threshold=10) or
                     self.done_p_bullet(threshold=10) or
                     self.done_height_bullet(threshold=0.25) or
                     self.done_region_bullet(threshold=3))
@@ -201,17 +191,14 @@ class LaikagoStandUpBullet5(LaikagoStandUpBulletBase):
 
     def __init__(self, mode='train'):
         super(LaikagoStandUpBullet5, self).__init__(mode)
+        self.die_if_unhealthy = True
 
-    def done(self):
-        if self.mode == 'no-die':
-            return False
-        if self.steps > 1000:
-            return True
-        else:
-            return (self.done_r_bullet(threshold=30) or
-                    self.done_p_bullet(threshold=30) or
+    @property
+    def is_healthy(self):
+        return not (self.done_r_bullet(threshold=10) or
+                    self.done_p_bullet(threshold=10) or
                     self.done_height_bullet(threshold=0.25) or
-                    self.done_toe_contact())
+                    self.done_region_bullet(threshold=3))
 
     def reward(self):
         self.add_reward(self.reward_energy(), 1)

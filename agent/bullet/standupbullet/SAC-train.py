@@ -6,12 +6,12 @@ import importlib
 import sys
 from os.path import abspath, join, dirname
 sys.path.insert(0, dirname(dirname(dirname(dirname(abspath(__file__))))))
-from builder.gym_env import LaikagoEnv
-from robot_bullet.laikago import Laikago
+from builder.build_env import build_env
 
 TASK_NAME = 'standup'
 ClASS_NAME = 'StandUp'
 MODE = 'train'
+SIMULATOR = 'bullet'
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -44,16 +44,18 @@ if __name__ == "__main__":
     else:
         best_model_dir = './SAC-v{}/logs/best_model.zip'.format(args.load_version)
 
-    standup_task_bullet = importlib.import_module('builder.tasks_bullet.' + TASK_NAME + '_task_bullet')
-    task = eval('standup_task_bullet.Laikago' + ClASS_NAME + 'Bullet{}(mode="'.format(version) + MODE + '")')
+    env = build_env(TASK_NAME, ClASS_NAME, version, MODE, SIMULATOR, visual=False, ctrl_delay=True)
+    eval_env = build_env(TASK_NAME, ClASS_NAME, version, MODE, SIMULATOR, visual=False, ctrl_delay=True)
 
-    env = LaikagoEnv(task=task, visual=False, ctrl_delay=False, action_repeat=20, simulator='bullet')
-    eval_env = LaikagoEnv(task=task, visual=False, ctrl_delay=False, action_repeat=20, simulator='bullet')
+    if env.task.die_if_unhealthy:
+        eval_freq = 1000
+    else:
+        eval_freq = 10000
 
     eval_callback = EvalCallback(eval_env,
                                  best_model_save_path=best_model_save_path,
                                  log_path=log_path,
-                                 eval_freq=10000,
+                                 eval_freq=eval_freq,
                                  deterministic=True,
                                  render=False)
     policy_kwargs = dict(activation_fn=torch.nn.ReLU, net_arch=net_arch)
@@ -65,6 +67,7 @@ if __name__ == "__main__":
     else:
         model = SAC('MlpPolicy',
                     env,
+                    gamma=0.99,
                     device=torch.device('cuda:0'),
                     verbose=1,
                     tensorboard_log=tensorboard_log,

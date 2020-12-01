@@ -19,6 +19,8 @@ class LaikagoTask(object):
         self.init_pose = init_pose
         self.sum_reward = 0
         self.sum_p = 0
+        self.max_episode_steps = 1000
+        self.die_if_unhealthy = False
         return
 
     def reset(self, env):

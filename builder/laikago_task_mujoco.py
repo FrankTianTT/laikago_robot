@@ -20,6 +20,8 @@ class LaikagoTaskMujoco(object):
         self.sum_reward = 0
         self.sum_p = 0
         self.steps = 0
+        self.max_episode_steps = 1000
+        self.die_if_unhealthy = False
         return
 
     def reset(self, env):
@@ -30,7 +32,12 @@ class LaikagoTaskMujoco(object):
         self.steps += 1
 
     def done(self):
-        return False
+        if self.mode == 'no-die':
+            return False
+        if self.die_if_unhealthy and not self.is_healthy:
+            return True
+        else:
+            return False
 
     def reward(self):
         return 0
