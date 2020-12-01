@@ -19,21 +19,24 @@ class LaikagoTask(object):
         self.init_pose = init_pose
         self.sum_reward = 0
         self.sum_p = 0
+        self.steps = 0
         self.max_episode_steps = 1000
         self.die_if_unhealthy = False
-        return
 
     def reset(self, env):
-        pass
+        self._env = env
+        self.steps = 0
 
     def update(self):
-        pass
+        self.steps += 1
 
     def done(self):
-        return False
-
-    def reward(self):
-        return 0
+        if self.mode == 'no-die':
+            return False
+        if self.die_if_unhealthy and not self.is_healthy:
+            return True
+        else:
+            return False
 
     def add_reward(self, reward, p=1):
         self.sum_reward += reward * p
@@ -44,6 +47,25 @@ class LaikagoTask(object):
         self.sum_reward = 0
         self.sum_p = 0
         return reward
+
+    def cal_reward(self):
+        # 你需要重载这个函数
+        return
+
+    @property
+    def is_healthy(self):
+        # 你（可能）需要重载这个函数
+        return True
+
+    def reward(self):
+        reward = self.cal_reward()
+        if self.die_if_unhealthy:
+            return reward
+        else:
+            if self.is_healthy:
+                return reward
+            else:
+                return reward - 1
 
     def normalize_reward(self, reward, min_reward, max_reward):
         return (reward - min_reward)/(max_reward - min_reward)

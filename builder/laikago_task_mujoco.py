@@ -4,56 +4,19 @@ import numpy as np
 from enum import Enum
 from builder import env_constant
 import collections
+from laikago_task import LaikagoTask
 
 class InitPose(Enum):
     STAND = 1
     LIE = 2
     ON_ROCK = 3
 
-class LaikagoTaskMujoco(object):
+class LaikagoTaskMujoco(LaikagoTask):
     def __init__(self,
                  mode='train',
                  init_pose=InitPose.STAND):
-        self._env = None
-        self.mode = mode
-        self.init_pose = init_pose
-        self.sum_reward = 0
-        self.sum_p = 0
-        self.steps = 0
-        self.max_episode_steps = 1000
-        self.die_if_unhealthy = False
-        return
-
-    def reset(self, env):
-        self._env = env
-        self.steps = 0
-
-    def update(self):
-        self.steps += 1
-
-    def done(self):
-        if self.mode == 'no-die':
-            return False
-        if self.die_if_unhealthy and not self.is_healthy:
-            return True
-        else:
-            return False
-
-    def reward(self):
-        return 0
-
-    def add_reward(self, reward, p=1):
-        self.sum_reward += reward * p
-        self.sum_p += p
-
-    def get_sum_reward(self):
-        reward = self.sum_reward / self.sum_p
-        self.sum_reward = 0
-        self.sum_p = 0
-        return reward
-
-    def normalize_reward(self, reward, min_reward, max_reward):
-        return (reward - min_reward)/(max_reward - min_reward)
+        super(LaikagoTaskMujoco, self).__init__(mode=mode,
+                                                init_pose=init_pose)
 
     def precision_cost(self, v, t, m):
         w = math.atanh(math.sqrt(0.95)) / m
