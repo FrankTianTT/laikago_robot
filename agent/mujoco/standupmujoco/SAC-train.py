@@ -10,7 +10,7 @@ from builder.build_env import build_env
 
 TASK_NAME = 'standup'
 ClASS_NAME = 'StandUp'
-MODE = 'train'
+RUN_MODE = 'train'
 SIMULATOR = 'mujoco'
 
 if __name__ == "__main__":
@@ -44,8 +44,8 @@ if __name__ == "__main__":
     else:
         best_model_dir = './SAC-v{}/logs/best_model.zip'.format(args.load_version)
 
-    env = build_env(TASK_NAME, ClASS_NAME, version, MODE, SIMULATOR, visual=False, ctrl_delay=True)
-    eval_env = build_env(TASK_NAME, ClASS_NAME, version, MODE, SIMULATOR, visual=False, ctrl_delay=True)
+    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
+    eval_env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
 
     if env.task.die_if_unhealthy:
         eval_freq = 1000
