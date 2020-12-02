@@ -51,7 +51,8 @@ class LaikagoStandUpBullet0_2(LaikagoStandUpBullet0):
                                                       reward_mode='with_shaping')
 
     def cal_phi_function(self):
-        sum = self.reward_r_bullet() + self.reward_p_bullet() + self.reward_y_bullet() + self.reward_height_bullet() + \
+        sum = self.reward_r_bullet(threshold=10) + self.reward_p_bullet(threshold=10) + \
+              self.reward_y_bullet(threshold=10) + self.reward_height_bullet(threshold=0.3) + \
               self.reward_toe_contact_soft()
         return sum / 5
 
@@ -97,7 +98,8 @@ class LaikagoStandUpBullet1_2(LaikagoStandUpBullet1):
                                                       reward_mode='with_shaping')
 
     def cal_phi_function(self):
-        sum = self.reward_r_bullet() + self.reward_p_bullet() + self.reward_y_bullet() + self.reward_height_bullet() + \
+        sum = self.reward_r_bullet(threshold=60) + self.reward_p_bullet(threshold=60) + \
+              self.reward_y_bullet(threshold=60) + self.reward_height_bullet(threshold=0.15) + \
               self.reward_toe_contact_soft()
         return sum / 5
 
@@ -117,7 +119,7 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
                     self.done_p_bullet(threshold=60) or
                     self.done_y_bullet(threshold=60) or
                     self.done_height_bullet(threshold=0.15) or
-                    self.done_region_bullet(threshold=2) or
+                    self.done_region_bullet(threshold=3) or
                     self.done_toe_contact())
 
     def update_reward(self):
@@ -126,7 +128,7 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
         else:
             self.add_reward(self.reward_energy() - 1, 1)
 
-class LaikagoStandUpBullet2_1(LaikagoStandUpBullet1):
+class LaikagoStandUpBullet2_1(LaikagoStandUpBullet2):
 
     def __init__(self, run_mode='train'):
         super(LaikagoStandUpBullet2_1, self).__init__(run_mode=run_mode)
@@ -136,16 +138,17 @@ class LaikagoStandUpBullet2_1(LaikagoStandUpBullet1):
         if self.is_healthy:
             self.add_reward(1, 1)
 
-class LaikagoStandUpBullet2_2(LaikagoStandUpBullet1):
+class LaikagoStandUpBullet2_2(LaikagoStandUpBullet2):
 
     def __init__(self, run_mode='train'):
         super(LaikagoStandUpBullet2_2, self).__init__(run_mode=run_mode,
                                                       reward_mode='with_shaping')
 
     def cal_phi_function(self):
-        sum = self.reward_r_bullet() + self.reward_p_bullet() + self.reward_y_bullet() + self.reward_height_bullet() + \
-              self.reward_toe_contact_soft()
-        return sum / 5
+        sum = self.reward_r_bullet(threshold=60) + self.reward_p_bullet(threshold=60) + \
+              self.reward_y_bullet(threshold=60) + self.reward_height_bullet(threshold=0.15) + \
+              self.reward_toe_contact_soft() + self.reward_region_bullet(threshold=3)
+        return sum / 6
 
     def update_reward(self):
         if self.is_healthy:
