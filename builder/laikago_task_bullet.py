@@ -25,6 +25,10 @@ class LaikagoTaskBullet(LaikagoTask):
                                                 die_if_unhealthy=die_if_unhealthy,
                                                 max_episode_steps=max_episode_steps,
                                                 init_pose=init_pose)
+        self.contact_buffer = collections.deque(maxlen=10)
+        for i in range(10):
+            self.contact_buffer.appendleft(4)
+
     def reward_energy(self):
         energy = self._env.get_energy()
         reward = - energy
@@ -151,3 +155,8 @@ class LaikagoTaskBullet(LaikagoTask):
         contact = self._env.get_history_toe_collision()[0]
         reward = 1 if sum(contact) == 4 else 0
         return self.normalize_reward(reward, 0, 1)
+
+    def done_toe_contact_long(self, threshold=32):
+        contact = sum(self._env.get_history_toe_collision()[0])
+        self.contact_buffer.appendleft(contact)
+        return sum(self.contact_buffer) < threshold
