@@ -3,8 +3,8 @@ from builder import env_constant
 
 class LaikagoLiftFoot(LaikagoTask):
 
-    def __init__(self, mode='train', foot = env_constant.FOOT_FR):
-        super(LaikagoLiftFoot, self).__init__(mode)
+    def __init__(self, run_mode='train', foot = env_constant.FOOT_FR):
+        super(LaikagoLiftFoot, self).__init__(run_mode)
         self.foot = foot
         self.fall_timer = 0
         pass

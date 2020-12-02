@@ -8,9 +8,9 @@ version 6-1 is the best from then on.
 
 class LaikagoStandFromLieBulletBase(LaikagoTaskBullet):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandFromLieBulletBase, self).__init__(mode,
-                                                       init_pose=InitPose.LIE)
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandFromLieBulletBase, self).__init__(run_mode,
+                                                            init_pose=InitPose.LIE)
         # self.mode = 'no-die'
         self.steps = 0
 
@@ -28,7 +28,7 @@ class LaikagoStandFromLieBulletBase(LaikagoTaskBullet):
                     self.done_region_bullet(threshold=3))
 
     def done(self):
-        if self.mode=='no-die':
+        if self.run_mode== 'no-die':
             return False
         if self.steps > 1000:
             return True
@@ -37,8 +37,8 @@ class LaikagoStandFromLieBulletBase(LaikagoTaskBullet):
 
 class LaikagoStandFromLieBullet0(LaikagoStandFromLieBulletBase):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandFromLieBullet0, self).__init__(mode)
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandFromLieBullet0, self).__init__(run_mode)
 
     def reward(self):
         self.add_reward(self.reward_toe_height_bullet(), 1)

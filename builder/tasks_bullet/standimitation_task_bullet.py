@@ -12,9 +12,9 @@ KNEE_D_GAIN = 2.0
 
 class LaikagoStandImitationBulletBase(LaikagoTaskBullet):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandImitationBulletBase, self).__init__(mode,
-                                                       init_pose=InitPose.STAND)
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandImitationBulletBase, self).__init__(run_mode,
+                                                              init_pose=InitPose.STAND)
         # self.mode = 'no-die'
         self.steps = 0
         self.imit_action = np.array([-10, 30, -75,
@@ -39,7 +39,7 @@ class LaikagoStandImitationBulletBase(LaikagoTaskBullet):
         self.steps += 1
 
     def done(self):
-        if self.mode=='no-die':
+        if self.run_mode== 'no-die':
             return False
         if self.steps > 300:
             return True
@@ -57,8 +57,8 @@ class LaikagoStandImitationBulletBase(LaikagoTaskBullet):
 
 class LaikagoStandImitationBullet0(LaikagoStandImitationBulletBase):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandImitationBullet0, self).__init__(mode)
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandImitationBullet0, self).__init__(run_mode)
 
     def reward(self):
         self.add_reward(self.reward_imitation(), 1)

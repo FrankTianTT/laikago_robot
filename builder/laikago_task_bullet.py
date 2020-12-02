@@ -15,9 +15,15 @@ class InitPose(Enum):
 
 class LaikagoTaskBullet(LaikagoTask):
     def __init__(self,
-                 mode='train',
+                 run_mode='train',
+                 reward_mode='without_shaping',
+                 die_if_unhealthy=False,
+                 max_episode_steps=1000,
                  init_pose=InitPose.STAND):
-        super(LaikagoTaskBullet, self).__init__(mode=mode,
+        super(LaikagoTaskBullet, self).__init__(run_mode=run_mode,
+                                                reward_mode=reward_mode,
+                                                die_if_unhealthy=die_if_unhealthy,
+                                                max_episode_steps=max_episode_steps,
                                                 init_pose=init_pose)
     def reward_energy(self):
         energy = self._env.get_energy()

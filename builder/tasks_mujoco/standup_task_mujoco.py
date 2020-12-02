@@ -5,8 +5,8 @@ import random
 
 class LaikagoStandUpMujocoBase(LaikagoTaskMujoco):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpMujocoBase, self).__init__(mode,
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandUpMujocoBase, self).__init__(run_mode,
                                                        init_pose=InitPose.STAND)
         # self.mode = 'no-die'
         self.max_episode_steps = 1000
@@ -23,26 +23,26 @@ class LaikagoStandUpMujocoBase(LaikagoTaskMujoco):
 
 class LaikagoStandUpMujoco0(LaikagoStandUpMujocoBase):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpMujoco0, self).__init__(mode)
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandUpMujoco0, self).__init__(run_mode)
         self.die_if_unhealthy = False
 
-    def cal_reward(self):
+    def update_reward(self):
         self.add_reward(self.reward_energy(), 1)
 
 class LaikagoStandUpMujoco0_1(LaikagoStandUpMujocoBase):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpMujoco0_1, self).__init__(mode)
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandUpMujoco0_1, self).__init__(run_mode)
         self.die_if_unhealthy = False
 
-    def cal_reward(self):
+    def update_reward(self):
         self.add_reward(1, 1)
 
 class LaikagoStandUpMujoco1(LaikagoStandUpMujocoBase):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpMujoco1, self).__init__(mode)
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandUpMujoco1, self).__init__(run_mode)
         self.die_if_unhealthy = False
 
     @property
@@ -54,22 +54,22 @@ class LaikagoStandUpMujoco1(LaikagoStandUpMujocoBase):
                     # self.done_region_mujoco(threshold=0.1) or
                     self.done_toe_contact())
 
-    def cal_reward(self):
+    def update_reward(self):
         self.add_reward(self.reward_energy(), 1)
 
 class LaikagoStandUpMujoco1_1(LaikagoStandUpMujocoBase):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpMujoco1_1, self).__init__(mode)
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandUpMujoco1_1, self).__init__(run_mode)
         self.die_if_unhealthy = False
 
-    def cal_reward(self):
+    def update_reward(self):
         self.add_reward(1, 1)
 
 class LaikagoStandUpMujoco4(LaikagoStandUpMujocoBase):
 
-    def __init__(self, mode='train'):
-        super(LaikagoStandUpMujoco4, self).__init__(mode)
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandUpMujoco4, self).__init__(run_mode)
         self.die_if_unhealthy = True
 
     @property
@@ -80,7 +80,7 @@ class LaikagoStandUpMujoco4(LaikagoStandUpMujocoBase):
                     self.done_region_mujoco(threshold=3))
 
 
-    def cal_reward(self):
+    def update_reward(self):
         self.add_reward(self.reward_height_mujoco(threshold=0.3), 1)
         self.add_reward(self.reward_region_mujoco(threshold=0.5), 1)
         self.add_reward(self.reward_energy(), 1)

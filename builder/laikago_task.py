@@ -12,16 +12,22 @@ class InitPose(Enum):
 
 class LaikagoTask(object):
     def __init__(self,
-                 mode='train',
-                 init_pose=InitPose.STAND):
+                 run_mode='train',
+                 init_pose=InitPose.STAND,
+                 reward_mode='with_shaping',
+                 die_if_unhealthy=False,
+                 max_episode_steps=1000):
         self._env = None
-        self.mode = mode
+        self.run_mode = run_mode
         self.init_pose = init_pose
+        self.reward_mode = reward_mode
+        self.die_if_unhealthy = die_if_unhealthy
+        self.max_episode_steps = max_episode_steps
         self.sum_reward = 0
         self.sum_p = 0
         self.steps = 0
-        self.max_episode_steps = 1000
-        self.die_if_unhealthy = False
+        # phi is a function of s, a, s', a' and t
+        self.phi_last_state = 0
 
     def reset(self, env):
         self._env = env
@@ -31,26 +37,33 @@ class LaikagoTask(object):
         self.steps += 1
 
     def done(self):
-        if self.mode == 'no-die':
+        if self.run_mode == 'no-die':
             return False
         if self.die_if_unhealthy and not self.is_healthy:
             return True
         else:
             return False
 
-    def add_reward(self, reward, p = 1):
+    def add_reward(self, reward, p=1):
         self.sum_reward += reward * p
         self.sum_p += p
 
     def get_sum_reward(self):
-        reward = self.sum_reward / self.sum_p
+        if self.sum_p == 0:
+            reward = 0
+        else:
+            reward = self.sum_reward / self.sum_p
         self.sum_reward = 0
         self.sum_p = 0
         return reward
 
-    def cal_reward(self):
+    def update_reward(self):
         # 你需要重载这个函数
         return
+
+    def cal_phi_function(self):
+        # 你（可能）需要重载这个函数
+        return 0
 
     @property
     def is_healthy(self):
@@ -58,15 +71,15 @@ class LaikagoTask(object):
         return True
 
     def reward(self):
-        self.cal_reward()
+        self.update_reward()
         reward = self.get_sum_reward()
-        if self.die_if_unhealthy:
-            return reward
+        if self.reward_mode == 'with_shaping':
+            phi_this_state = self.cal_phi_function()
+            shaping_reward = phi_this_state - self.phi_last_state
+            self.phi_last_state = phi_this_state
+            return reward + shaping_reward
         else:
-            if self.is_healthy:
-                return reward
-            else:
-                return reward - 1
+            return reward
 
     def normalize_reward(self, reward, min_reward, max_reward):
         return (reward - min_reward)/(max_reward - min_reward)

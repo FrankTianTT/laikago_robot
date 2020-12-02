@@ -5,9 +5,9 @@ import random
 
 class LaikagoRunStraightBulletBase(LaikagoTaskBullet):
 
-    def __init__(self, mode='train'):
-        super(LaikagoRunStraightBulletBase, self).__init__(mode,
-                                                       init_pose=InitPose.STAND)
+    def __init__(self, run_mode='train'):
+        super(LaikagoRunStraightBulletBase, self).__init__(run_mode,
+                                                           init_pose=InitPose.STAND)
         # self.mode = 'no-die'
         self.steps = 0
 
@@ -24,7 +24,7 @@ class LaikagoRunStraightBulletBase(LaikagoTaskBullet):
                     self.done_height_bullet(threshold=0.25))
 
     def done(self):
-        if self.mode == 'no-die':
+        if self.run_mode == 'no-die':
             return False
         if self.steps > 1000:
             return True
@@ -33,8 +33,8 @@ class LaikagoRunStraightBulletBase(LaikagoTaskBullet):
 
 class LaikagoRunStraightBullet0(LaikagoRunStraightBulletBase):
 
-    def __init__(self, mode='train'):
-        super(LaikagoRunStraightBullet0, self).__init__(mode)
+    def __init__(self, run_mode='train'):
+        super(LaikagoRunStraightBullet0, self).__init__(run_mode)
 
     def reward(self):
         self.add_reward(self.reward_x_velocity(), 5)
@@ -46,8 +46,8 @@ class LaikagoRunStraightBullet0(LaikagoRunStraightBulletBase):
 
 class LaikagoRunStraightBullet1(LaikagoRunStraightBulletBase):
 
-    def __init__(self, mode='train'):
-        super(LaikagoRunStraightBullet1, self).__init__(mode)
+    def __init__(self, run_mode='train'):
+        super(LaikagoRunStraightBullet1, self).__init__(run_mode)
 
     @property
     def is_healthy(self):
