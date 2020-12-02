@@ -1,7 +1,7 @@
 /**
- * @file client.cpp'
+ * @file client.cpp
  * 
- * Control the laikago without time shift
+ * Control laikago with time shift
  *
  * @author Song Lei
  */
@@ -64,7 +64,7 @@ float last_pos[ACTION_SIZE], target_pos[ACTION_SIZE];
 float cur_torque[ACTION_SIZE] = {0};
 clock_t cur = 0, large_step_pre = 0, small_step_pre = 0;
 int cur_smooth_step = 0;
-int recv_action_flag = 1;
+int send_obs_flag = 1;
 const int MAX_REPEAT_STEP = 10;
 const float LARGE_STEP = 0.020, SMALL_STEP = 0.001;
 
@@ -120,24 +120,31 @@ float smooth_action(float old_action, float target_action, int step) {
 
 void RobotControl() {
   motiontime ++; 
-  cout << "time: " << double(clock() - cur)/CLOCKS_PER_SEC << endl;
   cur = clock();
 
   udp.GetState(state);
+  // PrintMotorState(state);
   sensor.UpdateSensor(state);
   sensor.ConvertSensor2Obs(obs);
 
+
   if(motiontime == 1) {
     cout << "Get init position" << endl;
-    int len = recv(client_fd, (char*)target_pos, ACTION_SIZE*sizeof(float), 0);
+    int len = recv(client_fd, (char*)target_pos, ACTION_SIZE*sizeof(float), 0);  // 阻塞接受初始pos
     assert(len == ACTION_SIZE*sizeof(float));
     small_step_pre = large_step_pre = clock();
     for(int i = 0; i < N_MOTOR; i++)
       last_pos[i] = target_pos[i];
   }
 
+  if(send_obs_flag) {
+    send(client_fd, (char*)obs, OBS_SIZE*sizeof(float), 0);
+    send_obs_flag = 0;
+  }
+
   // 每SMALL_STEP更新一次torque
   if(((double)(cur - small_step_pre)) / CLOCKS_PER_SEC >= SMALL_STEP) {
+    // small_step_pre = clock();
     float next_action = 0;
     small_step_pre += CLOCKS_PER_SEC * SMALL_STEP;
     for(int i = 0; i < N_MOTOR; i++) {
@@ -153,23 +160,31 @@ void RobotControl() {
 
   // 每LARGE_STEP更新一次action
   if(((double)(cur - large_step_pre)) / CLOCKS_PER_SEC >= LARGE_STEP) {
-    send(client_fd, (char*)obs, OBS_SIZE*sizeof(float), 0);
-    large_step_pre += CLOCKS_PER_SEC * LARGE_STEP;
-    recv_action_flag = 0;
-  }
-
-  if(recv_action_flag == 0) {
+    // large_step_pre = clock();
     for(int i = 0; i < N_MOTOR; i++)
       last_pos[i] = target_pos[i];
+
+    large_step_pre += CLOCKS_PER_SEC * LARGE_STEP;
     int len = recv(client_fd, (char*)target_pos, ACTION_SIZE*sizeof(float), MSG_DONTWAIT);
-    assert(len == -1 || len == ACTION_SIZE*sizeof(float));
-    if(len == ACTION_SIZE*sizeof(float)) {
-      recv_action_flag = 1;
-      cur_smooth_step = 0;
-    }
+    // int len = recv(client_fd, (char*)target_pos, ACTION_SIZE*sizeof(float), 0);
+    // cout << "length: " << len << endl;
+    cout << "len:" << len << endl;
+    assert(len == ACTION_SIZE*sizeof(float));
+
+    float tmp = 0;
+    if(recv(client_fd, &tmp, sizeof(float), MSG_DONTWAIT) != -1)  // 检查socket缓冲区是否为空
+      assert(0);
+
+    send_obs_flag = 1;
+    // cout << "Smooth count: " << cur_smooth_step << endl;
+    cur_smooth_step = 0;
   }
 
-  // Limit the torques to a small range
+  // cout << "Get target_pos: ";
+  // for(int i = 0; i < ACTION_SIZE; i++)
+  //   cout << target_pos[i] << " ";
+  // cout << endl;
+
   for(int i = 0; i < 4; i++) {
     if(state.footForce[i] > 0) {
       torque_limit[i] = 1+0.25*state.footForce[i];
@@ -179,6 +194,7 @@ void RobotControl() {
       torque_limit[i] = 1;
     }
   }
+  cout << torque_limit[0] << endl;
 
   for(int i = 0; i < N_MOTOR; i++) {
     if(cur_torque[i] < -torque_limit[i/3])
@@ -195,15 +211,16 @@ void RobotControl() {
   SetCmdTorque(cmd, 1, tor.torque[1]);
   SetCmdTorque(cmd, 2, tor.torque[2]);
   SetCmdTorque(cmd, 3, tor.torque[3]);
-  // SetCmdTorque(cmd, 4, tor.torque[4]);
-  // SetCmdTorque(cmd, 5, tor.torque[5]);
-  // SetCmdTorque(cmd, 6, tor.torque[6]);
-  // SetCmdTorque(cmd, 7, tor.torque[7]);
-  // SetCmdTorque(cmd, 8, tor.torque[8]);
-  // SetCmdTorque(cmd, 9, tor.torque[9]);
-  // SetCmdTorque(cmd, 10, tor.torque[10]);
-  // SetCmdTorque(cmd, 11, tor.torque[11]);
-  // SetCmdTorque(cmd, 12, tor.torque[12]);
+  SetCmdTorque(cmd, 4, tor.torque[4]);
+  SetCmdTorque(cmd, 5, tor.torque[5]);
+  SetCmdTorque(cmd, 6, tor.torque[6]);
+  SetCmdTorque(cmd, 7, tor.torque[7]);
+  SetCmdTorque(cmd, 8, tor.torque[8]);
+  SetCmdTorque(cmd, 9, tor.torque[9]);
+  SetCmdTorque(cmd, 10, tor.torque[10]);
+  SetCmdTorque(cmd, 11, tor.torque[11]);
+  SetCmdTorque(cmd, 12, tor.torque[12]);
+
 
   control.JointLimit(cmd);
   control.PowerLimit(cmd, state, 1);
