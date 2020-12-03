@@ -6,7 +6,7 @@ import importlib
 import sys
 from os.path import abspath, join, dirname
 sys.path.insert(0, dirname(dirname(dirname(dirname(abspath(__file__))))))
-from builder.build_env import build_env
+from builder.env_builder import build_env
 
 TASK_NAME = 'runstraight'
 ClASS_NAME = 'RunStraight'

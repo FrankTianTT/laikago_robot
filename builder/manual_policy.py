@@ -5,7 +5,7 @@ import sys
 from os.path import abspath, join, dirname
 
 sys.path.insert(0, dirname(dirname(abspath(__file__))))
-from builder.gym_env import LaikagoEnv
+from builder.laikago_env import LaikagoEnv
 import numpy as np
 
 if __name__ == "__main__":

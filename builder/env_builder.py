@@ -1,5 +1,5 @@
 import importlib
-from builder.gym_env import LaikagoEnv
+from builder.laikago_env import LaikagoEnv
 from gym.wrappers.time_limit import TimeLimit
 
 def build_env(task_name,
@@ -9,8 +9,8 @@ def build_env(task_name,
               simulator,
               visual,
               ctrl_delay,
-              action_repeat=4,
-              time_step=0.005):
+              action_repeat=20,
+              time_step=0.001):
     task_import = importlib.import_module('builder.tasks_' + simulator + '.' + task_name + '_task_' + simulator)
     task = eval('task_import.Laikago' + class_name + simulator.capitalize() +'{}(run_mode="'.format(version) + run_mode + '")')
 
