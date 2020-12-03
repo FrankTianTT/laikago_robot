@@ -12,6 +12,7 @@ class Transfer(object):
                  init_pose=InitPose.STAND,
                  ctrl_delay=False,
                  action_repeat=33,
+                 time_step=0.001,
                  visual=False,
                  history_len=transfer_constant.HISTORY_LEN,
                  simulator='bullet'):
@@ -30,7 +31,8 @@ class Transfer(object):
         self.laikago = self.robot_class(visual=self.visual,
                                         init_pose=init_pose,
                                         action_repeat=self.action_repeat,
-                                        ctrl_delay=self.ctrl_delay)
+                                        ctrl_delay=self.ctrl_delay,
+                                        time_step=time_step)
         self.observation = None
 
     def step(self, pos_action):

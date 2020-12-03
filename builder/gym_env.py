@@ -13,6 +13,7 @@ class LaikagoEnv(gym.Env):
                  transfer_class=Transfer,
                  ctrl_delay=False,
                  action_repeat=33,
+                 time_step=0.001,
                  position_upper_bound=env_constant.POSITION_UPPER_BOUND,
                  position_lower_bound=env_constant.POSITION_LOWER_BOUND,
                  simulator='bullet'):
@@ -26,6 +27,7 @@ class LaikagoEnv(gym.Env):
         self.transfer = self.transfer_class(visual=self.visual,
                                             init_pose=self.task.init_pose,
                                             action_repeat=self.action_repeat,
+                                            time_step=time_step,
                                             ctrl_delay=self.ctrl_delay,
                                             simulator=simulator)
         self.action_space = spaces.Box(

@@ -9,11 +9,17 @@ def build_env(task_name,
               simulator,
               visual,
               ctrl_delay,
-              action_repeat=20):
+              action_repeat=4,
+              time_step=0.005):
     task_import = importlib.import_module('builder.tasks_' + simulator + '.' + task_name + '_task_' + simulator)
     task = eval('task_import.Laikago' + class_name + simulator.capitalize() +'{}(run_mode="'.format(version) + run_mode + '")')
 
-    env = LaikagoEnv(task=task, visual=visual, ctrl_delay=ctrl_delay, action_repeat=action_repeat, simulator=simulator)
+    env = LaikagoEnv(task=task,
+                     visual=visual,
+                     ctrl_delay=ctrl_delay,
+                     action_repeat=action_repeat,
+                     time_step=time_step,
+                     simulator=simulator)
     wrapped = TimeLimit(env, task.max_episode_steps)
     return wrapped
 
