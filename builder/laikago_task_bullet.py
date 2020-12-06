@@ -30,6 +30,11 @@ class LaikagoTaskBullet(LaikagoTask):
         for i in range(self.contact_buffer_length):
             self.contact_buffer.appendleft(4)
 
+    def update(self):
+        super(LaikagoTaskBullet, self).update()
+        contact = sum(self._env.get_history_toe_collision()[0])
+        self.contact_buffer.appendleft(contact)
+
     def reward_energy(self):
         energy = self._env.get_energy()
         reward = - energy
@@ -163,6 +168,7 @@ class LaikagoTaskBullet(LaikagoTask):
         return self.normalize_reward(reward, 0, 1)
 
     def done_toe_contact_long(self, threshold=16):
-        contact = sum(self._env.get_history_toe_collision()[0])
-        self.contact_buffer.appendleft(contact)
         return sum(self.contact_buffer) < threshold
+
+    def reward_toe_contact_long(self, threshold=16):
+        return 1 if sum(self.contact_buffer) > threshold else sum(self.contact_buffer) / threshold

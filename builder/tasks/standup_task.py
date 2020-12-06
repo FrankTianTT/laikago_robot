@@ -9,13 +9,6 @@ class LaikagoStandUpBase(LaikagoTask):
         # self.mode = 'no-die'
         self.steps = 0
 
-    def reset(self, env):
-        self._env = env
-        self.steps = 0
-
-    def update(self):
-        self.steps += 1
-
     def done(self):
         if self.run_mode == 'no-die':
             return False
