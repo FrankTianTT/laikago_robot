@@ -63,19 +63,21 @@ class LaikagoStandUpBullet0(LaikagoStandUpBulletBase):
                     self.done_y_bullet(threshold=30) or
                     self.done_height_bullet(threshold=0.25) or
                     self.done_region_bullet(threshold=3) or
-                    self.done_toe_contact_long(threshold=30))
+                    self.done_toe_contact_long(threshold=16))
                     # self.done_toe_distance(threshold=0.2))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=30) + self.reward_p_bullet(threshold=30) + \
               self.reward_y_bullet(threshold=30) + self.reward_height_bullet(threshold=0.25) + \
-              self.reward_toe_contact_soft() * 5 + self.reward_region_bullet(threshold=3)#  + \
+              self.reward_toe_height_bullet(threshold=0.03) * 5 + self.reward_region_bullet(threshold=3)#  + \
               # self.reward_toe_distance(threshold=0.2)
         return sum
 
     def update_reward(self):
+        self.reward_toe_height_bullet()
         if self.is_healthy:
             self.add_reward(1, 1)
+
 
 class LaikagoStandUpBullet0_1(LaikagoStandUpBulletBase):
 
@@ -90,13 +92,13 @@ class LaikagoStandUpBullet0_1(LaikagoStandUpBulletBase):
                     self.done_y_bullet(threshold=30) or
                     self.done_height_bullet(threshold=0.25) or
                     self.done_region_bullet(threshold=3) or
-                    self.done_toe_contact_long(threshold=20) or
+                    self.done_toe_contact_long(threshold=16) or
                     self.done_toe_distance(threshold=0.2))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=30) + self.reward_p_bullet(threshold=30) + \
               self.reward_y_bullet(threshold=30) + self.reward_height_bullet(threshold=0.25) + \
-              self.reward_toe_contact_soft() * 5 + self.reward_region_bullet(threshold=3) + \
+              self.reward_toe_height_bullet(threshold=0.03) * 5 + self.reward_region_bullet(threshold=3) + \
               self.reward_toe_distance(threshold=0.2)
         return sum
 
@@ -117,13 +119,13 @@ class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
                     self.done_y_bullet(threshold=15) or
                     self.done_height_bullet(threshold=0.25) or
                     self.done_region_bullet(threshold=1) or
-                    self.done_toe_contact_long(threshold=30)) # or
+                    self.done_toe_contact_long(threshold=16)) # or
                     # self.done_toe_distance(threshold=0.2))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=15) + self.reward_p_bullet(threshold=15) + \
               self.reward_y_bullet(threshold=15) + self.reward_height_bullet(threshold=0.25) + \
-              self.reward_toe_contact_soft() * 5 + self.reward_region_bullet(threshold=1)#  + \
+              self.reward_toe_height_bullet(threshold=0.03) * 5 + self.reward_region_bullet(threshold=1)#  + \
               # self.reward_toe_distance(threshold=0.2)
         return sum
 
@@ -144,13 +146,13 @@ class LaikagoStandUpBullet1_1(LaikagoStandUpBulletBase):
                     self.done_y_bullet(threshold=15) or
                     self.done_height_bullet(threshold=0.25) or
                     self.done_region_bullet(threshold=1) or
-                    self.done_toe_contact_long(threshold=20) or
+                    self.done_toe_contact_long(threshold=16) or
                     self.done_toe_distance(threshold=0.2))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=15) + self.reward_p_bullet(threshold=15) + \
               self.reward_y_bullet(threshold=15) + self.reward_height_bullet(threshold=0.25) + \
-              self.reward_toe_contact_soft() * 5 + self.reward_region_bullet(threshold=1) + \
+              self.reward_toe_height_bullet(threshold=0.03) * 5 + self.reward_region_bullet(threshold=1) + \
               self.reward_toe_distance(threshold=0.2)
         return sum
 
@@ -170,13 +172,13 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
                     self.done_y_bullet(threshold=15) or
                     self.done_height_bullet(threshold=0.25) or
                     self.done_region_bullet(threshold=1) or
-                    self.done_toe_contact_long(threshold=21)) # or
+                    self.done_toe_contact_long(threshold=16)) # or
                     # self.done_toe_distance(threshold=0.2))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=15) + self.reward_p_bullet(threshold=15) + \
               self.reward_y_bullet(threshold=15) + self.reward_height_bullet(threshold=0.3) + \
-              self.reward_toe_contact_soft() * 5 + self.reward_region_bullet(threshold=1) # + \
+              self.reward_toe_height_bullet(threshold=0.03) * 5 + self.reward_region_bullet(threshold=1) # + \
               # self.reward_toe_distance(threshold=0.2)
         return sum
 
@@ -227,7 +229,7 @@ class LaikagoStandUpBullet3_1(LaikagoStandUpBulletPush):
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=30) + self.reward_p_bullet(threshold=30) + \
               self.reward_y_bullet(threshold=30) + self.reward_height_bullet(threshold=0.2) + \
-              self.reward_toe_contact_soft() * 5 + self.reward_region_bullet(threshold=3)#  + \
+              self.reward_toe_height_bullet(threshold=0.03) * 5 + self.reward_region_bullet(threshold=3)#  + \
               # self.reward_toe_distance(threshold=0.2)
         return sum
 

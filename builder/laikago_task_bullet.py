@@ -25,8 +25,9 @@ class LaikagoTaskBullet(LaikagoTask):
                                                 die_if_unhealthy=die_if_unhealthy,
                                                 max_episode_steps=max_episode_steps,
                                                 init_pose=init_pose)
-        self.contact_buffer = collections.deque(maxlen=10)
-        for i in range(10):
+        self.contact_buffer_length = 5
+        self.contact_buffer = collections.deque(maxlen=self.contact_buffer_length)
+        for i in range(self.contact_buffer_length):
             self.contact_buffer.appendleft(4)
 
     def reward_energy(self):
@@ -77,14 +78,9 @@ class LaikagoTaskBullet(LaikagoTask):
                 reward = 0
         return self.normalize_reward(reward, 0, threshold)
 
-    def reward_toe_height_bullet(self, threshold=0.2):
-        """
-        if 0<max_height<threshold, reward is (threshold - max_height)/threshold
-        elif max_height>threshold, reward is 0
-        """
+    def reward_toe_height_bullet(self, threshold=0.03):
         max_height = max(self._env.transfer.laikago.get_toe_height_for_reward())
-        reward = - threshold if max_height > threshold else - max_height
-        return self.normalize_reward(reward, - threshold, 0)
+        reward = 1 if max_height < threshold else threshold / max_height
 
     def reward_x_velocity(self, threshold=3):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
@@ -166,7 +162,7 @@ class LaikagoTaskBullet(LaikagoTask):
         reward = 1 if sum(contact) == 4 else 0
         return self.normalize_reward(reward, 0, 1)
 
-    def done_toe_contact_long(self, threshold=32):
+    def done_toe_contact_long(self, threshold=16):
         contact = sum(self._env.get_history_toe_collision()[0])
         self.contact_buffer.appendleft(contact)
         return sum(self.contact_buffer) < threshold
