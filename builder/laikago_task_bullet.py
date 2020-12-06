@@ -80,7 +80,7 @@ class LaikagoTaskBullet(LaikagoTask):
 
     def reward_toe_height_bullet(self, threshold=0.03):
         max_height = max(self._env.transfer.laikago.get_toe_height_for_reward())
-        reward = 1 if max_height < threshold else threshold / max_height
+        return 1 if max_height < threshold else threshold / max_height
 
     def reward_x_velocity(self, threshold=3):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
