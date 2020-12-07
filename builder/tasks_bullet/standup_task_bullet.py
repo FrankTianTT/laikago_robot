@@ -135,7 +135,7 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
         if self.is_healthy:
             self.add_reward(self.reward_energy(), 1)
 
-class LaikagoStandUpBullet3_1(LaikagoStandUpBulletBase):
+class LaikagoStandUpBullet2_1(LaikagoStandUpBulletBase):
 
     def __init__(self, run_mode='train', reward_mode='with_shaping'):
         super(LaikagoStandUpBullet3_1, self).__init__(run_mode=run_mode,
@@ -163,7 +163,7 @@ class LaikagoStandUpBullet3_1(LaikagoStandUpBulletBase):
         if self.is_healthy:
             self.add_reward(self.reward_energy(), 1)
 
-class LaikagoStandUpBullet3_2(LaikagoStandUpBulletBase):
+class LaikagoStandUpBullet2_2(LaikagoStandUpBulletBase):
 
     def __init__(self, run_mode='train', reward_mode='with_shaping'):
         super(LaikagoStandUpBullet3_2, self).__init__(run_mode=run_mode,
