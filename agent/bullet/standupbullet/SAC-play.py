@@ -11,7 +11,7 @@ import numpy as np
 
 TASK_NAME = 'standup'
 ClASS_NAME = 'StandUp'
-RUN_MODE = 'train'
+RUN_MODE = 'report_done'
 SIMULATOR = 'bullet'
 
 if __name__ == "__main__":
@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
 
-    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=True, ctrl_delay=True)
+    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
     model = SAC.load(best_model_save_path, device=torch.device('cuda:0'))
 
     obs = env.reset()

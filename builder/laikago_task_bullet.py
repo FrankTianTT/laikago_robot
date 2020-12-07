@@ -1,5 +1,7 @@
 import math
 import random
+import inspect
+import sys
 import numpy as np
 from enum import Enum
 from builder import env_constant
@@ -34,6 +36,8 @@ class LaikagoTaskBullet(LaikagoTask):
         super(LaikagoTaskBullet, self).update()
         contact = sum(self._env.get_history_toe_collision()[0])
         self.contact_buffer.appendleft(contact)
+        if self.run_mode is "report_done":
+            print(self.steps)
 
     def reward_energy(self):
         energy = self._env.get_energy()
@@ -94,7 +98,10 @@ class LaikagoTaskBullet(LaikagoTask):
 
     def done_r_bullet(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        return abs(r) > abs(threshold * np.pi / 180)
+        done = abs(r) > abs(threshold * np.pi / 180)
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def reward_r_bullet(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
@@ -104,7 +111,10 @@ class LaikagoTaskBullet(LaikagoTask):
 
     def done_p_bullet(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        return abs(p) > abs(threshold * np.pi / 180)
+        done = abs(p) > abs(threshold * np.pi / 180)
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def reward_p_bullet(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
@@ -114,7 +124,10 @@ class LaikagoTaskBullet(LaikagoTask):
 
     def done_y_bullet(self, threshold=30):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        return abs(y) > abs(threshold * np.pi / 180)
+        done = abs(y) > abs(threshold * np.pi / 180)
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def reward_y_bullet(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
@@ -125,8 +138,10 @@ class LaikagoTaskBullet(LaikagoTask):
     def done_height_bullet(self, threshold=0.35):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         height = base_pos[2]
-        # print('done h: ', height)
-        return height < threshold
+        done = height < threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def reward_height_bullet(self, threshold=0.3):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
@@ -136,19 +151,18 @@ class LaikagoTaskBullet(LaikagoTask):
 
     def done_x_velocity(self, threshold=0.1):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
-        return x_vel < threshold
-
-    def done_height_adaptation_bullet(self, threshold=0.35, time=100):
-        base_pos = self._env.transfer.laikago.get_position_for_reward()
-        height = base_pos[2]
-        # print('done h: ', height)
-        ada = 1 if self.steps>time else self.steps/time
-        return height < threshold * ada
+        done = x_vel < threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def done_region_bullet(self, threshold=0.5):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         x = base_pos[0] ** 2 + base_pos[1] ** 2
-        return x > threshold ** 2
+        done = x > threshold ** 2
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def reward_region_bullet(self, threshold=1):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
@@ -160,7 +174,10 @@ class LaikagoTaskBullet(LaikagoTask):
         if self.steps < threshold:
             return False
         contact = self._env.get_history_toe_collision()[0]
-        return sum(contact) != 4
+        done = sum(contact) != 4
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def reward_toe_contact(self):
         contact = self._env.get_history_toe_collision()[0]
@@ -168,7 +185,14 @@ class LaikagoTaskBullet(LaikagoTask):
         return self.normalize_reward(reward, 0, 1)
 
     def done_toe_contact_long(self, threshold=16):
-        return sum(self.contact_buffer) < threshold
+        done = sum(self.contact_buffer) < threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def reward_toe_contact_long(self, threshold=16):
         return 1 if sum(self.contact_buffer) > threshold else sum(self.contact_buffer) / threshold
+
+    @staticmethod
+    def get_function_name():
+        return inspect.stack()[1][3]
