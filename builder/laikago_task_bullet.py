@@ -34,7 +34,7 @@ class LaikagoTaskBullet(LaikagoTask):
 
     def update(self):
         super(LaikagoTaskBullet, self).update()
-        contact = sum(self._env.get_history_toe_collision()[0])
+        contact = (sum(self._env.get_history_toe_collision()[0]) + 4) / 2
         self.contact_buffer.appendleft(contact)
         if self.run_mode is "report_done":
             print(self.steps)
@@ -53,11 +53,6 @@ class LaikagoTaskBullet(LaikagoTask):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
         reward = (r ** 2 + p ** 2)
         return 1 - math.log10(reward + 1)
-
-    def reward_toe_contact_soft(self):
-        contact = self._env.get_history_toe_collision()[0]
-        reward = sum(contact)
-        return self.normalize_reward(reward, -4, 4)
 
     def done_toe_distance(self, threshold=0.2):
         signal = [[1, -1], [1, 1], [-1, -1], [-1, 1]]
@@ -184,13 +179,13 @@ class LaikagoTaskBullet(LaikagoTask):
         reward = 1 if sum(contact) == 4 else 0
         return self.normalize_reward(reward, 0, 1)
 
-    def done_toe_contact_long(self, threshold=16):
+    def done_toe_contact_long(self, threshold=15):
         done = sum(self.contact_buffer) < threshold
         if done and self.run_mode is "report_done":
             print(self.get_function_name())
         return done
 
-    def reward_toe_contact_long(self, threshold=16):
+    def reward_toe_contact_long(self, threshold=15):
         return 1 if sum(self.contact_buffer) > threshold else sum(self.contact_buffer) / threshold
 
     @staticmethod
