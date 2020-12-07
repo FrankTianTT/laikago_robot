@@ -138,7 +138,7 @@ class LaikagoStandUpBullet2(LaikagoStandUpBulletBase):
 class LaikagoStandUpBullet2_1(LaikagoStandUpBulletBase):
 
     def __init__(self, run_mode='train', reward_mode='with_shaping'):
-        super(LaikagoStandUpBullet3_1, self).__init__(run_mode=run_mode,
+        super(LaikagoStandUpBullet2_1, self).__init__(run_mode=run_mode,
                                                     reward_mode=reward_mode)
 
     @property
@@ -166,7 +166,7 @@ class LaikagoStandUpBullet2_1(LaikagoStandUpBulletBase):
 class LaikagoStandUpBullet2_2(LaikagoStandUpBulletBase):
 
     def __init__(self, run_mode='train', reward_mode='with_shaping'):
-        super(LaikagoStandUpBullet3_2, self).__init__(run_mode=run_mode,
+        super(LaikagoStandUpBullet2_2, self).__init__(run_mode=run_mode,
                                                     reward_mode=reward_mode)
 
     @property
