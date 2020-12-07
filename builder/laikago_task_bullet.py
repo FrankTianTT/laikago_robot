@@ -39,10 +39,10 @@ class LaikagoTaskBullet(LaikagoTask):
         if self.run_mode is "report_done":
             print(self.steps)
 
-    def reward_energy(self):
+    def reward_energy(self, threshold=0.2):
         energy = self._env.get_energy()
-        reward = - energy
-        return self.normalize_reward(reward, -1, 0)
+        reward = 1 if energy < threshold else threshold / energy
+        return reward
 
     def reward_base_vel_bullet(self):
         base_vel = self._env.transfer.laikago.get_velocity_for_reward()
