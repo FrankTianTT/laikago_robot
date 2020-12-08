@@ -44,16 +44,6 @@ class LaikagoTaskBullet(LaikagoTask):
         reward = 1 if energy < threshold else threshold / energy
         return reward
 
-    def reward_base_vel_bullet(self):
-        base_vel = self._env.transfer.laikago.get_velocity_for_reward()
-        reward = - math.sqrt(base_vel[0] ** 2 + base_vel[1] ** 2)
-        return self.normalize_reward(reward, -3, 0)
-
-    def reward_rpy_bullet(self):
-        r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        reward = (r ** 2 + p ** 2)
-        return 1 - math.log10(reward + 1)
-
     def done_toe_distance(self, threshold=0.2):
         signal = [[1, -1], [1, 1], [-1, -1], [-1, 1]]
         position = self._env.get_history_toe_position()[0]
@@ -145,12 +135,17 @@ class LaikagoTaskBullet(LaikagoTask):
         reward = 1 if h > threshold else h / threshold
         return reward
 
-    def done_x_velocity(self, threshold=0.1):
+    def done_x_velocity(self, threshold=1):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
         done = x_vel < threshold
         if done and self.run_mode is "report_done":
             print(self.get_function_name())
         return done
+
+    def reward_x_velocity(self, threshold=1):
+        x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
+        reward = 1 if x_vel > threshold else x_vel / threshold
+        return reward
 
     def done_region_bullet(self, threshold=0.5):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
