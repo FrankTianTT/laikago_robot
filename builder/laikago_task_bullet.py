@@ -18,7 +18,7 @@ class InitPose(Enum):
 class LaikagoTaskBullet(LaikagoTask):
     def __init__(self,
                  run_mode='train',
-                 reward_mode='without_shaping',
+                 reward_mode='with_shaping',
                  die_if_unhealthy=False,
                  max_episode_steps=1000,
                  init_pose=InitPose.STAND):
@@ -133,6 +133,7 @@ class LaikagoTaskBullet(LaikagoTask):
     def done_height_bullet(self, threshold=0.35):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         height = base_pos[2]
+        # print(height)
         done = height < threshold
         if done and self.run_mode is "report_done":
             print(self.get_function_name())
