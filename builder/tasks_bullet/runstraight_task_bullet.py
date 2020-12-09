@@ -43,11 +43,13 @@ class LaikagoRunStraightBullet1(LaikagoRunStraightBulletBase):
         return not (self.done_r_bullet(threshold=45) or
                     self.done_p_bullet(threshold=45) or
                     self.done_y_bullet(threshold=15) or
-                    self.done_height_bullet(threshold=0.30))
+                    self.done_height_bullet(threshold=0.30) or
+                    self.done_x_velocity(threshold=1))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=45) + self.reward_p_bullet(threshold=45) + \
-              self.reward_y_bullet(threshold=15) + self.reward_height_bullet(threshold=0.30)
+              self.reward_y_bullet(threshold=15) + self.reward_height_bullet(threshold=0.30) + \
+              self.reward_x_velocity(threshold=1)
         return sum
 
     def update_reward(self):
