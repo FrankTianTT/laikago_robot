@@ -146,6 +146,18 @@ class LaikagoTaskBullet(LaikagoTask):
         reward = 1 if x_vel > threshold else x_vel / threshold
         return reward
 
+    def done_y_velocity(self, threshold=0.1):
+        y_vel = self._env.transfer.laikago.get_velocity_for_reward()[1]
+        done = y_vel > threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
+
+    def reward_y_velocity(self, threshold=0.1):
+        y_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
+        reward = 1 if y_vel < threshold else threshold / y_vel
+        return reward
+
     def done_region_bullet(self, threshold=0.5):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         x = base_pos[0] ** 2 + base_pos[1] ** 2
