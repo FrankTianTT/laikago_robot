@@ -204,3 +204,14 @@ class LaikagoTaskMujoco(LaikagoTask):
         contact = self._env.get_history_toe_collision()[0]
         reward = 1 if sum(contact) == 4 else 0
         return self.normalize_reward(reward, 0, 1)
+
+    def reward_quad_impact(self):
+        quad_impact = self._env.transfer.laikago.get_quad_impact_for_reward()
+        quad_impact_cost = .5e-6 * quad_impact
+        print(quad_impact_cost)
+        # quad_impact_cost = min(quad_impact_cost, 10)
+        return - quad_impact_cost
+
+    def reward_quad_ctrl(self):
+        quad_ctrl = self._env.transfer.laikago.get_quad_ctrl_for_reward()
+        return - 0.1 * quad_ctrl
