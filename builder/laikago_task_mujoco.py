@@ -261,7 +261,7 @@ class LaikagoTaskMujoco(LaikagoTask):
 
     def reward_quad_ctrl(self):
         quad_ctrl = self._env.transfer.laikago.get_quad_ctrl_for_reward()
-        return - 0.1 * quad_ctrl
+        return - quad_ctrl / 3333
 
     @staticmethod
     def get_function_name():
