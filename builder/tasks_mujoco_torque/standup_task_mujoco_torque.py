@@ -11,6 +11,7 @@ class LaikagoStandUpMujocoTorqueBase(LaikagoTaskMujoco):
         super(LaikagoStandUpMujocoTorqueBase, self).__init__(run_mode=run_mode,
                                                        reward_mode=reward_mode,
                                                        init_pose=InitPose.STAND)
+
 class LaikagoStandUpMujocoTorque0(LaikagoStandUpMujocoTorqueBase):
 
     def __init__(self, run_mode='train', reward_mode='without_shaping'):
@@ -19,3 +20,18 @@ class LaikagoStandUpMujocoTorque0(LaikagoStandUpMujocoTorqueBase):
     def update_reward(self):
         self.add_reward(self.reward_quad_ctrl(), 1)
         self.add_reward(self.reward_height_mujoco(threshold=0.3), 1)
+
+class LaikagoStandUpMujocoTorque1(LaikagoStandUpMujocoTorqueBase):
+
+    def __init__(self, run_mode='train'):
+        super(LaikagoStandUpMujocoTorque1, self).__init__(run_mode)
+        self.die_if_unhealthy = False
+
+    def cal_phi_function(self):
+        sum = self.reward_r_mujoco(threshold=30) + self.reward_p_mujoco(threshold=30) + \
+              self.reward_y_mujoco(threshold=30) + self.reward_height_mujoco(threshold=0.2)
+        return sum
+
+    def update_reward(self):
+        if self.is_healthy:
+            self.add_reward(1, 1)

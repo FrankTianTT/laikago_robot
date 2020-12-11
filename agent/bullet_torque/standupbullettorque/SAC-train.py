@@ -44,8 +44,12 @@ if __name__ == "__main__":
     else:
         best_model_dir = './SAC-v{}/logs/best_model.zip'.format(args.load_version)
 
-    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
-    eval_env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
+    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True,
+                    action_repeat=5,
+                    time_step=0.003)
+    eval_env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True,
+                         action_repeat=5,
+                         time_step=0.003)
 
     if env.task.die_if_unhealthy:
         eval_freq = 1000

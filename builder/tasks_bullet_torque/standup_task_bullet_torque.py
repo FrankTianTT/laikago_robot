@@ -61,16 +61,11 @@ class LaikagoStandUpBulletTorque0(LaikagoStandUpBulletTorqueBase):
         return not (self.done_r_bullet(threshold=30) or
                     self.done_p_bullet(threshold=30) or
                     self.done_y_bullet(threshold=30) or
-                    self.done_height_bullet(threshold=0.3) or
-                    self.done_region_bullet(threshold=3) or
-                    self.done_toe_distance(threshold=0.1) or
-                    self.reward_toe_height_bullet(threshold=0.05))
+                    self.done_height_bullet(threshold=0.2))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=30) + self.reward_p_bullet(threshold=30) + \
-              self.reward_y_bullet(threshold=30) + self.reward_height_bullet(threshold=0.3) + \
-              self.reward_region_bullet(threshold=3) + self.reward_toe_distance(threshold=0.1) + \
-              self.reward_toe_height_bullet(threshold=0.05)
+              self.reward_y_bullet(threshold=30) + self.reward_height_bullet(threshold=0.2)
         return sum
 
     def update_reward(self):
