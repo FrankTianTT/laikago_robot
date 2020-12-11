@@ -127,10 +127,10 @@ class LaikagoTaskMujoco(LaikagoTask):
                 reward = 0
         return self.normalize_reward(reward, 0, threshold)
 
-    def reward_energy(self):
+    def reward_energy(self, threshold=0.2):
         energy = self._env.get_energy()
-        reward = - energy
-        return self.normalize_reward(reward, -1, 0)
+        reward = 1 if energy < threshold else threshold / energy
+        return reward
 
     def done_r_mujoco(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
