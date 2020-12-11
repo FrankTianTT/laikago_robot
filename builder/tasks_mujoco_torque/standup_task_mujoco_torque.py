@@ -17,6 +17,5 @@ class LaikagoStandUpMujocoTorque0(LaikagoStandUpMujocoTorqueBase):
         super(LaikagoStandUpMujocoTorque0, self).__init__(run_mode=run_mode,
                                                     reward_mode=reward_mode)
     def update_reward(self):
-        self.add_reward(self.reward_quad_impact(), 1)
         self.add_reward(self.reward_quad_ctrl(), 1)
         self.add_reward(self.reward_height_mujoco(threshold=0.3), 1)
