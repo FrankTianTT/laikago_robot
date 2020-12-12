@@ -188,6 +188,7 @@ class Laikago(object):
         return
 
     def _step_internal_torque(self, torque_action):
+        torque_action = np.clip(torque_action, -1 * self._torque_limits, self._torque_limits)
         self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
         self.receive_observation()

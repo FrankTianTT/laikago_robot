@@ -164,6 +164,7 @@ class Laikago(object):
         return
 
     def _step_internal_torque(self, torque_action):
+        torque_action = np.clip(torque_action, -1 * self._torque_limits, self._torque_limits)
         self._set_torque_control(torque_action)
         self.sim.step()
         self.receive_observation()
