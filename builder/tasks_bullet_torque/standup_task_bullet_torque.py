@@ -69,9 +69,8 @@ class LaikagoStandUpBulletTorque0(LaikagoStandUpBulletTorqueBase):
         return sum
 
     def update_reward(self):
-        self.reward_toe_height_bullet()
         if self.is_healthy:
-            self.add_reward(self.reward_energy(), 1)
+            self.add_reward(1, 1)
 
 class LaikagoStandUpBulletTorque1(LaikagoStandUpBulletTorqueBase):
 

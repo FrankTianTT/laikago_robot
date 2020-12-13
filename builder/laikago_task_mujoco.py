@@ -24,6 +24,17 @@ class LaikagoTaskMujoco(LaikagoTask):
                                                 die_if_unhealthy=die_if_unhealthy,
                                                 max_episode_steps=max_episode_steps,
                                                 init_pose=init_pose)
+        self.contact_buffer_length = 5
+        self.contact_buffer = collections.deque(maxlen=self.contact_buffer_length)
+        for i in range(self.contact_buffer_length):
+            self.contact_buffer.appendleft(4)
+
+    def update(self):
+        super(LaikagoTaskMujoco, self).update()
+        contact = (sum(self._env.get_history_toe_collision()[0]) + 4) / 2
+        self.contact_buffer.appendleft(contact)
+        if self.run_mode is "report_done":
+            print(self.steps)
 
     def precision_cost(self, v, t, m):
         w = math.atanh(math.sqrt(0.95)) / m
@@ -210,20 +221,6 @@ class LaikagoTaskMujoco(LaikagoTask):
         reward = 1 if y_vel < threshold else threshold / y_vel
         return reward
 
-    def done_region_mujoco(self, threshold=0.5):
-        base_pos = self._env.transfer.laikago.get_position_for_reward()
-        x = base_pos[0] ** 2 + base_pos[1] ** 2
-        done = x > threshold ** 2
-        if done and self.run_mode is "report_done":
-            print(self.get_function_name())
-        return done
-
-    def reward_region_mujoco(self, threshold=1):
-        base_pos = self._env.transfer.laikago.get_position_for_reward()
-        x = base_pos[0] ** 2 + base_pos[1] ** 2
-        reward = 1 if x < threshold else threshold/x
-        return reward
-
     def done_height_adaptation_mujoco(self, threshold=0.35, time=100):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         height = base_pos[2]
@@ -251,6 +248,19 @@ class LaikagoTaskMujoco(LaikagoTask):
         contact = self._env.get_history_toe_collision()[0]
         reward = 1 if sum(contact) == 4 else 0
         return self.normalize_reward(reward, 0, 1)
+
+    def reward_toe_height_mujoco(self, threshold=0.03):
+        max_height = max(self._env.transfer.laikago.get_toe_height_for_reward())
+        return 1 if max_height < threshold else threshold / max_height
+
+    def done_toe_contact_long(self, threshold=15):
+        done = sum(self.contact_buffer) < threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
+
+    def reward_toe_contact_long(self, threshold=15):
+        return 1 if sum(self.contact_buffer) > threshold else sum(self.contact_buffer) / threshold
 
     def reward_quad_impact(self):
         quad_impact = self._env.transfer.laikago.get_quad_impact_for_reward()
