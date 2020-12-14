@@ -35,7 +35,8 @@ class Laikago(object):
                  friction_bound=laikago_constant.FRICTION_BOUND,
                  toe_f_bound=laikago_constant.TOE_F_BOUND,
                  g_bound=laikago_constant.G_BOUND,
-                 max_motor_angle_change_per_step=laikago_constant.MAX_MOTOR_ANGLE_CHANGE_PER_STEP):
+                 max_motor_angle_change_per_step=laikago_constant.MAX_MOTOR_ANGLE_CHANGE_PER_STEP,
+                 control_mode='position'):
         self.time_step = time_step
         self.visual = visual
         self.model = mj.load_model_from_path(urdf_filename)
@@ -68,6 +69,7 @@ class Laikago(object):
         self.toe_f_bound = toe_f_bound
         self.g_bound = g_bound
         self.max_motor_angle_change_per_step = max_motor_angle_change_per_step
+        self.control_mode = control_mode
 
         self.now_g = sum(g_bound) / 2
         self.energy = 0
@@ -117,15 +119,17 @@ class Laikago(object):
         self.energy = 0
         if self.action_filter_enabled:
             action = self._filter_action(action)
+        if self.control_mode == "position":
+            for i in range(self._action_repeat):
+                proc_action = self._smooth_action(action, i)
+                self._step_internal(proc_action)
+                if self.visual:
+                    self.viewer.render()
+        else:
+            for i in range(self._action_repeat):
+                self._step_internal_torque(action)
 
-        for i in range(self._action_repeat):
-            proc_action = self._smooth_action(action, i)
-            self._step_internal(proc_action)
-            if self.visual:
-                self.viewer.render()
-
-            obs = self.get_observation()
-
+        obs = self.get_observation()
         self._step_counter += 1
         self._last_action = action
         return obs, self.energy * self.time_step / self._action_repeat
@@ -153,6 +157,14 @@ class Laikago(object):
     def _step_internal(self, pos_action):
         clipped_pos_action = self._clip_action(pos_action)
         torque_action = self.position2torque(clipped_pos_action)
+        self._set_torque_control(torque_action)
+        self.sim.step()
+        self.receive_observation()
+        self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_velocities()))
+        return
+
+    def _step_internal_torque(self, torque_action):
+        torque_action = np.clip(torque_action, -1 * self._torque_limits, self._torque_limits)
         self._set_torque_control(torque_action)
         self.sim.step()
         self.receive_observation()
@@ -413,34 +425,39 @@ class Laikago(object):
     def get_toe_height_for_reward(self):
         toe_height = [self.data.get_geom_xpos(t)[2] for t in laikago_constant.TOE_GEOM_NAME]
         return toe_height
+    def get_quad_ctrl_for_reward(self):
+        return np.square(self.sim.data.ctrl).sum()
+    def get_quad_impact_for_reward(self):
+        return np.square(self.sim.data.cfrc_ext).sum()
 
 
 if __name__ == '__main__':
 
     laikago = Laikago(visual=True, init_pose=InitPose.STAND, randomized=True)
-    laikago.reset()
-    t = 0
-    T = 2
-    while True:
-        # print(laikago.get_true_base_roll_pitch_yaw()[2])
-        # print(laikago.get_toe_contacts())
-        t += 1
-        action = np.array([[-10, 30, -75],
-                           [10, 30, -75],
-                           [-10, 40, -75],
-                           [10, 40, -75]], dtype=np.float64)
-        if t > 60:
-            action[[0, 3], 1] += np.sin(t/T)*15
-            action[[1, 2], 1] += np.sin(t/T + np.pi)*15
-            action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20
-            action[[1, 2], 2] += np.sin(t/T + np.pi/2 + np.pi)*20
-
-        action *= (np.pi/180)
-        laikago.step(action.flatten())
-
-        if t > 400:
-            t = 0
-            laikago.reset()
+    print(laikago.model.actuator_ctrlrange)
+    # laikago.reset()
+    # t = 0
+    # T = 2
+    # while True:
+    #     # print(laikago.get_true_base_roll_pitch_yaw()[2])
+    #     # print(laikago.get_toe_contacts())
+    #     t += 1
+    #     action = np.array([[-10, 30, -75],
+    #                        [10, 30, -75],
+    #                        [-10, 40, -75],
+    #                        [10, 40, -75]], dtype=np.float64)
+    #     if t > 60:
+    #         action[[0, 3], 1] += np.sin(t/T)*15
+    #         action[[1, 2], 1] += np.sin(t/T + np.pi)*15
+    #         action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20
+    #         action[[1, 2], 2] += np.sin(t/T + np.pi/2 + np.pi)*20
+    #
+    #     action *= (np.pi/180)
+    #     laikago.step(action.flatten())
+    #
+    #     if t > 400:
+    #         t = 0
+    #         laikago.reset()
         # print('joint friction', laikago.model.dof_frictionloss)
         # print('geom friction', laikago.model.geom_friction)
 

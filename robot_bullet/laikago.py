@@ -34,7 +34,8 @@ class Laikago(object):
                  joint_f_bound=laikago_constant.JOINT_F_BOUND,
                  toe_f_bound=laikago_constant.TOE_F_BOUND,
                  g_bound=laikago_constant.G_BOUND,
-                 max_motor_angle_change_per_step=laikago_constant.MAX_MOTOR_ANGLE_CHANGE_PER_STEP):
+                 max_motor_angle_change_per_step=laikago_constant.MAX_MOTOR_ANGLE_CHANGE_PER_STEP,
+                 control_mode='position'):
         self.visual = visual
         if self.visual:
             self._pybullet_client = bullet_client.BulletClient(connection_mode=pybullet.GUI)
@@ -63,6 +64,7 @@ class Laikago(object):
         self.toe_f_bound = toe_f_bound
         self.g_bound = g_bound
         self.max_motor_angle_change_per_step = max_motor_angle_change_per_step
+        self.control_mode = control_mode
 
         self.now_g = sum(g_bound)/2
         self.energy = 0
@@ -134,14 +136,18 @@ class Laikago(object):
                                                              base_pos)
 
         self.energy = 0
-        if self.action_filter_enabled:
-            action = self._filter_action(action)
+        if self.control_mode == "position":
+            if self.action_filter_enabled:
+                action = self._filter_action(action)
 
-        for i in range(self._action_repeat):
-            proc_action = self._smooth_action(action, i)
-            self._step_internal(proc_action)
+            for i in range(self._action_repeat):
+                proc_action = self._smooth_action(action, i)
+                self._step_internal(proc_action)
+        else:
+            for i in range(self._action_repeat):
+                self._step_internal_torque(action)
 
-            obs = self.get_observation()
+        obs = self.get_observation()
 
         self._step_counter += 1
         self._last_action = action
@@ -175,6 +181,14 @@ class Laikago(object):
     def _step_internal(self, pos_action):
         clipped_pos_action = self._clip_action(pos_action)
         torque_action = self.position2torque(clipped_pos_action)
+        self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
+        self._pybullet_client.stepSimulation()
+        self.receive_observation()
+        self.energy += np.sum(np.abs(np.array(torque_action) * self.get_true_motor_velocities()))
+        return
+
+    def _step_internal_torque(self, torque_action):
+        torque_action = np.clip(torque_action, -1 * self._torque_limits, self._torque_limits)
         self._set_motor_torque_by_Ids(self._motor_id_list, torque_action)
         self._pybullet_client.stepSimulation()
         self.receive_observation()

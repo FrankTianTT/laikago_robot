@@ -15,10 +15,11 @@ class Transfer(object):
                  time_step=0.001,
                  visual=False,
                  history_len=transfer_constant.HISTORY_LEN,
-                 simulator='bullet'):
+                 simulator='bullet',
+                 control_mode='position'):
 
         self.laikago = None
-        if simulator == 'bullet':
+        if simulator[:6] == 'bullet':
             self.robot_class = robot_bullet.laikago.Laikago
         else:
             self.robot_class = robot_mujoco.laikago.Laikago
@@ -32,7 +33,8 @@ class Transfer(object):
                                         init_pose=init_pose,
                                         action_repeat=self.action_repeat,
                                         ctrl_delay=self.ctrl_delay,
-                                        time_step=time_step)
+                                        time_step=time_step,
+                                        control_mode=control_mode)
         self.observation = None
 
     def step(self, pos_action):

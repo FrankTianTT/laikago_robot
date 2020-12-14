@@ -1,5 +1,6 @@
 import math
 import random
+import inspect
 import numpy as np
 from enum import Enum
 from builder import env_constant
@@ -23,6 +24,17 @@ class LaikagoTaskMujoco(LaikagoTask):
                                                 die_if_unhealthy=die_if_unhealthy,
                                                 max_episode_steps=max_episode_steps,
                                                 init_pose=init_pose)
+        self.contact_buffer_length = 5
+        self.contact_buffer = collections.deque(maxlen=self.contact_buffer_length)
+        for i in range(self.contact_buffer_length):
+            self.contact_buffer.appendleft(4)
+
+    def update(self):
+        super(LaikagoTaskMujoco, self).update()
+        contact = (sum(self._env.get_history_toe_collision()[0]) + 4) / 2
+        self.contact_buffer.appendleft(contact)
+        if self.run_mode is "report_done":
+            print(self.steps)
 
     def precision_cost(self, v, t, m):
         w = math.atanh(math.sqrt(0.95)) / m
@@ -126,46 +138,58 @@ class LaikagoTaskMujoco(LaikagoTask):
                 reward = 0
         return self.normalize_reward(reward, 0, threshold)
 
-    def reward_energy(self):
+    def reward_energy(self, threshold=0.2):
         energy = self._env.get_energy()
-        reward = - energy
-        return self.normalize_reward(reward, -1, 0)
-
-    def reward_x_velocity(self, threshold=3):
-        x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
-        reward = x_vel if x_vel < threshold else threshold
-        return self.normalize_reward(reward, 0, threshold)
+        reward = 1 if energy < threshold else threshold / energy
+        return reward
 
     def done_r_mujoco(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        # print(r,p,y)
-        return abs(r) > abs(threshold * np.pi / 180)
+        done = abs(r) > abs(threshold * np.pi / 180)
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
-    def reward_r_bullet(self, threshold=15):
+    def reward_r_mujoco(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        return 1/(1 + math.exp(5*(abs(r)-1)))
+        threshold = threshold * np.pi / 180
+        reward = 1 if r < threshold else threshold / r
+        return reward
 
     def done_p_mujoco(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        return abs(p) > abs(threshold * np.pi / 180)
+        done = abs(p) > abs(threshold * np.pi / 180)
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
-    def reward_p_bullet(self, threshold=15):
+    def reward_p_mujoco(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        return 1 / (1 + math.exp(5 * (abs(p) - 1)))
+        threshold = threshold * np.pi / 180
+        reward = 1 if p < threshold else threshold / p
+        return reward
 
     def done_y_mujoco(self, threshold=30):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        return abs(y) > abs(threshold * np.pi / 180)
+        done = abs(y) > abs(threshold * np.pi / 180)
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
-    def reward_y_bullet(self, threshold=15):
+    def reward_y_mujoco(self, threshold=15):
         r, p, y = self._env.transfer.laikago.get_rpy_for_reward()
-        return 1 / (1 + math.exp(5 * (abs(y) - 1)))
+        threshold = threshold * np.pi / 180
+        reward = 1 if y < threshold else threshold / y
+        return reward
 
     def done_height_mujoco(self, threshold=0.35):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         height = base_pos[2]
-        # print('done h: ', height)
-        return height < threshold
+        # print(height)
+        done = height < threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def reward_height_mujoco(self, threshold=0.3):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
@@ -173,11 +197,31 @@ class LaikagoTaskMujoco(LaikagoTask):
         reward = 1 if h > threshold else h / threshold
         return reward
 
-    def done_x_velocity(self, threshold=0.1):
+    def done_x_velocity(self, threshold=1):
         x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
-        return x_vel < threshold
+        done = x_vel < threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
-    def done_height_adaptation_bullet(self, threshold=0.35, time=100):
+    def reward_x_velocity(self, threshold=1):
+        x_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
+        reward = 1 if x_vel > threshold else x_vel / threshold
+        return reward
+
+    def done_y_velocity(self, threshold=0.1):
+        y_vel = self._env.transfer.laikago.get_velocity_for_reward()[1]
+        done = y_vel > threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
+
+    def reward_y_velocity(self, threshold=0.1):
+        y_vel = self._env.transfer.laikago.get_velocity_for_reward()[0]
+        reward = 1 if y_vel < threshold else threshold / y_vel
+        return reward
+
+    def done_height_adaptation_mujoco(self, threshold=0.35, time=100):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         height = base_pos[2]
         # print('done h: ', height)
@@ -204,3 +248,31 @@ class LaikagoTaskMujoco(LaikagoTask):
         contact = self._env.get_history_toe_collision()[0]
         reward = 1 if sum(contact) == 4 else 0
         return self.normalize_reward(reward, 0, 1)
+
+    def reward_toe_height_mujoco(self, threshold=0.03):
+        max_height = max(self._env.transfer.laikago.get_toe_height_for_reward())
+        return 1 if max_height < threshold else threshold / max_height
+
+    def done_toe_contact_long(self, threshold=15):
+        done = sum(self.contact_buffer) < threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
+
+    def reward_toe_contact_long(self, threshold=15):
+        return 1 if sum(self.contact_buffer) > threshold else sum(self.contact_buffer) / threshold
+
+    def reward_quad_impact(self):
+        quad_impact = self._env.transfer.laikago.get_quad_impact_for_reward()
+        quad_impact_cost = .5e-6 * quad_impact
+        print(quad_impact_cost)
+        # quad_impact_cost = min(quad_impact_cost, 10)
+        return - quad_impact_cost
+
+    def reward_quad_ctrl(self):
+        quad_ctrl = self._env.transfer.laikago.get_quad_ctrl_for_reward()
+        return - quad_ctrl / 3333
+
+    @staticmethod
+    def get_function_name():
+        return inspect.stack()[1][3]
