@@ -30,7 +30,7 @@ class LaikagoTaskMujoco(LaikagoTask):
             self.contact_buffer.appendleft(4)
 
     def update(self):
-        print(self._env.get_history_toe_collision()[0])
+        # print(self._env.get_history_toe_collision()[0])
         super(LaikagoTaskMujoco, self).update()
         contact = (sum(self._env.get_history_toe_collision()[0]) + 4) / 2
         self.contact_buffer.appendleft(contact)
@@ -255,7 +255,7 @@ class LaikagoTaskMujoco(LaikagoTask):
         return 1 if max_height < threshold else threshold / max_height
 
     def done_toe_contact_long(self, threshold=15):
-        print(self.contact_buffer)
+        # print(self.contact_buffer)
         done = sum(self.contact_buffer) < threshold
         if done and self.run_mode is "report_done":
             print(self.get_function_name())
