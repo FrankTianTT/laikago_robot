@@ -7,10 +7,12 @@ class LaikagoStandUpBulletTorqueBase(LaikagoTaskBullet):
 
     def __init__(self,
                  reward_mode='with_shaping',
-                 run_mode='train'):
+                 run_mode='train',
+                 contact_buffer_length=5):
         super(LaikagoStandUpBulletTorqueBase, self).__init__(run_mode=run_mode,
-                                                       reward_mode=reward_mode,
-                                                       init_pose=InitPose.STAND)
+                                                             reward_mode=reward_mode,
+                                                             init_pose=InitPose.STAND,
+                                                             contact_buffer_length=contact_buffer_length)
 
 class LaikagoStandUpBulletTorquePush(LaikagoStandUpBulletTorqueBase):
     def __init__(self,
@@ -60,44 +62,44 @@ class LaikagoStandUpBulletTorque0(LaikagoStandUpBulletTorqueBase):
     def is_healthy(self):
         return not (self.done_r_bullet(threshold=30) or
                     self.done_p_bullet(threshold=30) or
-                    self.done_y_bullet(threshold=30) or
-                    self.done_height_bullet(threshold=0.2))
+                    self.done_height_bullet(threshold=0.25) or
+                    self.done_toe_distance(threshold=0.1) or
+                    self.done_toe_contact_long(threshold=16))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=30) + self.reward_p_bullet(threshold=30) + \
-              self.reward_y_bullet(threshold=30) + self.reward_height_bullet(threshold=0.2)
+              self.reward_height_bullet(threshold=0.25) + \
+              self.reward_toe_distance(threshold=0.1) + \
+              self.reward_toe_contact_long(threshold=16)
         return sum
 
     def update_reward(self):
         if self.is_healthy:
-            self.add_reward(1, 1)
+            self.add_reward(self.reward_energy(), 1)
 
 class LaikagoStandUpBulletTorque1(LaikagoStandUpBulletTorqueBase):
 
     def __init__(self, run_mode='train', reward_mode='with_shaping'):
         super(LaikagoStandUpBulletTorque1, self).__init__(run_mode=run_mode,
-                                                    reward_mode=reward_mode)
+                                                    reward_mode=reward_mode,
+                                                    contact_buffer_length=2)
 
     @property
     def is_healthy(self):
         return not (self.done_r_bullet(threshold=30) or
                     self.done_p_bullet(threshold=30) or
-                    self.done_y_bullet(threshold=30) or
-                    self.done_height_bullet(threshold=0.35) or
-                    self.done_region_bullet(threshold=3)) # or
-                    # self.done_toe_contact_long(threshold=16) or
-                    # self.done_toe_distance(threshold=0.2))
+                    self.done_height_bullet(threshold=0.25) or
+                    self.done_toe_distance(threshold=0.1) or
+                    self.done_toe_contact_long(threshold=7))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=30) + self.reward_p_bullet(threshold=30) + \
-              self.reward_y_bullet(threshold=30) + self.reward_height_bullet(threshold=0.35) + \
-              self.reward_region_bullet(threshold=3)
-              # self.reward_toe_contact_long(threshold=16) + self.reward_region_bullet(threshold=3) + \
-              # self.reward_toe_distance(threshold=0.2)
+              self.reward_height_bullet(threshold=0.25) + \
+              self.reward_toe_distance(threshold=0.1) + \
+              self.reward_toe_contact_long(threshold=7)
         return sum
 
     def update_reward(self):
-        self.reward_toe_height_bullet()
         if self.is_healthy:
             self.add_reward(self.reward_energy(), 1)
 
@@ -105,27 +107,24 @@ class LaikagoStandUpBulletTorque2(LaikagoStandUpBulletTorqueBase):
 
     def __init__(self, run_mode='train', reward_mode='with_shaping'):
         super(LaikagoStandUpBulletTorque2, self).__init__(run_mode=run_mode,
-                                                    reward_mode=reward_mode)
+                                                    reward_mode=reward_mode,
+                                                    contact_buffer_length=3)
 
     @property
     def is_healthy(self):
         return not (self.done_r_bullet(threshold=30) or
                     self.done_p_bullet(threshold=30) or
-                    self.done_y_bullet(threshold=30) or
-                    self.done_height_bullet(threshold=0.35) or
-                    self.done_region_bullet(threshold=3) or
-                    self.done_toe_contact_long(threshold=15)) # or
-                    # self.done_toe_distance(threshold=0.1))
+                    self.done_height_bullet(threshold=0.25) or
+                    self.done_toe_distance(threshold=0.1) or
+                    self.done_toe_contact_long(threshold=9))
 
     def cal_phi_function(self):
         sum = self.reward_r_bullet(threshold=30) + self.reward_p_bullet(threshold=30) + \
-              self.reward_y_bullet(threshold=30) + self.reward_height_bullet(threshold=0.35) + \
-              self.reward_region_bullet(threshold=3) + self.reward_toe_contact_long(threshold=15) + \
-              self.reward_toe_height_bullet(threshold=0.03)
-             # self.reward_toe_distance(threshold=0.1)
+              self.reward_height_bullet(threshold=0.25) + \
+              self.reward_toe_distance(threshold=0.1) + \
+              self.reward_toe_contact_long(threshold=9)
         return sum
 
     def update_reward(self):
-        self.reward_toe_height_bullet()
         if self.is_healthy:
             self.add_reward(self.reward_energy(), 1)

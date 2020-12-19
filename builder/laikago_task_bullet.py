@@ -21,13 +21,14 @@ class LaikagoTaskBullet(LaikagoTask):
                  reward_mode='with_shaping',
                  die_if_unhealthy=False,
                  max_episode_steps=1000,
-                 init_pose=InitPose.STAND):
+                 init_pose=InitPose.STAND,
+                 contact_buffer_length=5):
         super(LaikagoTaskBullet, self).__init__(run_mode=run_mode,
                                                 reward_mode=reward_mode,
                                                 die_if_unhealthy=die_if_unhealthy,
                                                 max_episode_steps=max_episode_steps,
                                                 init_pose=init_pose)
-        self.contact_buffer_length = 5
+        self.contact_buffer_length = contact_buffer_length
         self.contact_buffer = collections.deque(maxlen=self.contact_buffer_length)
         for i in range(self.contact_buffer_length):
             self.contact_buffer.appendleft(4)
