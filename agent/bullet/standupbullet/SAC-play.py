@@ -40,7 +40,6 @@ if __name__ == "__main__":
 
 
         obs, reward, done, info = env.step(action)
-        print(reward)
         total_reward += reward
         if done:
           obs = env.reset()
