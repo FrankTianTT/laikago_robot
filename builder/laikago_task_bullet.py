@@ -165,6 +165,38 @@ class LaikagoTaskBullet(LaikagoTask):
             print(self.get_function_name())
         return done
 
+    def done_toe_distance(self, threshold=0.2):
+        """
+        no, x,  y
+        0   +   -
+        1   +   +
+        2   -   -
+        3   -   +
+        """
+        signal = [[1, -1], [1, 1], [-1, -1], [-1, 1]]
+        position = self._env.get_history_toe_position()[0]
+        x_y_pos = [[position[3 * i], position[3 * i + 1]] for i in range(4)]
+        min_distance = min([math.sqrt(position[3 * i] ** 2 + position[3 * i + 1] ** 2) for i in range(4)])
+        for i in range(4):
+            if x_y_pos[i][0] * signal[i][0] < 0 or x_y_pos[i][1] * signal[i][1] < 0:
+                return True
+        done = min_distance < threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
+
+    def reward_toe_distance(self, threshold=0.2):
+        signal = [[1, -1], [1, 1], [-1, -1], [-1, 1]]
+        position = self._env.get_history_toe_position()[0]
+        x_y_pos = [[position[3 * i], position[3 * i + 1]] for i in range(4)]
+        min_distance = min([math.sqrt(position[3 * i] ** 2 + position[3 * i + 1] ** 2) for i in range(4)])
+        reward = 1 if min_distance < threshold else threshold / min_distance
+        for i in range(4):
+            if x_y_pos[i][0] * signal[i][0] < 0 or x_y_pos[i][1] * signal[i][1] < 0:
+                reward = 0
+        reward = 1 if min_distance > threshold else min_distance / threshold
+        return reward
+
     def reward_toe_contact_long(self, threshold=15):
         return 1 if sum(self.contact_buffer) > threshold else sum(self.contact_buffer) / threshold
 

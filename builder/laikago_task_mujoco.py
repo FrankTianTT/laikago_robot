@@ -123,22 +123,16 @@ class LaikagoTaskMujoco(LaikagoTask):
             return height * math.cos(roll) * math.cos(pitch)
 
     def reward_toe_distance(self, threshold=0.2):
-        """
-        no, x,  y
-        0   +   -
-        1   +   +
-        2   -   -
-        3   -   +
-        """
         signal = [[1, -1], [1, 1], [-1, -1], [-1, 1]]
         position = self._env.get_history_toe_position()[0]
-        x_y_pos = [[position[3 * i], position[3 * i + 1]]for i in range(4)]
+        x_y_pos = [[position[3 * i], position[3 * i + 1]] for i in range(4)]
         min_distance = min([math.sqrt(position[3 * i] ** 2 + position[3 * i + 1] ** 2) for i in range(4)])
-        reward = threshold if min_distance > threshold else min_distance
+        reward = 1 if min_distance < threshold else threshold / min_distance
         for i in range(4):
             if x_y_pos[i][0] * signal[i][0] < 0 or x_y_pos[i][1] * signal[i][1] < 0:
                 reward = 0
-        return self.normalize_reward(reward, 0, threshold)
+        reward = 1 if min_distance > threshold else min_distance / threshold
+        return reward
 
     def reward_energy(self, threshold=0.2):
         energy = self._env.get_energy()
@@ -233,7 +227,10 @@ class LaikagoTaskMujoco(LaikagoTask):
     def done_region_mujoco(self, threshold=0.5):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
         x = base_pos[0] ** 2 + base_pos[1] ** 2
-        return x > threshold ** 2
+        done = x > threshold ** 2
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
 
     def reward_region_mujoco(self, threshold=1):
         base_pos = self._env.transfer.laikago.get_position_for_reward()
@@ -264,6 +261,20 @@ class LaikagoTaskMujoco(LaikagoTask):
 
     def reward_toe_contact_long(self, threshold=15):
         return 1 if sum(self.contact_buffer) > threshold else sum(self.contact_buffer) / threshold
+
+    def done_toe_distance(self, threshold=0.2):
+        signal = [[1, -1], [1, 1], [-1, -1], [-1, 1]]
+        position = self._env.get_history_toe_position()[0]
+        x_y_pos = [[position[3 * i], position[3 * i + 1]] for i in range(4)]
+        min_distance = min([math.sqrt(position[3 * i] ** 2 + position[3 * i + 1] ** 2) for i in range(4)])
+        for i in range(4):
+            if x_y_pos[i][0] * signal[i][0] < 0 or x_y_pos[i][1] * signal[i][1] < 0:
+                return True
+        done = min_distance < threshold
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+            print(min_distance)
+        return done
 
     def reward_quad_impact(self):
         quad_impact = self._env.transfer.laikago.get_quad_impact_for_reward()
