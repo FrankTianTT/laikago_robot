@@ -29,8 +29,6 @@ def build_env(task_name,
                      time_step=time_step,
                      simulator=simulator)
     env = TimeLimit(env, task.max_episode_steps)
-    if record_dir is not None:
-        env = Monitor(env, record_dir)
     return env
 
 if __name__ == '__main__':

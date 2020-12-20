@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     version = args.version
-    record_dir = args.record
+    record_dir = args.record_dir
 
     best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
 
