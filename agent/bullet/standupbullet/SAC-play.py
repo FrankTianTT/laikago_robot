@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     version = args.version
-    record_dir = args.record
+    record_dir = args.record_dir
 
     best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     obs = env.reset()
     total_reward = 0
-    for i in range(10000):
+    for i in range(3000):
         action, _states = model.predict(obs, deterministic=True)
         # action = np.array([-10, 30, -75,
         #            10, 30, -75,
