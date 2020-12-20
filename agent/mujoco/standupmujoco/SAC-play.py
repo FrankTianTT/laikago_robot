@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
 
-    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=True, ctrl_delay=True)
+    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
     model = SAC.load(best_model_save_path, device=torch.device('cuda:0'))
 
     obs = env.reset()

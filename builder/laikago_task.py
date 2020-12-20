@@ -58,8 +58,8 @@ class LaikagoTask(object):
         return reward
 
     def update_reward(self):
-        # 你需要重载这个函数
-        return
+        self.sum_reward = 0
+        self.sum_p = 0
 
     def cal_phi_function(self):
         # 你（可能）需要重载这个函数
@@ -71,6 +71,8 @@ class LaikagoTask(object):
         return True
 
     def reward(self):
+        self.sum_reward = 0
+        self.sum_p = 0
         self.update_reward()
         reward = self.get_sum_reward()
         if self.reward_mode == 'with_shaping':

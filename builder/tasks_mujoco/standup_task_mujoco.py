@@ -124,3 +124,29 @@ class LaikagoStandUpMujoco3(LaikagoStandUpMujocoBase):
     def update_reward(self):
         if self.is_healthy:
             self.add_reward(1, 1)
+
+class LaikagoStandUpMujoco4(LaikagoStandUpMujocoBase):
+
+    def __init__(self, run_mode='train', reward_mode='with_shaping'):
+        super(LaikagoStandUpMujoco4, self).__init__(run_mode=run_mode,
+                                                    reward_mode=reward_mode,
+                                                    contact_buffer_length=3)
+
+    @property
+    def is_healthy(self):
+        return not (self.done_r_mujoco(threshold=30) or
+                    self.done_p_mujoco(threshold=30) or
+                    self.done_y_mujoco(threshold=30) or
+                    self.done_height_mujoco(threshold=0.25) or
+                    self.done_region_mujoco(threshold=0.5) or
+                    self.done_toe_distance(threshold=0.1))
+
+    def cal_phi_function(self):
+        sum = self.reward_r_mujoco(threshold=30) + self.reward_p_mujoco(threshold=30) + \
+              self.reward_y_mujoco(threshold=30) + self.reward_height_mujoco(threshold=0.25) + \
+              self.reward_region_mujoco(threshold=0.5) + self.reward_toe_distance(threshold=0.1)
+        return sum
+
+    def update_reward(self):
+        if self.is_healthy:
+            self.add_reward(1, 1)
