@@ -11,7 +11,7 @@ import numpy as np
 
 TASK_NAME = 'standup'
 ClASS_NAME = 'StandUp'
-RUN_MODE = 'report_done'
+RUN_MODE = 'train'
 SIMULATOR = 'bullet'
 
 if __name__ == "__main__":
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     obs = env.reset()
     total_reward = 0
-    for i in range(10000):
+    for i in range(3000):
         action, _states = model.predict(obs, deterministic=True)
         # action = np.array([-10, 30, -75,
         #            10, 30, -75,
