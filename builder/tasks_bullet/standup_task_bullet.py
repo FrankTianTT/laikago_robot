@@ -52,6 +52,7 @@ class LaikagoStandUpBulletPush(LaikagoStandUpBulletBase):
             force = self._give_force()
             self._env.transfer.laikago.apply_force(force)
 
+
 class LaikagoStandUpBullet0(LaikagoStandUpBulletBase):
 
     def __init__(self, run_mode='train', reward_mode='with_shaping'):
@@ -60,22 +61,48 @@ class LaikagoStandUpBullet0(LaikagoStandUpBulletBase):
 
     @property
     def is_healthy(self):
-        return not (self.done_r_bullet(threshold=30) or
-                    self.done_p_bullet(threshold=30) or
+        return not (self.done_r_bullet(threshold=10) or
+                    self.done_p_bullet(threshold=10) or
+                    self.done_y_bullet(threshold=10) or
                     self.done_height_bullet(threshold=0.25) or
-                    self.done_toe_distance(threshold=0.1) or
-                    self.done_toe_contact_long(threshold=16))
+                    self.done_region_bullet(threshold=0.5) or
+                    self.done_toe_distance(threshold=0.1))
 
     def cal_phi_function(self):
-        sum = self.reward_r_bullet(threshold=30) + self.reward_p_bullet(threshold=30) + \
-              self.reward_height_bullet(threshold=0.25) + \
-              self.reward_toe_distance(threshold=0.1) + \
-              self.reward_toe_contact_long(threshold=16)
+        sum = self.reward_r_bullet(threshold=10) + self.reward_p_bullet(threshold=10) + \
+              self.reward_y_bullet(threshold=10) + self.reward_height_bullet(threshold=0.25) + \
+              self.reward_region_bullet(threshold=0.5) + self.reward_toe_distance(threshold=0.1)
         return sum
 
     def update_reward(self):
         if self.is_healthy:
-            self.add_reward(self.reward_energy(), 1)
+            self.add_reward(1, 1)
+
+
+class LaikagoStandUpBullet0_1(LaikagoStandUpBulletBase):
+
+    def __init__(self, run_mode='train', reward_mode='with_shaping'):
+        super(LaikagoStandUpBullet0_1, self).__init__(run_mode=run_mode,
+                                                      reward_mode=reward_mode)
+
+    @property
+    def is_healthy(self):
+        return not (self.done_r_bullet(threshold=10) or
+                    self.done_p_bullet(threshold=10) or
+                    self.done_y_bullet(threshold=10) or
+                    self.done_height_bullet(threshold=0.25) or
+                    self.done_region_bullet(threshold=0.5) or
+                    self.done_toe_distance(threshold=0.1))
+
+    def cal_phi_function(self):
+        sum = self.reward_r_bullet(threshold=5) + self.reward_p_bullet(threshold=5) + \
+              self.reward_y_bullet(threshold=5) + self.reward_height_bullet(threshold=0.4) + \
+              self.reward_region_bullet(threshold=0.1) + self.reward_toe_distance(threshold=0.1)
+        return sum
+
+    def update_reward(self):
+        if self.is_healthy:
+            self.add_reward(1, 1)
 
 class LaikagoStandUpBullet1(LaikagoStandUpBulletBase):
 
