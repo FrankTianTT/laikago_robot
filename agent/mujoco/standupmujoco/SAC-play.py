@@ -31,16 +31,15 @@ if __name__ == "__main__":
     obs = env.reset()
     total_reward = 0
     for i in range(10000):
-        # action, _states = model.predict(obs, deterministic=True)
-        action = np.array([-10, 30, -75,
-                   10, 30, -75,
-                   -10, 50, -75,
-                   10, 50, -75]) * np.pi / 180
+        action, _states = model.predict(obs, deterministic=True)
+        # action = np.array([-10, 30, -75,
+        #            10, 30, -75,
+        #            -10, 50, -75,
+        #            10, 50, -75]) * np.pi / 180
         # action = env.action_space.sample()
 
 
         obs, reward, done, info = env.step(action)
-        print(reward)
         total_reward += reward
         if done:
           obs = env.reset()

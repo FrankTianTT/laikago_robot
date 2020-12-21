@@ -16,7 +16,7 @@ class LaikagoTask(object):
                  init_pose=InitPose.STAND,
                  reward_mode='with_shaping',
                  die_if_unhealthy=False,
-                 max_episode_steps=1000):
+                 max_episode_steps=200):
         self._env = None
         self.run_mode = run_mode
         self.init_pose = init_pose
@@ -29,18 +29,33 @@ class LaikagoTask(object):
         # phi is a function of s, a, s', a' and t
         self.phi_last_state = 0
 
+        self.last_healthy_step = -1
+        self.die_after_unhealthy = False
+
     def reset(self, env):
         self._env = env
         self.steps = 0
 
+    @property
+    def is_healthy(self):
+        pass
+
     def update(self):
         self.steps += 1
+        if self.is_healthy:
+            self.last_healthy_step = self.steps
 
     def done(self):
-        if self.run_mode == 'no-die':
-            return False
-        if self.die_if_unhealthy and not self.is_healthy:
-            return True
+        if self.die_after_unhealthy:
+            if self.last_healthy_step != -1 and self.last_healthy_step < self.steps + 30:
+                return True
+            else:
+                return False
+        elif self.die_if_unhealthy:
+            if self.is_healthy:
+                return True
+            else:
+                return False
         else:
             return False
 
