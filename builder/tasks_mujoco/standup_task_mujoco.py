@@ -66,7 +66,6 @@ class LaikagoStandUpMujoco1(LaikagoStandUpMujocoBase):
                     self.done_toe_distance(threshold=0.1))
 
     def cal_phi_function(self):
-        print(self.is_healthy)
         sum = self.reward_r_mujoco(threshold=10) + self.reward_p_mujoco(threshold=10) + \
               self.reward_y_mujoco(threshold=10) + self.reward_toe_contact_long(threshold=9) + \
               self.reward_height_mujoco(threshold=0.25) + \
