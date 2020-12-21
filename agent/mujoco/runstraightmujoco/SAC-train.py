@@ -47,15 +47,10 @@ if __name__ == "__main__":
     env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
     eval_env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
 
-    if env.task.die_if_unhealthy:
-        eval_freq = 1000
-    else:
-        eval_freq = 10000
-
     eval_callback = EvalCallback(eval_env,
                                  best_model_save_path=best_model_save_path,
                                  log_path=log_path,
-                                 eval_freq=eval_freq,
+                                 eval_freq=2000,
                                  deterministic=True,
                                  render=False)
     policy_kwargs = dict(activation_fn=torch.nn.ReLU, net_arch=net_arch)

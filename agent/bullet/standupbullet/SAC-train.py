@@ -16,7 +16,8 @@ SIMULATOR = 'bullet'
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--version", required=True, help="Version of task")
-    parser.add_argument("-lv", "--load_version")
+    parser.add_argument("-l", "--load_from_best", default=False, type=bool)
+    parser.add_argument("-lv", "--load_version", default='none')
 
     parser.add_argument("--time_steps", default=5000000)
     parser.add_argument("--buffer_size", default=1000000)
@@ -38,25 +39,23 @@ if __name__ == "__main__":
     log_path = './SAC-v{}/logs/'.format(version)
     tensorboard_log = './SAC-v{}/log/'.format(version)
     best_model_save_path = './SAC-v{}/logs/'.format(version)
+    if args.load_version == 'none':
+        best_model_dir = './SAC-v{}/logs/best_model.zip'.format(version)
+    else:
+        best_model_dir = './SAC-v{}/logs/best_model.zip'.format(args.load_version)
 
     env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
     eval_env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=False, ctrl_delay=True)
 
-    if env.task.die_if_unhealthy:
-        eval_freq = 1000
-    else:
-        eval_freq = 10000
-
     eval_callback = EvalCallback(eval_env,
                                  best_model_save_path=best_model_save_path,
                                  log_path=log_path,
-                                 eval_freq=eval_freq,
+                                 eval_freq=2000,
                                  deterministic=True,
                                  render=False)
     policy_kwargs = dict(activation_fn=torch.nn.ReLU, net_arch=net_arch)
 
-    if args.load_version is not None:
-        best_model_dir = './SAC-v{}/logs/best_model.zip'.format(args.load_version)
+    if args.load_from_best:
         model = SAC.load(best_model_dir, device=torch.device('cuda:0'))
         model.set_env(env)
         model.tensorboard_log = tensorboard_log
