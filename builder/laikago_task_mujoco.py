@@ -17,7 +17,7 @@ class LaikagoTaskMujoco(LaikagoTask):
                  run_mode='train',
                  reward_mode='without_shaping',
                  die_if_unhealthy=False,
-                 max_episode_steps=1000,
+                 max_episode_steps=200,
                  init_pose=InitPose.STAND,
                  contact_buffer_length=5):
         super(LaikagoTaskMujoco, self).__init__(run_mode=run_mode,
