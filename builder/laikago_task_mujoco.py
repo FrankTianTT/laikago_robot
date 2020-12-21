@@ -237,6 +237,21 @@ class LaikagoTaskMujoco(LaikagoTask):
         x = base_pos[0] ** 2 + base_pos[1] ** 2
         reward = 1 if x < threshold else threshold/x
         return reward
+    
+    def done_speed_mujoco(self, threshold=0.1):
+        base_vel = self._env.transfer.laikago.get_velocity_for_reward()
+        x = base_vel[0] ** 2 + base_vel[1] ** 2
+        print('speed:', math.sqrt(x))
+        done = x > threshold ** 2
+        if done and self.run_mode is "report_done":
+            print(self.get_function_name())
+        return done
+
+    def reward_speed_mujoco(self, threshold=0.1):
+        base_vel = self._env.transfer.laikago.get_velocity_for_reward()
+        x = base_vel[0] ** 2 + base_vel[1] ** 2
+        reward = 1 if x < threshold ** 2 else (threshold ** 2)/x
+        return reward
 
     def done_toe_contact(self):
         contact = self._env.get_history_toe_collision()[0]

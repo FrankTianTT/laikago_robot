@@ -362,7 +362,7 @@ class Laikago(object):
             self.model.dof_frictionloss[self.model.joint_name2id(joint) + 6 - 1] = frictionloss_list[i]
 
     def set_toe_friction(self, toe_friction_list):
-        self.model.geom_friction[self.model.geom_name2id('floor')][0] = np.random.uniform(0.05, 0.5)
+        self.model.geom_friction[self.model.geom_name2id('floor')][0] = 1 # np.random.uniform(0.05, 0.5)
         for i, toe in enumerate(laikago_constant.TOE_GEOM_NAME):
             self.model.geom_friction[self.model.geom_name2id(toe)][0] = toe_friction_list[i]
 
@@ -434,30 +434,30 @@ class Laikago(object):
 if __name__ == '__main__':
 
     laikago = Laikago(visual=True, init_pose=InitPose.STAND, randomized=True)
-    print(laikago.model.actuator_ctrlrange)
-    # laikago.reset()
-    # t = 0
-    # T = 2
-    # while True:
-    #     # print(laikago.get_true_base_roll_pitch_yaw()[2])
-    #     # print(laikago.get_toe_contacts())
-    #     t += 1
-    #     action = np.array([[-10, 30, -75],
-    #                        [10, 30, -75],
-    #                        [-10, 40, -75],
-    #                        [10, 40, -75]], dtype=np.float64)
-    #     if t > 60:
-    #         action[[0, 3], 1] += np.sin(t/T)*15
-    #         action[[1, 2], 1] += np.sin(t/T + np.pi)*15
-    #         action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20
-    #         action[[1, 2], 2] += np.sin(t/T + np.pi/2 + np.pi)*20
-    #
-    #     action *= (np.pi/180)
-    #     laikago.step(action.flatten())
-    #
-    #     if t > 400:
-    #         t = 0
-    #         laikago.reset()
+    # print(laikago.model.actuator_ctrlrange)
+    laikago.reset()
+    t = 0
+    T = 2
+    while True:
+        # print(laikago.get_true_base_roll_pitch_yaw()[2])
+        # print(laikago.get_toe_contacts())
+        t += 1
+        action = np.array([[-10, 30, -75],
+                           [10, 30, -75],
+                           [-10, 40, -75],
+                           [10, 40, -75]], dtype=np.float64)
+        if t > 60:
+            action[[0, 3], 1] += np.sin(t/T)*15
+            action[[1, 2], 1] += np.sin(t/T + np.pi)*15
+            action[[0, 3], 2] += np.sin(t/T + np.pi/2)*20
+            action[[1, 2], 2] += np.sin(t/T + np.pi/2 + np.pi)*20
+
+        action *= (np.pi/180)
+        laikago.step(action.flatten())
+
+        if t > 400:
+            t = 0
+            laikago.reset()
         # print('joint friction', laikago.model.dof_frictionloss)
         # print('geom friction', laikago.model.geom_friction)
 
