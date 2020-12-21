@@ -48,7 +48,7 @@ class LaikagoTask(object):
             else:
                 return False
         elif self.die_if_unhealthy:
-            if self.is_healthy:
+            if not self.is_healthy:
                 return True
             else:
                 return False
