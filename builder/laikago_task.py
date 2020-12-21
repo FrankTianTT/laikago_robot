@@ -36,10 +36,6 @@ class LaikagoTask(object):
         self._env = env
         self.steps = 0
 
-    @property
-    def is_healthy(self):
-        pass
-
     def update(self):
         self.steps += 1
         if self.is_healthy:
@@ -47,7 +43,7 @@ class LaikagoTask(object):
 
     def done(self):
         if self.die_after_unhealthy:
-            if self.last_healthy_step != -1 and self.last_healthy_step < self.steps + 30:
+            if self.last_healthy_step != -1 and self.last_healthy_step < self.steps - 30:
                 return True
             else:
                 return False
