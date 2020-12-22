@@ -18,22 +18,22 @@ class LaikagoRunStraightMujoco0(LaikagoRunStraightMujocoBase):
 
     @property
     def is_healthy(self):
-        return not (self.done_r_mujoco(threshold=30) or
-                    self.done_p_mujoco(threshold=45) or
-                    self.done_y_mujoco(threshold=30) or
+        return not (self.done_r_mujoco(threshold=15) or
+                    self.done_p_mujoco(threshold=30) or
+                    self.done_y_mujoco(threshold=15) or
                     self.done_x_velocity(threshold=0.3) or
-                    self.done_y_velocity(threshold=0.3) or
-                    self.done_height_mujoco(threshold=0.15))
+                    self.done_y_velocity(threshold=0.1) or
+                    self.done_height_mujoco(threshold=0.2))
 
     def cal_phi_function(self):
-        sum = self.reward_r_mujoco(threshold=30) + self.reward_p_mujoco(threshold=45) + \
-              self.reward_y_mujoco(threshold=30) + self.reward_x_velocity(threshold=0.3) + \
-              self.reward_y_velocity(threshold=0.3) + self.reward_height_mujoco(threshold=0.15)
+        sum = self.reward_r_mujoco(threshold=15) + self.reward_p_mujoco(threshold=30) + \
+              self.reward_y_mujoco(threshold=15) + self.reward_x_velocity(threshold=0.3) + \
+              self.reward_y_velocity(threshold=0.1) + self.reward_height_mujoco(threshold=0.2)
         return sum / 6
 
     def update_reward(self):
         if self.is_healthy:
-            self.add_reward(1, 1)
+            self.add_reward(self.reward_x_velocity(threshold=3), 1)
 
 class LaikagoRunStraightMujoco1(LaikagoRunStraightMujocoBase):
 
