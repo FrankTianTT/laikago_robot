@@ -18,10 +18,10 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--version", required=True, help="Version of task")
     parser.add_argument("-lv", "--load_version")
 
-    parser.add_argument("--time_steps", default=5000000)
-    parser.add_argument("--buffer_size", default=500000)
-    parser.add_argument("--learning_starts", default=1000)
-    parser.add_argument("--batch_size", default=256)
+    parser.add_argument("--time_steps", default=5000000, type=int)
+    parser.add_argument("--buffer_size", default=500000, type=int)
+    parser.add_argument("--learning_starts", default=1000, type=int)
+    parser.add_argument("--batch_size", default=256, type=int)
     parser.add_argument("--ent_coef", default='auto')
     parser.add_argument("--net_arch", default=[256, 256], nargs='+', type=int)
 
@@ -30,10 +30,7 @@ if __name__ == "__main__":
     version = args.version
     buffer_size = args.buffer_size
     batch_size = args.batch_size
-    if args.load_version is None:
-        learning_starts = args.learning_starts
-    else:
-        learning_starts = args.learning_starts * 10
+    learning_starts = args.learning_starts
     ent_coef = args.ent_coef
     time_steps = args.time_steps
     net_arch = args.net_arch
@@ -58,11 +55,13 @@ if __name__ == "__main__":
         model = SAC.load(best_model_dir, device=torch.device('cuda:0'))
         model.set_env(env)
         model.tensorboard_log = tensorboard_log
+        model.num_timesteps = 0
+        model.learning_starts = args.learning_starts
+        model.buffer_size = args.buffer_size
     else:
         model = SAC('MlpPolicy',
                     env,
                     gamma=0.99,
-                    device=torch.device('cuda:0'),
                     verbose=1,
                     tensorboard_log=tensorboard_log,
                     policy_kwargs=policy_kwargs,
