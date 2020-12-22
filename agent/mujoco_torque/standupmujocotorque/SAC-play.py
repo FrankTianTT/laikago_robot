@@ -17,15 +17,17 @@ SIMULATOR = 'mujoco_torque'
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--version", required=True, help="Version of task")
+    parser.add_argument("-lv", "--load_version")
 
     args = parser.parse_args()
     version = args.version
 
-    best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
+    if args.load_version is None:
+        best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
+    else:
+        best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(args.load_version)
 
-    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=True, ctrl_delay=True,
-                    action_repeat=5,
-                    time_step=0.003)
+    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=True, ctrl_delay=True)
     model = SAC.load(best_model_save_path, device=torch.device('cuda:0'))
 
     obs = env.reset()

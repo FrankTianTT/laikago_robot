@@ -17,15 +17,17 @@ SIMULATOR = 'mujoco'
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--version", required=True, help="Version of task")
-    parser.add_argument("-r", "--record_dir", help="If specified, sets the recording dir, default=Disabled")
+    parser.add_argument("-lv", "--load_version")
 
     args = parser.parse_args()
     version = args.version
-    record_dir = args.record_dir
 
-    best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
+    if args.load_version is None:
+        best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
+    else:
+        best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(args.load_version)
 
-    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=True, ctrl_delay=True, record_dir=record_dir)
+    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=True, ctrl_delay=True)
     model = SAC.load(best_model_save_path, device=torch.device('cuda:0'))
 
     obs = env.reset()
@@ -36,10 +38,9 @@ if __name__ == "__main__":
         #            10, 30, -75,
         #            -10, 50, -75,
         #            10, 50, -75]) * np.pi / 180
-        # action = env.action_space.sample()
-
 
         obs, reward, done, info = env.step(action)
+
         total_reward += reward
         if done:
           obs = env.reset()
