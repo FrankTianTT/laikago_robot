@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--version", required=True, help="Version of task")
     parser.add_argument("-lv", "--load_version")
-
+    parser.add_argument("--learning_rate", default=0.0003, type=float)
     parser.add_argument("--time_steps", default=5000000, type=int)
     parser.add_argument("--buffer_size", default=500000, type=int)
     parser.add_argument("--learning_starts", default=1000, type=int)
@@ -27,6 +27,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    learning_rate = args.learning_rate
     version = args.version
     buffer_size = args.buffer_size
     batch_size = args.batch_size
@@ -58,6 +59,7 @@ if __name__ == "__main__":
         model.num_timesteps = 0
         model.learning_starts = args.learning_starts
         model.buffer_size = args.buffer_size
+        model.learning_rate = learning_rate
         if ent_coef == 'auto':
             init_value = 1.0
             model.log_ent_coef = torch.log(torch.ones(1, device=model.device) * init_value).requires_grad_(True)
@@ -67,6 +69,7 @@ if __name__ == "__main__":
                     env,
                     gamma=0.99,
                     verbose=1,
+                    learning_rate=learning_rate,
                     tensorboard_log=tensorboard_log,
                     policy_kwargs=policy_kwargs,
                     buffer_size=buffer_size,
