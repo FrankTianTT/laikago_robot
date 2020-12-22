@@ -62,3 +62,21 @@ class LaikagoRunStraightMujoco2(LaikagoRunStraightMujocoBase):
         if self.is_healthy:
             self.add_reward(self.reward_x_velocity(threshold=3), 1)
             self.add_reward(self.reward_y_velocity(threshold=0.1), 1)
+
+class LaikagoRunStraightMujoco3(LaikagoRunStraightMujocoBase):
+
+    def __init__(self, run_mode='train', reward_mode='with_shaping'):
+        super(LaikagoRunStraightMujoco3, self).__init__(run_mode=run_mode,
+                                                    reward_mode=reward_mode)
+        self.die_if_unhealthy = True
+
+    @property
+    def is_healthy(self):
+        return not (self.done_r_mujoco(threshold=30) or
+                    self.done_p_mujoco(threshold=60) or
+                    self.done_height_mujoco(threshold=0.2))
+
+    def update_reward(self):
+        if self.is_healthy:
+            self.add_reward(self.reward_x_velocity(threshold=3), 1)
+            self.add_reward(self.reward_y_velocity(threshold=0.1), 1)
