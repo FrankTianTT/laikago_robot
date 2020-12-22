@@ -20,7 +20,6 @@ class LaikagoStandUpMujocoBase(LaikagoTaskMujoco):
                     self.done_y_mujoco(threshold=30) or
                     self.done_height_mujoco(threshold=0.2))
 
-
 class LaikagoStandUpMujoco0(LaikagoStandUpMujocoBase):
 
     def __init__(self, run_mode='train', reward_mode='with_shaping'):

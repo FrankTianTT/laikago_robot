@@ -17,7 +17,7 @@ class LaikagoTaskMujoco(LaikagoTask):
                  run_mode='train',
                  reward_mode='without_shaping',
                  die_if_unhealthy=False,
-                 max_episode_steps=200,
+                 max_episode_steps=1000,
                  init_pose=InitPose.STAND,
                  contact_buffer_length=5):
         super(LaikagoTaskMujoco, self).__init__(run_mode=run_mode,
@@ -241,7 +241,7 @@ class LaikagoTaskMujoco(LaikagoTask):
     def done_speed_mujoco(self, threshold=0.1):
         base_vel = self._env.transfer.laikago.get_velocity_for_reward()
         s = base_vel[0] ** 2 + base_vel[1] ** 2 + base_vel[2] ** 2
-        # print('speed:', math.sqrt(x))
+        print('speed:', math.sqrt(s))
         done = s > threshold ** 2
         if done and self.run_mode is "report_done":
             print(self.get_function_name())
