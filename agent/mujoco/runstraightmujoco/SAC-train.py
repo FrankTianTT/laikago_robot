@@ -19,7 +19,7 @@ if __name__ == "__main__":
     parser.add_argument("-lv", "--load_version")
 
     parser.add_argument("--time_steps", default=5000000)
-    parser.add_argument("--buffer_size", default=1000000)
+    parser.add_argument("--buffer_size", default=500000)
     parser.add_argument("--learning_starts", default=1000)
     parser.add_argument("--batch_size", default=256)
     parser.add_argument("--ent_coef", default='auto')
@@ -30,7 +30,10 @@ if __name__ == "__main__":
     version = args.version
     buffer_size = args.buffer_size
     batch_size = args.batch_size
-    learning_starts = args.learning_starts
+    if args.load_version is None:
+        learning_starts = args.learning_starts
+    else:
+        learning_starts = args.learning_starts * 10
     ent_coef = args.ent_coef
     time_steps = args.time_steps
     net_arch = args.net_arch
