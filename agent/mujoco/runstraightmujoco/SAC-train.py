@@ -58,6 +58,10 @@ if __name__ == "__main__":
         model.num_timesteps = 0
         model.learning_starts = args.learning_starts
         model.buffer_size = args.buffer_size
+        if ent_coef == 'auto':
+            init_value = 1.0
+            model.log_ent_coef = torch.log(torch.ones(1, device=model.device) * init_value).requires_grad_(True)
+            model.ent_coef_optimizer = torch.optim.Adam([model.log_ent_coef], lr=model.lr_schedule(1))
     else:
         model = SAC('MlpPolicy',
                     env,
