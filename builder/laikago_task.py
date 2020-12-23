@@ -16,7 +16,7 @@ class LaikagoTask(object):
                  init_pose=InitPose.STAND,
                  reward_mode='with_shaping',
                  die_if_unhealthy=False,
-                 max_episode_steps=200):
+                 max_episode_steps=500):
         self._env = None
         self.run_mode = run_mode
         self.init_pose = init_pose
