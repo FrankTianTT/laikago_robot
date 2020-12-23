@@ -23,13 +23,15 @@ class LaikagoRunStraightMujoco0(LaikagoRunStraightMujocoBase):
                     self.done_y_mujoco(threshold=15) or
                     self.done_x_velocity(threshold=0.3) or
                     self.done_y_velocity(threshold=0.1) or
-                    self.done_height_mujoco(threshold=0.2))
+                    self.done_height_mujoco(threshold=0.2 or
+                    self.done_toe_distance(threshold=0.05)))
 
     def cal_phi_function(self):
         sum = self.reward_r_mujoco(threshold=15) + self.reward_p_mujoco(threshold=30) + \
               self.reward_y_mujoco(threshold=15) + self.reward_x_velocity(threshold=0.3) + \
-              self.reward_y_velocity(threshold=0.1) + self.reward_height_mujoco(threshold=0.2)
-        return sum / 6
+              self.reward_y_velocity(threshold=0.1) + self.reward_height_mujoco(threshold=0.2) + \
+              self.reward_toe_distance(threshold=0.05)
+        return sum / 7
 
     def update_reward(self):
         if self.is_healthy:
