@@ -16,7 +16,8 @@ class LaikagoTask(object):
                  init_pose=InitPose.STAND,
                  reward_mode='with_shaping',
                  die_if_unhealthy=False,
-                 max_episode_steps=500):
+                 max_episode_steps=500,
+                 shaping_coef=0.3):
         self._env = None
         self.run_mode = run_mode
         self.init_pose = init_pose
@@ -28,6 +29,7 @@ class LaikagoTask(object):
         self.steps = 0
         # phi is a function of s, a, s', a' and t
         self.phi_last_state = 0
+        self.shaping_coef =shaping_coef
 
         self.last_healthy_step = -1
         self.die_after_unhealthy = False
@@ -90,7 +92,7 @@ class LaikagoTask(object):
             phi_this_state = self.cal_phi_function()
             shaping_reward = phi_this_state - self.phi_last_state
             self.phi_last_state = phi_this_state
-            return reward + shaping_reward
+            return reward + shaping_reward * self.shaping_coef
         else:
             return reward
 

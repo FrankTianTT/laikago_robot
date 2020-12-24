@@ -37,10 +37,10 @@ class LaikagoStandUpMujoco0(LaikagoStandUpMujocoBase):
                     self.done_toe_distance(threshold=0.1))
 
     def cal_phi_function(self):
-        sum = self.reward_r_mujoco(threshold=10) + self.reward_p_mujoco(threshold=10) + \
-              self.reward_y_mujoco(threshold=10) + self.reward_speed_mujoco(threshold=0.3) + \
-              self.reward_height_mujoco(threshold=0.25) + \
-              self.reward_toe_distance(threshold=0.1)
+        sum = self.reward_r_mujoco(threshold=5) + self.reward_p_mujoco(threshold=5) + \
+              self.reward_y_mujoco(threshold=5) + self.reward_speed_mujoco(threshold=0.15) + \
+              self.reward_height_mujoco(threshold=0.5) + \
+              self.reward_toe_distance(threshold=0.2)
         return sum / 6
 
     def update_reward(self):
