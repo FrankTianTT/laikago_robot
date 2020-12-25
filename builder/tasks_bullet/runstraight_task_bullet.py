@@ -82,6 +82,5 @@ class LaikagoRunStraightBullet2(LaikagoRunStraightBulletBase):
         return sum
 
     def update_reward(self):
-        self.reward_toe_height_bullet()
         if self.is_healthy:
             self.add_reward(self.reward_energy(), 1)

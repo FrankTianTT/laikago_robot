@@ -60,15 +60,15 @@ class LaikagoStandUpMujoco1(LaikagoStandUpMujocoBase):
         return not (self.done_r_mujoco(threshold=10) or
                     self.done_p_mujoco(threshold=10) or
                     self.done_y_mujoco(threshold=10) or
-                    self.done_toe_contact_long(threshold=9) or
+                    self.done_speed_mujoco(threshold=0.3) or
                     self.done_height_mujoco(threshold=0.25) or
-                    self.done_toe_distance(threshold=0.1))
+                    self.done_toe_distance(threshold=0.15))
 
     def cal_phi_function(self):
-        sum = self.reward_r_mujoco(threshold=10) + self.reward_p_mujoco(threshold=10) + \
-              self.reward_y_mujoco(threshold=10) + self.reward_toe_contact_long(threshold=9) + \
-              self.reward_height_mujoco(threshold=0.25) + \
-              self.reward_toe_distance(threshold=0.1)
+        sum = self.reward_r_mujoco(threshold=5) + self.reward_p_mujoco(threshold=5) + \
+              self.reward_y_mujoco(threshold=5) + self.reward_speed_mujoco(threshold=0.15) + \
+              self.reward_height_mujoco(threshold=0.5) + \
+              self.reward_toe_distance(threshold=0.3)
         return sum / 6
 
     def update_reward(self):

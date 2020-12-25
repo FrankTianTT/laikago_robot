@@ -241,7 +241,7 @@ class LaikagoTaskMujoco(LaikagoTask):
     def done_speed_mujoco(self, threshold=0.1):
         base_vel = self._env.transfer.laikago.get_velocity_for_reward()
         s = base_vel[0] ** 2 + base_vel[1] ** 2 + base_vel[2] ** 2
-        print('speed:', math.sqrt(s))
+        # print('speed:', math.sqrt(s))
         done = s > threshold ** 2
         if done and self.run_mode is "report_done":
             print(self.get_function_name())
