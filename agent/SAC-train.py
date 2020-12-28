@@ -17,6 +17,7 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--run_mode', default='train')
     parser.add_argument('-s', '--simulator', default='mujoco')
 
+    parser.add_argument("--learning_rate", default=0.0003, type=float)
     parser.add_argument("--time_steps", default=5000000)
     parser.add_argument("--buffer_size", default=1000000)
     parser.add_argument("--learning_starts", default=1000)
@@ -26,6 +27,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    learning_rate = args.learning_rate
     version = args.version
     task_name = args.task_name
     run_mode = args.run_mode
@@ -58,10 +60,20 @@ if __name__ == "__main__":
         model = SAC.load(best_model_dir, device=torch.device('cuda:0'))
         model.set_env(env)
         model.tensorboard_log = tensorboard_log
+        model.num_timesteps = 0
+        model.learning_starts = args.learning_starts
+        model.buffer_size = args.buffer_size
+        model.learning_rate = learning_rate
+        if ent_coef == 'auto':
+            init_value = 1.0
+            model.log_ent_coef = torch.log(torch.ones(1, device=model.device) * init_value).requires_grad_(True)
+            model.ent_coef_optimizer = torch.optim.Adam([model.log_ent_coef], lr=model.lr_schedule(1))
+
     else:
         model = SAC('MlpPolicy',
                     env,
                     gamma=0.99,
+                    learning_rate=learning_rate,
                     device=torch.device('cuda:0'),
                     verbose=1,
                     tensorboard_log=tensorboard_log,
