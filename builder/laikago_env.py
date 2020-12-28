@@ -54,7 +54,7 @@ class LaikagoEnv(gym.Env):
 
         done = self.task.done()
         reward = self.task.reward()
-        return obs, reward, done, {}
+        return obs, reward, done, {'energy': energy}
 
     def reset(self):
         obs = self.transfer.reset()

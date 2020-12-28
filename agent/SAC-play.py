@@ -5,29 +5,30 @@ import argparse
 import importlib
 import sys
 from os.path import abspath, join, dirname
-sys.path.insert(0, dirname(dirname(dirname(dirname(abspath(__file__))))))
+sys.path.insert(0, dirname(dirname(abspath(__file__))))
 from builder.env_builder import build_env
 import numpy as np
-
-TASK_NAME = 'standup'
-ClASS_NAME = 'StandUp'
-RUN_MODE = 'train'
-SIMULATOR = 'mujoco'
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--version", required=True, help="Version of task")
     parser.add_argument("-lv", "--load_version")
+    parser.add_argument('-t', '--task_name', default='standup')
+    parser.add_argument('-m', '--run_mode', default='train')
+    parser.add_argument('-s', '--simulator', default='mujoco')
 
     args = parser.parse_args()
     version = args.version
+    task_name = args.task_name
+    run_mode = args.run_mode
+    simulator = args.simulator
 
     if args.load_version is None:
-        best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(version)
+        best_model_save_path = './{}/{}/SAC-v{}/logs/best_model.zip'.format(simulator, task_name, version)
     else:
-        best_model_save_path = './SAC-v{}/logs/best_model.zip'.format(args.load_version)
+        best_model_save_path = './{}/{}/SAC-v{}/logs/best_model.zip'.format(simulator, task_name, version)
 
-    env = build_env(TASK_NAME, ClASS_NAME, version, RUN_MODE, SIMULATOR, visual=True, ctrl_delay=True)
+    env = build_env(task_name, version, run_mode, simulator, visual=True, ctrl_delay=True)
     model = SAC.load(best_model_save_path, device=torch.device('cuda:0'))
 
     obs = env.reset()
@@ -40,6 +41,8 @@ if __name__ == "__main__":
         #            10, 50, -75]) * np.pi / 180
         # action = env.action_space.sample()
         obs, reward, done, info = env.step(action)
+
+        print(info['energy'])
 
         total_reward += reward
         if done:

@@ -103,6 +103,7 @@ class Laikago(object):
             raise NotImplementedError
         else:
             raise RuntimeError('Unknown initial pose')
+
         init_qpos.extend(laikago_constant.INIT_ORIENTATION)
         self.sim.data.set_joint_qpos('root', init_qpos)
         self.sim.forward()

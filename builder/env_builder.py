@@ -1,4 +1,5 @@
 import importlib
+import builder
 from builder.laikago_env import LaikagoEnv
 from gym.wrappers.time_limit import TimeLimit
 from gym.wrappers import Monitor
@@ -11,7 +12,6 @@ def str2Hump(text):
     return hump
 
 def build_env(task_name,
-              class_name,
               version,
               run_mode,
               simulator,
@@ -20,6 +20,7 @@ def build_env(task_name,
               action_repeat=20,
               time_step=0.001,
               record_dir=None):
+    class_name = builder.task_name2class_name[task_name]
     task_import = importlib.import_module('builder.tasks_' + simulator + '.' + task_name + '_task_' + simulator)
     task = eval('task_import.Laikago' + class_name + str2Hump(simulator) +'{}(run_mode="'.format(version) + run_mode + '")')
     env = LaikagoEnv(task=task,
