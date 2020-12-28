@@ -26,7 +26,7 @@ if __name__ == "__main__":
     if args.load_version is None:
         best_model_save_path = './{}/{}/SAC-v{}/logs/best_model.zip'.format(simulator, task_name, version)
     else:
-        best_model_save_path = './{}/{}/SAC-v{}/logs/best_model.zip'.format(simulator, task_name, version)
+        best_model_save_path = './{}/{}/SAC-v{}/logs/best_model.zip'.format(simulator, task_name, args.load_version)
 
     env = build_env(task_name, version, run_mode, simulator, visual=True, ctrl_delay=True)
     model = SAC.load(best_model_save_path, device=torch.device('cuda:0'))
