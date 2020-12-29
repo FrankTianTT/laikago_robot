@@ -260,8 +260,8 @@ class LaikagoTaskMujoco(LaikagoTask):
 
     def reward_toe_contact(self):
         contact = self._env.get_history_toe_collision()[0]
-        reward = 1 if sum(contact) == 4 else 0
-        return self.normalize_reward(reward, 0, 1)
+        reward = (sum(contact) + 4) / 2
+        return reward
 
     def reward_toe_height_mujoco(self, threshold=0.03):
         max_height = max(self._env.transfer.laikago.get_toe_height_for_reward())
