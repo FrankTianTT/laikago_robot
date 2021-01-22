@@ -18,8 +18,7 @@ def build_env(task_name,
               visual,
               ctrl_delay,
               action_repeat=20,
-              time_step=0.001,
-              record_dir=None):
+              time_step=0.001):
     class_name = builder.task_name2class_name[task_name]
     task_import = importlib.import_module('builder.tasks_' + simulator + '.' + task_name + '_task_' + simulator)
     task = eval('task_import.Laikago' + class_name + str2Hump(simulator) +'{}(run_mode="'.format(version) + run_mode + '")')
@@ -34,8 +33,7 @@ def build_env(task_name,
 
 if __name__ == '__main__':
     TASK_NAME = 'standup'
-    ClASS_NAME = 'StandUp'
     RUN_MODE = 'report_done'
     SIMULATOR = 'mujoco_torque'
 
-    build_env(TASK_NAME, ClASS_NAME, version=0, run_mode=RUN_MODE, simulator=SIMULATOR, visual=True, ctrl_delay=True)
+    build_env(TASK_NAME, version=0, run_mode=RUN_MODE, simulator=SIMULATOR, visual=True, ctrl_delay=True)
