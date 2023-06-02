@@ -10,7 +10,7 @@ The project has 4 modules, which are
 
 These four modules are described in detail below
 
-###robot
+### robot
 
 In this module, we use a python program to simulate a laikago as accurately as possible where C++ is using in the real environment. The task of this module is to make the latter three modules (at the program level) in the real environment and the simulation environment runs without distinction.
 
@@ -22,8 +22,8 @@ At the same time, we use torque control instead of position control at this laye
 Calculating torque by position is one of the tasks of transfer.
 
 The robot provides two observations, namely:
-- get_true_observation: real observation, used to calculate reward
-- get_observation: Observations with random noise added, used as input to the neural network
+- `get_true_observation`: real observation, used to calculate reward
+- `get_observation`: Observations with random noise added, used as input to the neural network
 
 ### transfer
 
@@ -37,3 +37,6 @@ The accusations of this module mainly include:
 ### builder
 
 Combining the underlying data from the transfer layer with the task, and meeting the interface specifications of the env class in the gym, forms an environment that can be directly used for reinforcement learning algorithm learning.
+
+### agent
+Reinforcement learning algorithm from [Stable-baselines](https://github.com/DLR-RM/stable-baselines3) is using.
